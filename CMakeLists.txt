@@ -19,11 +19,6 @@ option(COMPILE_TESTS "Compile test" OFF)
 #PAMELA
 add_subdirectory (PAMELA)
 
-#Visualization
-#if(COMPILE_VISUALIZATION)
-#   add_subdirectory (visualization)
-#endif(COMPILE_VISUALIZATION)
-
 
 # #Examples
 if(COMPILE_EXAMPLES)

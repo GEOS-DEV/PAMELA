@@ -98,7 +98,7 @@ public:
 
 protected:
 
-	virtual ~ElementBase() = 0 {}
+	//virtual ~ElementBase() = 0; 
 	ELEMENTS::TYPE m_vtkType;
 	ELEMENTS::FAMILY m_family;
 

@@ -1,7 +1,7 @@
 #include "PAMELA.hpp"
 #include <iostream>
 #include "Mesh/MeshFactory.hpp"
-#include "Mesh/mesh.hpp"
+#include "Mesh/Mesh.hpp"
 #include "Utils/Communicator.hpp"
 #include <thread>
 #include "Adjacency/Adjacency.hpp"

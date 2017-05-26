@@ -40,7 +40,7 @@ public:
 
 protected:
 
-	virtual ~EnsembleBase()=0 {}
+	//virtual ~EnsembleBase()=0;// {}
 
 
 	//Sizes

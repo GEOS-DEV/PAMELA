@@ -1,6 +1,6 @@
 #include "Adjacency/Adjacency.hpp"
 #include "Utils/Logger.hpp"
-#include "Elements/polyhedron.hpp"
+#include "Elements/Polyhedron.hpp"
 
 std::pair<std::vector<int>, std::vector<int>> Adjacency::get_SingleElementAdjacency(int i) const
 {

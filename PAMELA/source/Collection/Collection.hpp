@@ -105,7 +105,7 @@ public:
 		}
 		auto grp = m_labelToGroup[label];
 		grp->push_back_unique(Element);
-		auto add = push_back_unique(Element);
+		auto add = this->push_back_unique(Element);
 		return add;
 	}
 

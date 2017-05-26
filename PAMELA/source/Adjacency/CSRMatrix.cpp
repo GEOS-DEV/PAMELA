@@ -68,7 +68,7 @@ void CSRMatrix::sortRowIndexAndMoveValues(int i)
 
 	//Sort
 	std::sort(std::begin(zipped), std::end(zipped),
-		[&](const auto& a, const auto& b)
+		[&](const std::pair<int, int>& a, const std::pair<int, int>& b)
 	{
 		return a.first < b.first;
 	});

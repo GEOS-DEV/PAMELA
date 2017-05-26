@@ -17,7 +17,7 @@ public:
 		m_family = ELEMENTS::FAMILY::POINT;
 	}
 
-	virtual ~Element() = 0 {}
+	//virtual ~Element() = 0;// {}
 
 	//Getters
 	const Coordinates& get_coordinates() const  { return m_coordinates; }

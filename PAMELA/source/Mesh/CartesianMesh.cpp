@@ -1,4 +1,3 @@
-#pragma once
 #include<string>
 #include "CartesianMesh.hpp"
 #include "Utils/Logger.hpp"

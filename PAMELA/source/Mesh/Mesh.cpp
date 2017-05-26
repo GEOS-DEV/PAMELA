@@ -3,7 +3,9 @@
 #include "Adjacency/Adjacency.hpp"
 #include "Utils/Communicator.hpp"
 #include <functional>
+#ifdef WITH_MPI
 #include <metis.h>
+#endif
 #include <algorithm>  
 #include "Utils/VectorUtils.hpp"
 

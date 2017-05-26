@@ -19,7 +19,7 @@ public:
 	{
 		m_family = ELEMENTS::FAMILY::POLYHEDRON;
 	}
-	virtual ~Element() = 0 {}
+	//virtual ~Element() = 0;// {}
 
 	virtual std::vector<Polygon*> CreateFaces() { return {}; }
 

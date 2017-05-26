@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cmath>
 
 
 struct Coordinates
@@ -30,5 +31,5 @@ inline std::vector <double> cross_product(const std::vector <double>& vec1, cons
 
 inline double norm(const std::vector <double>& vec)
 {
-	return sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
+	return std::sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
 }

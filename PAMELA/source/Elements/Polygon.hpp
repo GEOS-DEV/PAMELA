@@ -19,7 +19,7 @@ public:
 	{
 		m_family = ELEMENTS::FAMILY::POLYGON;
 	}
-	virtual ~Element() = 0 {}
+	//virtual ~Element() = 0;// {}
 
 	//Getters
 	ELEMENTS::TYPE get_vtkType() const {return m_vtkType;}

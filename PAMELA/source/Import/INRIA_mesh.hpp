@@ -13,7 +13,7 @@ enum class INRIA_MESH_TYPE{VERTEX,TRIANGLE,EDGE,QUADRILATERAL,TETRAHEDRON,PENTRA
 
 	private:
 
-		virtual ~INRIA_mesh()=0{ };
+		virtual ~INRIA_mesh()=0;//{ };
 
 		static std::string m_label;
 		static int m_dimension;

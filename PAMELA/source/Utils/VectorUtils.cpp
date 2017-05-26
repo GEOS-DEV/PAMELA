@@ -32,7 +32,7 @@ int vectorUtils::MostOccuringValue(std::vector<int> vec)
 std::vector<int> vectorUtils::Vector2VectorMapping(const std::vector<int>& map_vec, const std::vector<int>& source_vec)
 {
 
-	int size = map_vec.size();
+	int size = static_cast<int>(map_vec.size());
 	std::vector<int> res(size);
 	for (auto i=0;i<size;++i)
 	{

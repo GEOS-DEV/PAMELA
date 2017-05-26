@@ -5,7 +5,7 @@
 #include "Elements/Polygon.hpp"
 #include "Elements/Polyhedron.hpp"
 #include "Collection/Collection.hpp"
-#include "Utils/types.hpp"
+#include "Utils/Types.hpp"
 #include "Elements/Line.hpp"
 
 

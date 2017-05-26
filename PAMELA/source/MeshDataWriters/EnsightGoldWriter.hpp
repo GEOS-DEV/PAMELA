@@ -1,6 +1,6 @@
 #pragma once
 // Library includes
-#include "Mesh/mesh.hpp"
+#include "Mesh/Mesh.hpp"
 #include "Utils/Types.hpp"
 #include "Utils/Communicator.hpp"
 #include "Elements/Element.hpp"

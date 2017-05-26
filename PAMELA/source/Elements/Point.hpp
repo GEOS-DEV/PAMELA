@@ -3,52 +3,57 @@
 #include "Elements/Element.hpp"
 #include "Utils/Assert.hpp"
 
-template <typename T>
-class Collection;
-
-
-template <>
-class Element<ELEMENTS::FAMILY::POINT> : public ElementBase
+namespace PAMELA
 {
-public:
 
-	Element(int index, double x, double y, double z) :ElementBase(), m_coordinates(Coordinates(x, y, z))
+	template <typename T>
+	class Collection;
+
+
+	template <>
+	class Element<ELEMENTS::FAMILY::POINT> : public ElementBase
 	{
-		m_family = ELEMENTS::FAMILY::POINT;
-	}
+	public:
 
-	//virtual ~Element() = 0;// {}
+		Element(int index, double x, double y, double z) :ElementBase(), m_coordinates(Coordinates(x, y, z))
+		{
+			m_family = ELEMENTS::FAMILY::POINT;
+		}
 
-	//Getters
-	const Coordinates& get_coordinates() const  { return m_coordinates; }
-	Coordinates& get_coordinates() { return m_coordinates; }
+		//virtual ~Element() = 0;// {}
 
-
-protected:
-
-	Coordinates m_coordinates;
-
-};
-typedef Element<ELEMENTS::FAMILY::POINT> Point;
+		//Getters
+		const Coordinates& get_coordinates() const { return m_coordinates; }
+		Coordinates& get_coordinates() { return m_coordinates; }
 
 
+	protected:
 
-template <ELEMENTS::TYPE elementType>
-class ElementSpe<ELEMENTS::FAMILY::POINT, elementType> : public Element<ELEMENTS::FAMILY::POINT>
-{
-public:
+		Coordinates m_coordinates;
 
-	ElementSpe(int index, double x, double y, double z) :Element(index, x, y, z)
+	};
+	typedef Element<ELEMENTS::FAMILY::POINT> Point;
+
+
+
+	template <ELEMENTS::TYPE elementType>
+	class ElementSpe<ELEMENTS::FAMILY::POINT, elementType> : public Element<ELEMENTS::FAMILY::POINT>
 	{
-		ELEMENTS::nVertex.at(elementType);
-		ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
-		m_vtkType = elementType;
-	}
+	public:
 
-	~ElementSpe() {};
+		ElementSpe(int index, double x, double y, double z) :Element(index, x, y, z)
+		{
+			ELEMENTS::nVertex.at(elementType);
+			ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
+			m_vtkType = elementType;
+		}
 
-private:
+		~ElementSpe() {};
+
+	private:
 
 
-};
-typedef ElementSpe<ELEMENTS::FAMILY::POINT, ELEMENTS::TYPE::VTK_VERTEX> Vertex;
+	};
+	typedef ElementSpe<ELEMENTS::FAMILY::POINT, ELEMENTS::TYPE::VTK_VERTEX> Vertex;
+
+}

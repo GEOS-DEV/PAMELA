@@ -4,52 +4,57 @@
 #include "Elements/Element.hpp"
 #include "Utils/Assert.hpp"
 
-template <typename T>
-class Collection;
-
-template<>
-class Element<ELEMENTS::FAMILY::LINE> : public ElementBase
+namespace PAMELA
 {
-public:
 
-	Element(int index,const std::vector<Point*>& vertexList) :ElementBase(), m_vertexList(vertexList)
+	template <typename T>
+	class Collection;
+
+	template<>
+	class Element<ELEMENTS::FAMILY::LINE> : public ElementBase
 	{
-		m_family = ELEMENTS::FAMILY::LINE;
-	}
+	public:
 
-	//virtual ~Element() = 0;// {}
+		Element(int index, const std::vector<Point*>& vertexList) :ElementBase(), m_vertexList(vertexList)
+		{
+			m_family = ELEMENTS::FAMILY::LINE;
+		}
 
-	//Getter
-	const std::vector<Point*>& get_vertexList() const { return m_vertexList; };
-	
-protected:
+		//virtual ~Element() = 0;// {}
 
-	std::vector<Point*> m_vertexList;
+		//Getter
+		const std::vector<Point*>& get_vertexList() const { return m_vertexList; };
 
-	//Functions
-	virtual double get_length() = 0;
-	virtual Coordinates get_centroidLocation() = 0;
+	protected:
 
-};
+		std::vector<Point*> m_vertexList;
 
-typedef Element<ELEMENTS::FAMILY::LINE> Line;
+		//Functions
+		virtual double get_length() = 0;
+		virtual Coordinates get_centroidLocation() = 0;
 
-template <ELEMENTS::TYPE elementType>
-class ElementSpe<ELEMENTS::FAMILY::LINE, elementType> : public Element<ELEMENTS::FAMILY::LINE>
-{
-public:
-	ElementSpe(int index, const std::vector<Point*>& vertexList) :Element(index,vertexList)
+	};
+
+	typedef Element<ELEMENTS::FAMILY::LINE> Line;
+
+	template <ELEMENTS::TYPE elementType>
+	class ElementSpe<ELEMENTS::FAMILY::LINE, elementType> : public Element<ELEMENTS::FAMILY::LINE>
 	{
-		ELEMENTS::nVertex.at(elementType);
-		ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
-		m_vtkType = elementType;
-	}
-	~ElementSpe() {};
+	public:
+		ElementSpe(int index, const std::vector<Point*>& vertexList) :Element(index, vertexList)
+		{
+			ELEMENTS::nVertex.at(elementType);
+			ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
+			m_vtkType = elementType;
+		}
+		~ElementSpe() {};
 
-private:
+	private:
 
-	//Functions
-	double get_length() { return 0; };
-	Coordinates get_centroidLocation() { return Coordinates(); };
+		//Functions
+		double get_length() { return 0; };
+		Coordinates get_centroidLocation() { return Coordinates(); };
 
-};
+	};
+
+}

@@ -2,8 +2,10 @@
 #include <vector>
 #include "Mesh/UnstructuredMesh.hpp"
 #include <fstream>
+namespace PAMELA
+{
 
-enum class INRIA_MESH_TYPE{VERTEX,TRIANGLE,EDGE,QUADRILATERAL,TETRAHEDRON,PENTRAHEDRON,HEXAHEDRON};
+	enum class INRIA_MESH_TYPE { VERTEX, TRIANGLE, EDGE, QUADRILATERAL, TETRAHEDRON, PENTRAHEDRON, HEXAHEDRON };
 
 	class INRIA_mesh
 	{
@@ -13,7 +15,7 @@ enum class INRIA_MESH_TYPE{VERTEX,TRIANGLE,EDGE,QUADRILATERAL,TETRAHEDRON,PENTRA
 
 	private:
 
-		virtual ~INRIA_mesh()=0;//{ };
+		virtual ~INRIA_mesh() = 0;//{ };
 
 		static std::string m_label;
 		static int m_dimension;
@@ -27,5 +29,7 @@ enum class INRIA_MESH_TYPE{VERTEX,TRIANGLE,EDGE,QUADRILATERAL,TETRAHEDRON,PENTRA
 
 		static void InitElementsMapping();
 
-	
+
 	};
+
+}

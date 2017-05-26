@@ -2,12 +2,16 @@
 #include <vector>
 
 
-namespace vectorUtils
+namespace PAMELA
 {
 
+	namespace vectorUtils
+	{
 
-	int MostOccuringValue(std::vector<int> vec);
 
-	std::vector<int> Vector2VectorMapping(const std::vector<int>& map_vec, const std::vector<int>& source_vec);
+		int MostOccuringValue(std::vector<int> vec);
 
+		std::vector<int> Vector2VectorMapping(const std::vector<int>& map_vec, const std::vector<int>& source_vec);
+
+	}
 }

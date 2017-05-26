@@ -9,6 +9,8 @@
 int main(int argc, const char * argv[]) 
 {
 
+	using namespace PAMELA;
+
 	//std::this_thread::sleep_for(std::chrono::seconds(5));
 
 	Communicator::initialize();

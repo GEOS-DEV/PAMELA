@@ -1,6 +1,4 @@
 #pragma once
-#ifndef CSRGRAPH_HPP_INCLUDED
-#define CSRGRAPH_HPP_INCLUDED
 
 // Project includes
 #include "Utils/Utils.hpp"
@@ -9,83 +7,88 @@
 #include <vector>
 #include <algorithm>
 
-template <typename SizeType, typename IndexType, typename DataType>
-class CSRGraph
+namespace PAMELA
 {
-public:
 
-  using size_type  = SizeType;
-  using index_type = IndexType;
-  using data_type  = DataType;
+	template <typename SizeType, typename IndexType, typename DataType>
+	class CSRGraph
+	{
+	public:
 
-  using row_start_vec = std::vector<size_type>;
-  using adj_index_vec = std::vector<index_type>;
-  using adj_data_vec  = std::vector<data_type>;
+		using size_type = SizeType;
+		using index_type = IndexType;
+		using data_type = DataType;
 
-  CSRGraph();
+		using row_start_vec = std::vector<size_type>;
+		using adj_index_vec = std::vector<index_type>;
+		using adj_data_vec = std::vector<data_type>;
 
-  CSRGraph(size_type nvert, size_type nedge);
+		CSRGraph();
 
-  template<typename SizeType2, typename IndexType2, typename DataType2>
-  explicit CSRGraph(const CSRGraph<SizeType2, IndexType2, DataType2>& other);
+		CSRGraph(size_type nvert, size_type nedge);
 
-  virtual ~CSRGraph();
+		template<typename SizeType2, typename IndexType2, typename DataType2>
+		explicit CSRGraph(const CSRGraph<SizeType2, IndexType2, DataType2>& other);
 
-  void resize(size_type nvert, size_type nedge);
+		virtual ~CSRGraph();
 
-  size_type getNumNodes() const { return m_row_start.size() - 1; }
-  size_type getNumEdges() const { return m_adj_index.size(); }
+		void resize(size_type nvert, size_type nedge);
 
-  row_start_vec& getRowStart() { return m_row_start; }
-  adj_index_vec& getAdjIndex() { return m_adj_index; }
-  adj_data_vec&  getAdjData()  { return m_adj_data;  }
+		size_type getNumNodes() const { return m_row_start.size() - 1; }
+		size_type getNumEdges() const { return m_adj_index.size(); }
 
-  const row_start_vec& getRowStart() const { return m_row_start; }
-  const adj_index_vec& getAdjIndex() const { return m_adj_index; }
-  const adj_data_vec&  getAdjData()  const { return m_adj_data; }
+		row_start_vec& getRowStart() { return m_row_start; }
+		adj_index_vec& getAdjIndex() { return m_adj_index; }
+		adj_data_vec&  getAdjData() { return m_adj_data; }
 
-private:
+		const row_start_vec& getRowStart() const { return m_row_start; }
+		const adj_index_vec& getAdjIndex() const { return m_adj_index; }
+		const adj_data_vec&  getAdjData()  const { return m_adj_data; }
 
-  row_start_vec m_row_start;
-  adj_index_vec m_adj_index;
-  adj_data_vec  m_adj_data;
+	private:
 
-};
+		row_start_vec m_row_start;
+		adj_index_vec m_adj_index;
+		adj_data_vec  m_adj_data;
 
-template <typename SizeType, typename IndexType, typename DataType>
-CSRGraph<SizeType, IndexType, DataType>::CSRGraph()
-{
+	};
+
+	template <typename SizeType, typename IndexType, typename DataType>
+	CSRGraph<SizeType, IndexType, DataType>::CSRGraph()
+	{
+	}
+
+	template <typename SizeType, typename IndexType, typename DataType>
+	CSRGraph<SizeType, IndexType, DataType>::CSRGraph(size_type nvert, size_type nedge)
+	{
+		resize(nvert, nedge);
+	}
+
+	template <typename SizeType, typename IndexType, typename DataType>
+	template<typename SizeType2, typename IndexType2, typename DataType2>
+	CSRGraph<SizeType, IndexType, DataType>::CSRGraph(const CSRGraph<SizeType2, IndexType2, DataType2>& other)
+	{
+		m_row_start.resize(other.getNumNodes() + 1);
+		m_adj_index.resize(other.getNumEdges());
+		m_adj_data.resize(other.getNumEdges());
+
+		utils::copy(other.getRowStart().begin(), other.getRowStart().end(), m_row_start.begin());
+		utils::copy(other.getAdjIndex().begin(), other.getAdjIndex().end(), m_adj_index.begin());
+		utils::copy(other.getAdjData().begin(), other.getAdjData().end(), m_adj_data.begin());
+	}
+
+	template <typename SizeType, typename IndexType, typename DataType>
+	CSRGraph<SizeType, IndexType, DataType>::~CSRGraph()
+	{
+	}
+
+	template <typename SizeType, typename IndexType, typename DataType>
+	void CSRGraph<SizeType, IndexType, DataType>::resize(size_type nvert, size_type nedge)
+	{
+		m_row_start.resize(nvert + 1);
+		m_adj_index.resize(nedge);
+		m_adj_data.resize(nedge);
+	}
+
 }
 
-template <typename SizeType, typename IndexType, typename DataType>
-CSRGraph<SizeType, IndexType, DataType>::CSRGraph(size_type nvert, size_type nedge)
-{
-  resize(nvert, nedge);
-}
-
-template <typename SizeType, typename IndexType, typename DataType>
-template<typename SizeType2, typename IndexType2, typename DataType2>
-CSRGraph<SizeType, IndexType, DataType>::CSRGraph(const CSRGraph<SizeType2, IndexType2, DataType2>& other)
-{
-  m_row_start.resize(other.getNumNodes() + 1);
-  m_adj_index.resize(other.getNumEdges());
-  m_adj_data.resize(other.getNumEdges());
-
-  utils::copy(other.getRowStart().begin(), other.getRowStart().end(), m_row_start.begin());
-  utils::copy(other.getAdjIndex().begin(), other.getAdjIndex().end(), m_adj_index.begin());
-  utils::copy(other.getAdjData().begin(), other.getAdjData().end(), m_adj_data.begin());
-}
-
-template <typename SizeType, typename IndexType, typename DataType>
-CSRGraph<SizeType, IndexType, DataType>::~CSRGraph()
-{
-}
-
-template <typename SizeType, typename IndexType, typename DataType>
-void CSRGraph<SizeType, IndexType, DataType>::resize(size_type nvert, size_type nedge)
-{
-  m_row_start.resize(nvert + 1);
-  m_adj_index.resize(nedge);
-  m_adj_data.resize(nedge);
-}
-#endif //CSRGRAPH_HPP_INCLUDED

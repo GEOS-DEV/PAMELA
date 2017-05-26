@@ -3,17 +3,22 @@
 #include <vector> 
 #include "Mesh/UnstructuredMesh.hpp"
 
-class Mesh;
-
-class MeshFactory
+namespace PAMELA
 {
 
-public:
+	class Mesh;
 
-   static Mesh* makeMesh(std::string file_path);
-   static Mesh* makeMesh(int nx, int ny, int nz, double dx, double dy, double dz);
+	class MeshFactory
+	{
 
-private:
-	MeshFactory() = delete;
+	public:
 
-};
+		static Mesh* makeMesh(std::string file_path);
+		static Mesh* makeMesh(int nx, int ny, int nz, double dx, double dy, double dz);
+
+	private:
+		MeshFactory() = delete;
+
+	};
+
+}

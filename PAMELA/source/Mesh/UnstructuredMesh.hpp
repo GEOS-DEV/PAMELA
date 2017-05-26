@@ -1,10 +1,15 @@
 #pragma once
 #include "Mesh/Mesh.hpp"
 
-class UnstructuredMesh : public Mesh
+namespace PAMELA
 {
 
-public:
+	class UnstructuredMesh : public Mesh
+	{
 
-	UnstructuredMesh(){};
-};
+	public:
+
+		UnstructuredMesh() {};
+	};
+
+}

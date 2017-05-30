@@ -82,8 +82,28 @@ namespace PAMELA
 
 			std::string Label;
 			int offset;
-			std::vector<double> Data;
 			ENSIGHT_GOLD_VARIABLE_TYPE dType;
+
+			void set_data(double cst) 
+			{
+				std::fill(Data.begin(), Data.end(), cst);
+			}
+
+			void set_data(std::vector<double> vec)
+			{
+				ASSERT(vec.size() == Data.size(), "Mismatch sizes");
+				Data = vec;
+			}
+
+			std::vector<double> get_data(int i)
+			{
+				std::vector<double> vec(&Data[i*offset], &Data[(i+1)*offset-1]);
+				return vec;
+			}
+
+		private:
+			std::vector<double> Data;
+
 		};
 
 
@@ -401,11 +421,15 @@ namespace PAMELA
 							std::string ENSTypeLabel = EnsightGold::ElementToLabel.at(elementType);
 							variableFile << ENSTypeLabel << std::endl;
 							variableFile << std::setw(10);
-							for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned(); ++it4)
+							for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned();  ++it4)
 							{
 								auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
 								auto variableIndex = subpart->IndexMapping[collectionIndex];
-								variableFile << std::setw(12) << variableptr->Data[variableIndex] << std::endl;
+								auto variableData = variableptr->get_data(variableIndex);
+								for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
+								{
+									variableFile << std::setw(12) << (*it5) << std::endl;
+								}
 							}
 
 						}
@@ -432,7 +456,11 @@ namespace PAMELA
 					for (auto it3 = partptr->Points.begin(); it3 != partptr->Points.end(); ++it3)
 					{
 						auto collectionIndex = std::distance(partptr->Points.begin(), it3);
-						variableFile << std::setw(12) << variableptr->Data[collectionIndex] << std::endl;
+						auto variableData = variableptr->get_data(collectionIndex);
+						for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
+						{
+							variableFile << std::setw(12) << (*it5) << std::endl;
+						}
 					}
 
 
@@ -449,7 +477,12 @@ namespace PAMELA
 							{
 								auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
 								auto variableIndex = subpart->IndexMapping[collectionIndex];
-								variableFile << std::setw(12) << variableptr->Data[variableIndex] << std::endl;
+								auto variableData = variableptr->get_data(collectionIndex);
+								for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
+								{
+									variableFile << std::setw(12) << (*it5) << std::endl;
+								}
+
 							}
 
 						}

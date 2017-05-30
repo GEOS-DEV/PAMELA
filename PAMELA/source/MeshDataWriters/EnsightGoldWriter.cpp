@@ -248,13 +248,13 @@ namespace PAMELA
 		void EnsightGoldWriter::SetVariable(std::string label, double univalue)
 		{
 			auto var = m_Variable.at(label);
-			std::fill(var->Data.begin(), var->Data.end(), univalue);
+			var->set_data(univalue);
 		}
 
 		void EnsightGoldWriter::SetVariable(std::string label, const std::vector<double>& values)
 		{
 			auto var = m_Variable.at(label);
-			var->Data = values;
+			var->set_data(values);
 		}
 
 		/**

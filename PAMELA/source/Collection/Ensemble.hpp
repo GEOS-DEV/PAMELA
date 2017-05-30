@@ -190,7 +190,7 @@ namespace PAMELA
 		std::vector<T> m_data;
 
 		//Pointer to Index
-		std::unordered_map<T, int, HashStruct, EqualStruct> m_pointerToIndex;
+		std::unordered_map<T, int, HashStruct, EqualStruct> m_pointerToIndex;   //Working map only?
 
 		//Map
 		std::unordered_map<T, int, HashStruct, EqualStruct> m_elementToLocalIndexMap;

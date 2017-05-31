@@ -108,9 +108,6 @@ namespace PAMELA
 
 			m_caseFile << "VARIABLE" << std::endl;
 
-			//Constant per case
-			m_caseFile << "constant per case:" << "     " << 1 << std::setw(5) << "     " << "Partition " << Communicator::worldRank() << std::setw(5) << std::endl;
-
 			//Variables
 			if (m_Variable.size() != 0)
 			{

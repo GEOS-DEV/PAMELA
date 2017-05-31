@@ -20,6 +20,7 @@ namespace PAMELA
 		void RemoveTab(std::string& v);
 		void RemoveEndOfLine(std::string& v);
 		void RemoveExtraSpaces(std::string& v);
+		void RemoveDoubleQuotes(std::string& v);
 		bool ExtendDefault(int n, std::string& v);
 		////Extraction
 		std::string GetNthWord(int n, std::string data);

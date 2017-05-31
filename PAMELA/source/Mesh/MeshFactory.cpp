@@ -3,6 +3,7 @@
 #include "Import/INRIA_mesh.hpp"
 #include "Utils/Logger.hpp"
 #include "Mesh/CartesianMesh.hpp"
+#include "Import/Gmsh_mesh.hpp"
 
 namespace PAMELA
 {
@@ -19,6 +20,10 @@ namespace PAMELA
 		if ((file_extension == "mesh") || (file_extension == "MESH"))
 		{
 			return INRIA_mesh::CreateMesh(file_path);
+		}
+		if ((file_extension == "msh") || (file_extension == "MSH"))
+		{
+			return Gmsh_mesh::CreateMesh(file_path);
 		}
 		else
 		{

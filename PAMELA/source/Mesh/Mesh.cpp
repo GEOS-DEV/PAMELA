@@ -81,29 +81,45 @@ namespace PAMELA
 	Point* Mesh::addPoint(ELEMENTS::TYPE elementType, int index, std::string groupLabel, double x, double y, double z)
 	{
 		Point* element = ElementFactory::makePoint(elementType, index, x, y, z);
-		m_PointCollection.AddElement(groupLabel, element);
-		return element;
+		auto returnedElement = m_PointCollection.AddElement(groupLabel, element);
+		if (element!=returnedElement)
+		{
+			LOGERROR("Try to add an existing element");
+		}
+		return returnedElement;
 	}
 
 	Line* Mesh::addLine(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
 	{
 		Line* element = ElementFactory::makeLine(elementType, elementIndex, vertexList);
-		m_LineCollection.AddElement(groupLabel, element);
-		return element;
+		auto returnedElement = m_LineCollection.AddElement(groupLabel, element);
+		if (element != returnedElement)
+		{
+			LOGERROR("Try to add an existing element");
+		}
+		return returnedElement;
 	}
 
 	Polygon* Mesh::addPolygon(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
 	{
 		Polygon* element = ElementFactory::makePolygon(elementType, elementIndex, vertexList);
-		m_PolygonCollection.AddElement(groupLabel, element);
-		return element;
+		auto returnedElement = m_PolygonCollection.AddElement(groupLabel, element);
+		if (element != returnedElement)
+		{
+			LOGERROR("Try to add an existing element");
+		}
+		return returnedElement;
 	}
 
 	Polyhedron* Mesh::addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
 	{
 		Polyhedron* element = ElementFactory::makePolyhedron(elementType, elementIndex, vertexList);
-		m_PolyhedronCollection.AddElement(groupLabel, element);
-		return element;
+		auto returnedElement = m_PolyhedronCollection.AddElement(groupLabel, element);
+		if (element != returnedElement)
+		{
+			LOGERROR("Try to add an existing element");
+		}
+		return returnedElement;
 
 	}
 

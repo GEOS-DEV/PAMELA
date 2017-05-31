@@ -130,6 +130,12 @@ namespace PAMELA
 
 	}
 
+	void StringUtils::RemoveDoubleQuotes(std::string& v)
+	{
+		v.erase(remove(v.begin(), v.end(), '\"'), v.end());
+
+	}
+
 
 	std::string StringUtils::GetNthWord(int n, std::string data)
 	{

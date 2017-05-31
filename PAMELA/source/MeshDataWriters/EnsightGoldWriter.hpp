@@ -97,7 +97,9 @@ namespace PAMELA
 
 			std::vector<double> get_data(int i)
 			{
-				std::vector<double> vec(&Data[i*offset], &Data[(i+1)*offset-1]);
+				if (offset == 1)
+					return{ Data[i] };
+				std::vector<double> vec(&Data[i*offset], &Data[(i + 1)*offset - 1]);
 				return vec;
 			}
 
@@ -456,7 +458,7 @@ namespace PAMELA
 					for (auto it3 = partptr->Points.begin(); it3 != partptr->Points.end(); ++it3)
 					{
 						auto collectionIndex = std::distance(partptr->Points.begin(), it3);
-						auto variableData = variableptr->get_data(collectionIndex);
+						auto variableData = variableptr->get_data(static_cast<int>(collectionIndex));
 						for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
 						{
 							variableFile << std::setw(12) << (*it5) << std::endl;
@@ -477,7 +479,7 @@ namespace PAMELA
 							{
 								auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
 								auto variableIndex = subpart->IndexMapping[collectionIndex];
-								auto variableData = variableptr->get_data(collectionIndex);
+								auto variableData = variableptr->get_data(static_cast<int>(collectionIndex));
 								for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
 								{
 									variableFile << std::setw(12) << (*it5) << std::endl;
@@ -491,7 +493,6 @@ namespace PAMELA
 				}
 
 			}
-
 
 
 		}

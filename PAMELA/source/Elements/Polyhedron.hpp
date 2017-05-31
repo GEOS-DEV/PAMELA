@@ -563,8 +563,47 @@ namespace PAMELA
 	template <>
 	inline std::vector<Polygon*> ElementSpe<ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::TYPE::VTK_PYRAMID >::CreateFaces()
 	{
-		LOGERROR("Not implemented yet");  //TODO
-		return {};
+		std::vector<Point*> vertexTemp3 = { nullptr,nullptr,nullptr };
+		std::vector<Point*> vertexTemp4 = { nullptr,nullptr,nullptr,nullptr };
+		std::vector<Polygon*> faceTemp;
+
+		//Create face 0
+		vertexTemp3[0] = m_vertexList[3];
+		vertexTemp3[1] = m_vertexList[0];
+		vertexTemp3[2] = m_vertexList[4];
+		auto face0 = new ElementSpe<ELEMENTS::FAMILY::POLYGON, ELEMENTS::TYPE::VTK_TRIANGLE>(-1, vertexTemp3);
+		faceTemp.push_back(face0);
+
+		//Create face 1
+		vertexTemp3[0] = m_vertexList[0];
+		vertexTemp3[1] = m_vertexList[1];
+		vertexTemp3[2] = m_vertexList[4];
+		auto face1 = new ElementSpe<ELEMENTS::FAMILY::POLYGON, ELEMENTS::TYPE::VTK_TRIANGLE>(-1, vertexTemp3);
+		faceTemp.push_back(face1);
+
+		//Create face 2
+		vertexTemp3[0] = m_vertexList[4];
+		vertexTemp3[1] = m_vertexList[1];
+		vertexTemp3[2] = m_vertexList[2];
+		auto face2 = new ElementSpe<ELEMENTS::FAMILY::POLYGON, ELEMENTS::TYPE::VTK_TRIANGLE>(-1, vertexTemp3);
+		faceTemp.push_back(face2);
+
+		//Create face 3
+		vertexTemp3[0] = m_vertexList[2];
+		vertexTemp3[1] = m_vertexList[3];
+		vertexTemp3[2] = m_vertexList[4];
+		auto face3 = new ElementSpe<ELEMENTS::FAMILY::POLYGON, ELEMENTS::TYPE::VTK_TRIANGLE>(-1, vertexTemp3);
+		faceTemp.push_back(face3);
+
+		//Create face 4
+		vertexTemp4[0] = m_vertexList[0];
+		vertexTemp4[1] = m_vertexList[1];
+		vertexTemp4[2] = m_vertexList[2];
+		vertexTemp4[3] = m_vertexList[3];
+		auto face4 = new ElementSpe<ELEMENTS::FAMILY::POLYGON, ELEMENTS::TYPE::VTK_QUAD>(-1, vertexTemp4);
+		faceTemp.push_back(face4);
+
+		return faceTemp;
 	}
 
 

@@ -84,7 +84,7 @@ namespace PAMELA
 		auto returnedElement = m_PointCollection.AddElement(groupLabel, element);
 		if (element!=returnedElement)
 		{
-			LOGERROR("Try to add an existing element");
+			LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
@@ -95,7 +95,7 @@ namespace PAMELA
 		auto returnedElement = m_LineCollection.AddElement(groupLabel, element);
 		if (element != returnedElement)
 		{
-			LOGERROR("Try to add an existing element");
+			LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
@@ -106,7 +106,7 @@ namespace PAMELA
 		auto returnedElement = m_PolygonCollection.AddElement(groupLabel, element);
 		if (element != returnedElement)
 		{
-			LOGERROR("Try to add an existing element");
+			LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}

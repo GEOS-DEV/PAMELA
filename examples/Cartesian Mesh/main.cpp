@@ -16,7 +16,7 @@ int main(int argc, const char * argv[])
 	Communicator::initialize();
 
 	//Make mesh
-	Mesh* MainMesh = MeshFactory::makeMesh(5, 5, 5, 1, 1, 1);
+	Mesh* MainMesh = MeshFactory::makeMesh(2, 2, 1, 1./5, 1./3, 1./4);
 	MainMesh->CreateFacesFromCells();
 
 	//Distort Mesh
@@ -31,6 +31,7 @@ int main(int argc, const char * argv[])
 	//--Create variables
 	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR, EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_CELL, "Partition", "DEFAULT");
 	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR,EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_CELL,"Pressure","DEFAULT");
+	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR, EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_NODE, "Test", "DEFAULT");
 
 	//--Make files
 	OutputWriter->MakeCaseFile();
@@ -39,6 +40,7 @@ int main(int argc, const char * argv[])
 	//--Set variables
 	//Set variable values
 	OutputWriter->SetVariable("Pressure", 55);
+	OutputWriter->SetVariable("Test", 0.1);
 	OutputWriter->SetVariable("Partition", Communicator::worldRank());
 	
 	//Dump variables

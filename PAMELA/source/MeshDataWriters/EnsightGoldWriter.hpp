@@ -4,6 +4,7 @@
 #include "Utils/Types.hpp"
 #include "Utils/Communicator.hpp"
 #include "Elements/Element.hpp"
+#include <iterator> 
 #if defined( _WIN32)
 #include <direct.h>
 #else
@@ -128,7 +129,7 @@ namespace PAMELA
 			int Index;   // global including all families
 			std::string Label;
 			Ensemble<T>* Collection;
-			std::set<Point*> Points;
+			std::vector<Point*> Points;
 			std::unordered_map<int, int> GlobalToLocalPointMapping;
 			std::unordered_map<ENSIGHT_GOLD_TYPE, SubPart<T>*> SubParts;
 			std::unordered_map<ENSIGHT_GOLD_TYPE, int> numberOfElementsPerSubPart
@@ -276,14 +277,22 @@ namespace PAMELA
 					subpart->IndexMapping.push_back(id);
 					id++;
 
+					//std::set<Point*> PointsSet;
+
 					//Insert vertices
 					auto vertexlist = (*it2)->get_vertexList();
 					int vertexsize = static_cast<int>(vertexlist.size());
 					for (auto i = 0; i != vertexsize; ++i)
 					{
-						partptr->Points.insert(vertexlist[i]);
+						partptr->Points.push_back(vertexlist[i]);
 					}
+					
 				}
+
+				std::sort(partptr->Points.begin(), partptr->Points.end());
+				partptr->Points.erase(std::unique(partptr->Points.begin(), partptr->Points.end()), partptr->Points.end());
+
+
 				//----Map Point Coordinates
 				int i = 0;
 				for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)
@@ -457,16 +466,28 @@ namespace PAMELA
 					variableFile << "coordinates" << std::endl;
 					for (auto it3 = partptr->Points.begin(); it3 != partptr->Points.end(); ++it3)
 					{
+
+						//TODO does not work
 						auto collectionIndex = std::distance(partptr->Points.begin(), it3);
 						auto variableData = variableptr->get_data(static_cast<int>(collectionIndex));
 						for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
 						{
 							variableFile << std::setw(12) << (*it5) << std::endl;
 						}
+						////y
+						//for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
+						//{
+						//	variableFile << std::setw(12) << (*it5) << std::endl;
+						//}
+						////z
+						//	for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
+						//{
+						//	variableFile << std::setw(12) << (*it5) << std::endl;
+						//}
 					}
 
 
-					for (auto it3 = partptr->SubParts.begin(); it3 != partptr->SubParts.end(); ++it3)
+					/*for (auto it3 = partptr->SubParts.begin(); it3 != partptr->SubParts.end(); ++it3)
 					{
 						if (it3->second->SubCollection.size_owned() > 0)
 						{
@@ -488,7 +509,7 @@ namespace PAMELA
 							}
 
 						}
-					}
+					}*/
 
 				}
 

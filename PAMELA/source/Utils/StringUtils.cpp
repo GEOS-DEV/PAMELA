@@ -8,6 +8,27 @@
 namespace PAMELA
 {
 
+	std::string StringUtils::FileToString(const std::string filepath)
+	{
+		std::ifstream mesh_file;
+		std::string file_contents("A");
+		int file_length = 0;
+
+		//Open file
+		mesh_file.open(filepath);
+		ASSERT(mesh_file.is_open(), filepath + " Could not be open");
+
+		//Transfer file content into string for easing broadcast
+		file_contents = { std::istreambuf_iterator<char>(mesh_file), std::istreambuf_iterator<char>() };
+		file_length = static_cast<int>(file_contents.size());
+
+		//Close file
+		mesh_file.close();
+
+		return file_contents;
+
+	}
+
 	void StringUtils::Trim(std::string& str)
 	{
 		if (str.size() > 0)

@@ -84,7 +84,7 @@ namespace PAMELA
 		auto returnedElement = m_PointCollection.AddElement(groupLabel, element);
 		if (element!=returnedElement)
 		{
-			LOGWARNING("Try to add an existing element");
+			//LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
@@ -276,7 +276,6 @@ namespace PAMELA
 		m_PolyhedronCollection.ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
 		m_PolygonCollection.ClearAfterPartitioning(PolygonOwned, PolygonGhost);
 		m_PointCollection.ClearAfterPartitioning(PointOwned, PointGhost);
-
 
 		LOGINFO("*** Done...");
 

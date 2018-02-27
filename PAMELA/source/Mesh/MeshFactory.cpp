@@ -1,9 +1,11 @@
 #pragma once
 #include "Mesh/MeshFactory.hpp"
 #include "Import/INRIA_mesh.hpp"
+#include "Import/Eclipse_mesh.hpp"
 #include "Utils/Logger.hpp"
 #include "Mesh/CartesianMesh.hpp"
 #include "Import/Gmsh_mesh.hpp"
+#include "Utils/File.hpp"
 
 namespace PAMELA
 {
@@ -16,6 +18,7 @@ namespace PAMELA
 	{
 		std::string file_extension;
 		file_extension = file_path.substr(file_path.find_last_of(".") + 1);
+		File file = File(file_path);
 
 		if ((file_extension == "mesh") || (file_extension == "MESH"))
 		{
@@ -24,6 +27,10 @@ namespace PAMELA
 		if ((file_extension == "msh") || (file_extension == "MSH"))
 		{
 			return Gmsh_mesh::CreateMesh(file_path);
+		}
+		if ((file_extension == "grdecl") || (file_extension == "GRDECL"))
+		{
+			return Eclipse_mesh::CreateMesh(file);
 		}
 		else
 		{

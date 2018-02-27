@@ -48,7 +48,6 @@ namespace PAMELA
 		std::vector<int> METISPartitioning(Adjacency* adjacency, int npartition);
 		std::vector<int> TRIVIALPartitioning();
 
-
 	protected:
 
 		//Element Collections - First owned then ghosts

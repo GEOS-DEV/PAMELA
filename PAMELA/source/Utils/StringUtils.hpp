@@ -11,6 +11,8 @@ namespace PAMELA
 	namespace StringUtils
 	{
 
+		std::string FileToString(const std::string filepath);
+
 		////Formatting
 		void Trim(std::string& str);
 		bool RemoveStringAndFollowingContentFromLine(std::string ToBeRemoved, std::string& line);

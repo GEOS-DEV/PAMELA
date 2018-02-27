@@ -2,6 +2,8 @@
 #include <unordered_map>
 #include <typeindex>
 #include "Collection/Indexing.hpp"
+#include "Utils/Assert.hpp"
+#include <set>
 
 namespace PAMELA
 {
@@ -99,6 +101,24 @@ namespace PAMELA
 		void set_globalIndex(int i) { m_index.Global = i; }
 		void set_partionOwner(int i) { m_partitionOwner = i; }
 
+		//Property
+		static void ReferenceProperty(std::string label)
+		{
+			m_PropertyCatalog.insert(label);
+		}
+		
+		void CreateProperty(std::string label)
+		{
+			ReferenceProperty(label);
+			m_Property[label]=0;
+		}
+
+		void SetProperty(std::string label,double val)
+		{
+			ASSERT(m_Property.count(label) == 1, "Property does not exist");
+			m_Property[label] = val;
+		}
+
 	protected:
 
 		//virtual ~ElementBase() = 0; 
@@ -109,6 +129,10 @@ namespace PAMELA
 		IndexData m_index;
 		int m_partitionOwner;
 
+		//Property
+		std::unordered_map<std::string, double> m_Property;
+		static std::set<std::string> m_PropertyCatalog; Mettre dans Ensemble??
+	
 	};
 
 	template <ELEMENTS::FAMILY family>

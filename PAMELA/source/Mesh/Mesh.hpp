@@ -7,6 +7,7 @@
 #include "Collection/Collection.hpp"
 #include "Utils/Types.hpp"
 #include "Elements/Line.hpp"
+#include "Property/Property.hpp"
 
 namespace PAMELA
 {
@@ -26,6 +27,8 @@ namespace PAMELA
 		LineCollection*  get_LineCollection() { return &m_LineCollection; }
 		PolygonCollection*  get_PolygonCollection() { return &m_PolygonCollection; }
 		PolyhedronCollection*  get_PolyhedronCollection() { return &m_PolyhedronCollection; }
+
+		Property<PolyhedronCollection, double>* get_PolyhedronProperty() const { return m_PolyhedronProperty; }
 
 		//Adjacency
 		MeshAdjacency* getMeshAdjacency() const;
@@ -48,6 +51,8 @@ namespace PAMELA
 		std::vector<int> METISPartitioning(Adjacency* adjacency, int npartition);
 		std::vector<int> TRIVIALPartitioning();
 
+	
+
 	protected:
 
 		//Element Collections - First owned then ghosts
@@ -55,6 +60,9 @@ namespace PAMELA
 		LineCollection m_LineCollection;
 		PolygonCollection m_PolygonCollection;
 		PolyhedronCollection m_PolyhedronCollection;
+
+		//Property
+		Property<PolyhedronCollection,double>* m_PolyhedronProperty;
 
 		//Adjacency
 		MeshAdjacency* m_adjacency;

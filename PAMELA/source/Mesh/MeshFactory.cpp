@@ -16,20 +16,28 @@ namespace PAMELA
 	 */
 	Mesh* MeshFactory::makeMesh(std::string file_path)
 	{
+		LOGINFO("**********************************************************************");
+		LOGINFO("                         PAMELA Library Import tool                   ");
+		LOGINFO("**********************************************************************");
+
+
 		std::string file_extension;
 		file_extension = file_path.substr(file_path.find_last_of(".") + 1);
 		File file = File(file_path);
 
 		if ((file_extension == "mesh") || (file_extension == "MESH"))
 		{
+			LOGINFO("INRIA MESH FORMAT IDENTIFIED");
 			return INRIA_mesh::CreateMesh(file_path);
 		}
 		if ((file_extension == "msh") || (file_extension == "MSH"))
 		{
+			LOGINFO("GMSH FORMAT IDENTIFIED");
 			return Gmsh_mesh::CreateMesh(file_path);
 		}
 		if ((file_extension == "grdecl") || (file_extension == "GRDECL"))
 		{
+			LOGINFO("ECLIPSE GRDECL FORMAT IDENTIFIED");
 			return Eclipse_mesh::CreateMesh(file);
 		}
 		else

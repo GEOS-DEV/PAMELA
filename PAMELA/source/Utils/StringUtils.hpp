@@ -23,6 +23,10 @@ namespace PAMELA
 		void RemoveEndOfLine(std::string& v);
 		void RemoveExtraSpaces(std::string& v);
 		void RemoveDoubleQuotes(std::string& v);
+		void ExpandStarExpression(std::string& v);
+
+		std::pair<int, int> boundsSubstr(std::string str, int pos);
+
 		bool ExtendDefault(int n, std::string& v);
 		////Extraction
 		std::string GetNthWord(int n, std::string data);

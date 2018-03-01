@@ -28,6 +28,7 @@ namespace PAMELA
 			return hc;
 		}
 	};
+
 	//--Point
 	template <>
 	struct ElementHash<Point*>
@@ -84,6 +85,65 @@ namespace PAMELA
 	};
 
 
+	//--Line
+	template <>
+	struct ElementEqual<Line*>
+	{
+		bool operator()(Line* lhs, Line* rhs) const
+		{
+			auto lhs_vertex_list = lhs->get_vertexList();
+			auto rhs_vertex_list = rhs->get_vertexList();
+			for (auto i = 0; i < lhs_vertex_list.size(); i++)
+			{
+				if (lhs_vertex_list[i]->get_globalIndex() != rhs_vertex_list[i]->get_globalIndex())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+	};
+
+	//--Polygon
+	template <>
+	struct ElementEqual<Polygon*>
+	{
+		bool operator()(Polygon* lhs, Polygon* rhs) const
+		{
+			auto lhs_vertex_list = lhs->get_vertexList();
+			auto rhs_vertex_list = rhs->get_vertexList();
+			for (auto i = 0; i < lhs_vertex_list.size(); i++)
+			{
+				if (lhs_vertex_list[i]->get_globalIndex() != rhs_vertex_list[i]->get_globalIndex())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+	};
+
+	//--Polyhedron
+	template <>
+	struct ElementEqual<Polyhedron*>
+	{
+		bool operator()(Polyhedron* lhs, Polyhedron* rhs) const
+		{
+			auto lhs_vertex_list = lhs->get_vertexList();
+			auto rhs_vertex_list = rhs->get_vertexList();
+			for (auto i = 0; i < lhs_vertex_list.size(); i++)
+			{
+				if (lhs_vertex_list[i]->get_globalIndex() != rhs_vertex_list[i]->get_globalIndex())
+				{
+					return false;
+				}
+			}
+			//return true;
+			return false;
+		}
+	};
+
+
 	/**
 	 * \brief
 	 * \tparam T should be a pointer
@@ -107,7 +167,7 @@ namespace PAMELA
 			}
 			auto grp = m_labelToGroup[label];
 			grp->push_back_unique(Element);
-			auto add = this->push_back_unique(Element);
+			auto add = this->push_back_unique(Element);//TODO:index twice
 			return add;
 		}
 
@@ -138,10 +198,10 @@ namespace PAMELA
 		}
 
 		//Groups
-		void addAndCreateGroup(std::string label) { m_labelToGroup[label] = new Ensemble<T>(); }
+		void addAndCreateGroup(std::string label) { m_labelToGroup[label] = new Ensemble<T, ElementHash<T>, ElementEqual<T>>(); }
 		void activeGroup(std::string label) { ASSERT(groupExist(label), "The group does not exist"); m_activeGroup[label] = true; }
 		std::unordered_map<std::string, bool>& get_ActiveGroupsMap() { return m_activeGroup; }
-		Ensemble<T>* get_Group(std::string label) { ASSERT(groupExist(label), "The group does not exist"); return m_labelToGroup.at(label); }
+		Ensemble<T, ElementHash<T>, ElementEqual<T>>* get_Group(std::string label) { ASSERT(groupExist(label), "The group does not exist"); return m_labelToGroup.at(label); }
 
 		//Parallel
 		void ClearAfterPartitioning(std::set<int> owned, std::set<int> ghost);
@@ -153,7 +213,7 @@ namespace PAMELA
 
 		//Groups
 		bool groupExist(std::string label) { return m_labelToGroup.count(label) == 1; }
-		std::unordered_map<std::string, Ensemble<T>*> m_labelToGroup;
+		std::unordered_map<std::string, Ensemble<T, ElementHash<T>, ElementEqual<T>>*> m_labelToGroup;
 		std::unordered_map<std::string, bool> m_activeGroup;
 
 	};

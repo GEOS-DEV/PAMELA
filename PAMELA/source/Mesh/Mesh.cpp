@@ -13,10 +13,11 @@ namespace PAMELA
 {
 
 	Mesh::Mesh() : m_PointCollection(PointCollection(ELEMENTS::FAMILY::POINT)),
-		m_LineCollection(LineCollection(ELEMENTS::FAMILY::LINE)),
-		m_PolygonCollection(PolygonCollection(ELEMENTS::FAMILY::POLYGON)),
-		m_PolyhedronCollection(PolyhedronCollection(ELEMENTS::FAMILY::POLYHEDRON)),
-		m_adjacency(new MeshAdjacency(this))
+	               m_LineCollection(LineCollection(ELEMENTS::FAMILY::LINE)),
+	               m_PolygonCollection(PolygonCollection(ELEMENTS::FAMILY::POLYGON)),
+	               m_PolyhedronCollection(PolyhedronCollection(ELEMENTS::FAMILY::POLYHEDRON)),
+				   m_PolyhedronProperty(new Property<PolyhedronCollection,double>(&m_PolyhedronCollection)),
+	               m_adjacency(new MeshAdjacency(this))
 	{
 	}
 
@@ -117,9 +118,11 @@ namespace PAMELA
 		auto returnedElement = m_PolyhedronCollection.AddElement(groupLabel, element);
 		if (element != returnedElement)
 		{
-			LOGERROR("Try to add an existing element");
+			//LOGWARNING("Try to add an existing element");
+			return returnedElement;
 		}
-		return returnedElement;
+		return nullptr;
+		
 
 	}
 

@@ -116,19 +116,19 @@ namespace PAMELA
 			SubPart(int size, ENSIGHT_GOLD_TYPE elementtype) { ElementType = elementtype; IndexMapping.reserve(size); SubCollection.reserve(size); }
 			ENSIGHT_GOLD_TYPE ElementType;
 			std::vector<int> IndexMapping;  //Subpart to Part
-			Ensemble<T> SubCollection;
+			Ensemble<T, ElementHash<T>, ElementEqual<T>> SubCollection;
 		};
 
 
 		template <class T>
 		struct Part
 		{
-			Part(std::string label, int index, Ensemble<T>* collection) { Label = label; Collection = collection; Index = index; }
+			Part(std::string label, int index, Ensemble<T, ElementHash<T>, ElementEqual<T>>* collection) { Label = label; Collection = collection; Index = index; }
 			Variable* AddVariable(ENSIGHT_GOLD_VARIABLE_TYPE dtype, ENSIGHT_GOLD_VARIABLE_LOCATION dloc, std::string label);
 
 			int Index;   // global including all families
 			std::string Label;
-			Ensemble<T>* Collection;
+			Ensemble<T, ElementHash<T>, ElementEqual<T>>* Collection;
 			std::vector<Point*> Points;
 			std::unordered_map<int, int> GlobalToLocalPointMapping;
 			std::unordered_map<ENSIGHT_GOLD_TYPE, SubPart<T>*> SubParts;
@@ -162,6 +162,7 @@ namespace PAMELA
 			EnsightGoldWriter(Mesh* mesh, std::string name) :m_mesh(mesh), m_name(name), m_partition(Communicator::worldRank()), m_nPartition(Communicator::worldSize()) { Init(); }
 
 			void CreateVariable(FAMILY family, ENSIGHT_GOLD_VARIABLE_TYPE dtype, ENSIGHT_GOLD_VARIABLE_LOCATION dloc, std::string name, std::string part);
+			void CreateVariable(FAMILY family, ENSIGHT_GOLD_VARIABLE_TYPE dtype, ENSIGHT_GOLD_VARIABLE_LOCATION dloc, std::string name);
 			void MakeCaseFile();
 			void MakeGeoFile();
 

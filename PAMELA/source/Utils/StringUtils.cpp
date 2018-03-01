@@ -68,10 +68,7 @@ namespace PAMELA
 
 		if (pos != std::string::npos)
 		{
-			std::string line;
-			std::size_t L1 = ToBeRemoved.size();
-			std::size_t L2 = data.size();
-			line = data.substr(pos + L1, L2 - 1);
+			std::string line = data.erase(pos, ToBeRemoved.size());
 			return line;
 		}
 		else
@@ -154,6 +151,97 @@ namespace PAMELA
 	void StringUtils::RemoveDoubleQuotes(std::string& v)
 	{
 		v.erase(remove(v.begin(), v.end(), '\"'), v.end());
+
+	}
+
+	void StringUtils::ExpandStarExpression(std::string& v)
+	{
+
+		int pos;
+		int ntime;
+		std::string ntimes;
+		std::string val;
+		int val_size;
+		std::string star("*");
+		std::string subset;
+		std::string expanded;
+		std::pair<int, int> bounds;
+
+
+			do
+			{
+				//Find *, extract subset
+				pos = int(v.find(star));
+				if (pos != -1)
+				{
+					bounds = boundsSubstr(v, pos);
+					subset = v.substr(bounds.first, bounds.second - bounds.first + 1);
+
+					//Expand * expression
+					ntimes = v.substr(bounds.first, pos - bounds.first);
+					ntime = std::stoi(ntimes);
+
+					if (pos == bounds.second) //Default value case
+					{
+						val = "DEFAULT"; // Replace 1* by DEFAULT
+					}
+					else
+					{
+						val = v.substr(pos + 1, bounds.second - pos);
+					}
+
+					//Erase * expression
+					v.erase(v.begin() + bounds.first, v.begin() + bounds.second + 1);
+					val_size = int(val.size());
+
+					//Create expanded expression
+					expanded.reserve(val_size*ntime);
+					for (int j = 0; j < ntime; j++)
+					{
+						expanded.insert((val_size + 1)*j, val + " ");
+					}
+					expanded.erase(expanded.end() - 1, expanded.end());
+
+					//Insert expanded expression
+					v.insert(bounds.first, expanded);
+					expanded.resize(0);
+
+				}
+			} while (pos != -1);
+
+	}
+
+	std::pair<int, int> StringUtils::boundsSubstr(std::string str, int pos)
+	{
+		int lower;
+		int upper;
+
+		//Upper Bound
+		int i = pos;
+		do
+		{
+			i++;
+		} while ((str[i] != ' ') && (i < static_cast<int>(str.size()) - 1));
+
+		upper = i - 1;
+
+		if (i == static_cast<int>(str.size()) - 1) upper++;
+
+
+
+		//Lower Bound
+		int j = pos;
+		do
+		{
+			j--;
+		} while ((str[j] != ' ') && (j > 0));
+
+		lower = j + 1;
+
+		if (j == 0) lower--;
+
+		return std::make_pair(lower, upper);
+
 
 	}
 

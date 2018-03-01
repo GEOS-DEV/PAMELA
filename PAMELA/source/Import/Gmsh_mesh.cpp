@@ -122,7 +122,6 @@ namespace PAMELA
 			}
 			else if ((line == "$PhysicalNames"))
 			{
-				int nb;
 				int dim;
 				int tagid;
 				std::string label;

@@ -306,6 +306,30 @@ namespace PAMELA
 
 		}
 
+		void EnsightGoldWriter::CreateVariable(FAMILY family, ENSIGHT_GOLD_VARIABLE_TYPE dtype, ENSIGHT_GOLD_VARIABLE_LOCATION dloc, std::string name)
+		{
+			std::string part;
+			switch (family)
+			{
+			case FAMILY::POINT:
+				part = m_PointParts.begin()->first;
+				break;
+			case FAMILY::LINE:
+				part = m_LineParts.begin()->first;
+				break;
+			case FAMILY::POLYGON:
+				part = m_PolygonParts.begin()->first;
+				break;
+			case FAMILY::POLYHEDRON:
+				part = m_PolyhedronParts.begin()->first;
+				break;
+			default:;
+			}
+
+			CreateVariable(family, dtype, dloc, name, part);
+
+		}
+
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//------------------------------------------ Utils

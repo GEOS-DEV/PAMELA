@@ -65,6 +65,8 @@ namespace PAMELA
 		//Reserve capacity for storage
 		void reserve(int n) { m_data.reserve(n); }
 
+		//Getter
+		int get_Index(T element) { return m_pointerToIndex[element]; }
 
 		//Iterators
 		typedef typename std::vector<T>::iterator collection_iterator;

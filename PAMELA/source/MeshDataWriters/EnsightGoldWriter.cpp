@@ -237,20 +237,42 @@ namespace PAMELA
 			LOGINFO("*** Done");
 		}
 
+
+		void EnsightGoldWriter::SetVariable(std::string label, double univalue)
+		{
+
+			for (auto const& part : m_PolyhedronParts)
+			{
+				auto var = m_Variable.at(VariableKey(label,part.first));
+				var->set_data(univalue);
+			}
+		}
+
+
 		/**
 		 * \brief
 		 * \param label
 		 * \param univalue
 		 */
-		void EnsightGoldWriter::SetVariable(std::string label, double univalue)
+		void EnsightGoldWriter::SetVariable(std::string label, std::string part, double univalue)
 		{
-			auto var = m_Variable.at(label);
+
+			auto var = m_Variable.at(VariableKey(label, part));
 			var->set_data(univalue);
 		}
 
+
+
 		void EnsightGoldWriter::SetVariable(std::string label, const std::vector<double>& values)
 		{
-			auto var = m_Variable.at(label);
+			auto var = m_Variable.at(VariableKey(label, m_PolyhedronParts.begin()->first));
+			var->set_data(values);
+		}
+
+
+		void EnsightGoldWriter::SetVariable(std::string label, std::string part, const std::vector<double>& values)
+		{
+			auto var = m_Variable.at(VariableKey(label, part));
 			var->set_data(values);
 		}
 
@@ -289,17 +311,17 @@ namespace PAMELA
 
 			switch (family)
 			{
-			case FAMILY::POINT:
-				m_Variable[name] = m_PointParts[part]->AddVariable(dtype, dloc, name);
+			case FAMILY::POINT:				
+				m_Variable[VariableKey(name, part)] = m_PointParts[part]->AddVariable(dtype, dloc, name);
 				break;
 			case FAMILY::LINE:
-				m_Variable[name] = m_LineParts[part]->AddVariable(dtype, dloc, name);
+				m_Variable[VariableKey(name, part)] = m_LineParts[part]->AddVariable(dtype, dloc, name);
 				break;
 			case FAMILY::POLYGON:
-				m_Variable[name] = m_PolygonParts[part]->AddVariable(dtype, dloc, name);
+				m_Variable[VariableKey(name, part)] = m_PolygonParts[part]->AddVariable(dtype, dloc, name);
 				break;
 			case FAMILY::POLYHEDRON:
-				m_Variable[name] = m_PolyhedronParts[part]->AddVariable(dtype, dloc, name);
+				m_Variable[VariableKey(name, part)] = m_PolyhedronParts[part]->AddVariable(dtype, dloc, name);
 				break;
 			default:;
 			}
@@ -308,25 +330,37 @@ namespace PAMELA
 
 		void EnsightGoldWriter::CreateVariable(FAMILY family, ENSIGHT_GOLD_VARIABLE_TYPE dtype, ENSIGHT_GOLD_VARIABLE_LOCATION dloc, std::string name)
 		{
+
 			std::string part;
 			switch (family)
 			{
 			case FAMILY::POINT:
-				part = m_PointParts.begin()->first;
+				for (auto const& part : m_PointParts)
+				{
+					CreateVariable(family, dtype, dloc, name, part.first);
+				}
 				break;
 			case FAMILY::LINE:
-				part = m_LineParts.begin()->first;
+				for (auto const& part : m_LineParts)
+				{
+					CreateVariable(family, dtype, dloc, name, part.first);
+				}
 				break;
 			case FAMILY::POLYGON:
-				part = m_PolygonParts.begin()->first;
+				for (auto const& part : m_PolygonParts)
+				{
+					CreateVariable(family, dtype, dloc, name, part.first);
+				}
 				break;
 			case FAMILY::POLYHEDRON:
-				part = m_PolyhedronParts.begin()->first;
+				for (auto const& part : m_PolyhedronParts)
+				{
+					CreateVariable(family, dtype, dloc, name, part.first);
+				}
 				break;
 			default:;
 			}
 
-			CreateVariable(family, dtype, dloc, name, part);
 
 		}
 

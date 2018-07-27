@@ -24,7 +24,10 @@ namespace PAMELA
 		std::string file_extension;
 		file_extension = file_path.substr(file_path.find_last_of(".") + 1);
 		File file = File(file_path);
-		ASSERT(file.exists(),"File does not exist.");
+		if(!file.exists())
+		{
+			LOGERROR("File does not exist.");
+		}
 
 		if ((file_extension == "mesh") || (file_extension == "MESH"))
 		{

@@ -5,6 +5,7 @@
 #include "Utils/Communicator.hpp"
 #include "Elements/Element.hpp"
 #include <iterator> 
+
 #if defined( _WIN32)
 #include <direct.h>
 #else
@@ -151,6 +152,36 @@ namespace PAMELA
 		};
 
 
+		struct VariableKey
+		{
+			std::string first;
+			std::string second;
+
+			VariableKey(std::string first, std::string second)
+			{
+				this->first = first;
+				this->second = second;
+			}
+
+			bool operator==(const VariableKey &other) const
+			{
+				return (first == other.first
+					&& second == other.second);
+			}
+		};
+
+		struct VariableKeyHash
+		{
+			std::size_t operator()(const VariableKey& k) const
+			{
+				auto hfirst = std::hash<std::string>()(k.first);
+				auto hsecond = std::hash<std::string>()(k.second);
+				return hfirst ^ hsecond;
+			}
+		};
+
+
+
 		class EnsightGoldWriter
 		{
 
@@ -167,7 +198,9 @@ namespace PAMELA
 			void MakeGeoFile();
 
 			void SetVariable(std::string label, double univalue);
-			void SetVariable(std::string label, const std::vector<double>& values);
+			void SetVariable(std::string label, std::string part, double univalue);
+			void SetVariable(std::string label,  const std::vector<double>& values); // this one assume only one part
+			void SetVariable(std::string label, std::string part, const std::vector<double>& values);
 			void DumpVariables();
 
 
@@ -207,9 +240,11 @@ namespace PAMELA
 			PartMap<Polygon*>  m_PolygonParts;
 			PartMap<Polyhedron*>  m_PolyhedronParts;
 
-			//Property
-			std::unordered_map<std::string, Variable*> m_Variable;
 
+			//Property
+			std::unordered_map<VariableKey, Variable*, VariableKeyHash> m_Variable;
+			
+			
 		};
 
 

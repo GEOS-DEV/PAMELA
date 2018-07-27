@@ -15,7 +15,9 @@ int main(int argc, const char * argv[]) {
 	Communicator::initialize();
 
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:/LocalGitRepository/PArallel MEsh LibrAry/examples/GMSH Unstructured Mesh/THM.msh");
-	Mesh* MainMesh = MeshFactory::makeMesh("E:/LocalGitRepository/PArallel MEsh LibrAry/examples/GMSH Unstructured Mesh/BoxWithFracs.msh");
+	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/GMSH Unstructured Mesh/BoxWithFracs.msh");
+	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/GMSH Unstructured Mesh/mesh.msh");
+	Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/GMSH Unstructured Mesh/modelA1_volume_meshed.msh");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:/LocalGitRepository/PAMELA - PArallel MEsh LibrAry/examples/INRIA Unstructured Mesh/spe10_one_layer.mesh");
 
 	MainMesh->CreateFacesFromCells();
@@ -23,7 +25,7 @@ int main(int argc, const char * argv[]) {
 
 
 	EnsightGold::EnsightGoldWriter* OutputWriter = new EnsightGold::EnsightGoldWriter(MainMesh, "UnstructuredGridExample");
-	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR, EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_CELL, "Partition", "POLYHEDRON_GROUP_9999991");
+	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR, EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->MakeCaseFile();
 	OutputWriter->MakeGeoFile();
 

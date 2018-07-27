@@ -87,7 +87,6 @@ namespace PAMELA
 		int id;
 		int itype;
 		int ntags;
-		int itrash;
 		int v0, v1, v2, v3, v4, v5, v6, v7;
 		std::vector<Point*> vertexTemp3 = { nullptr,nullptr,nullptr };
 		std::vector<Point*> vertexTemp4 = { nullptr,nullptr,nullptr,nullptr };
@@ -162,11 +161,15 @@ namespace PAMELA
 					mesh_file >> id;	//id
 					mesh_file >> itype;	//itype
 					mesh_file >> ntags;	//itype
-					mesh_file >> attribute; //trash
-					mesh_file >> itrash;	//attribute=
+					for (auto nt = 0; nt != ntags; nt++)
+					{
+						mesh_file >> attribute; //trash
+					}
+					//mesh_file >> itrash;	//attribute=
 
 					switch (itype)
 					{
+
 					case 2:	//TRIANGLE
 						elementType = m_TypeMap[GMSH_MESH_TYPE::TRIANGLE];
 						mesh_file >> v0 >> v1 >> v2;
@@ -318,7 +321,8 @@ namespace PAMELA
 						break;
 
 					default:
-
+						std::string toto;
+						getline(mesh_file, toto);  //get rest of the line
 						break;
 					}
 

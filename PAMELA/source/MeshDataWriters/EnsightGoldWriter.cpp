@@ -35,7 +35,7 @@ namespace PAMELA
 				{
 					std::string grplabel = it->first;
 					auto groupEnsemble = LineCollection->get_Group(grplabel);
-					m_LineParts[grplabel] = new EnsightGold::Part<Line*>(grplabel, partIndex, groupEnsemble);
+					m_LineParts[grplabel] = new Part<Line*>(grplabel, partIndex, groupEnsemble);
 					partIndex++;
 				}
 			}
@@ -53,7 +53,7 @@ namespace PAMELA
 				{
 					std::string grplabel = it->first;
 					auto groupEnsemble = PolygonCollection->get_Group(grplabel);
-					m_PolygonParts[grplabel] = new EnsightGold::Part<Polygon*>(grplabel, partIndex, groupEnsemble);
+					m_PolygonParts[grplabel] = new Part<Polygon*>(grplabel, partIndex, groupEnsemble);
 					partIndex++;
 				}
 			}
@@ -70,7 +70,7 @@ namespace PAMELA
 				{
 					std::string grplabel = it->first;
 					auto groupEnsemble = PolyhedronCollection->get_Group(grplabel);
-					m_PolyhedronParts[grplabel] = new EnsightGold::Part<Polyhedron*>(grplabel, partIndex, groupEnsemble);
+					m_PolyhedronParts[grplabel] = new Part<Polyhedron*>(grplabel, partIndex, groupEnsemble);
 					partIndex++;
 				}
 			}
@@ -306,7 +306,7 @@ namespace PAMELA
 
 		}
 
-		void EnsightGoldWriter::CreateVariable(FAMILY family, ENSIGHT_GOLD_VARIABLE_TYPE dtype, ENSIGHT_GOLD_VARIABLE_LOCATION dloc, std::string name, std::string part)
+		void EnsightGoldWriter::CreateVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name, std::string part)
 		{
 
 			switch (family)
@@ -328,7 +328,7 @@ namespace PAMELA
 
 		}
 
-		void EnsightGoldWriter::CreateVariable(FAMILY family, ENSIGHT_GOLD_VARIABLE_TYPE dtype, ENSIGHT_GOLD_VARIABLE_LOCATION dloc, std::string name)
+		void EnsightGoldWriter::CreateVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name)
 		{
 
 			std::string part;

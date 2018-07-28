@@ -30,12 +30,12 @@ int main(int argc, const char * argv[]) {
 
 	EnsightGold::EnsightGoldWriter* OutputWriter = new EnsightGold::EnsightGoldWriter(MainMesh, "EclipseGridExample");
 
-	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR, EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->CreateVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 
 	auto mesh_props = MainMesh->get_PolyhedronProperty()->get_PropertyMap();
 	for (auto it = mesh_props.begin(); it != mesh_props.end(); ++it)
 	{
-		OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR, EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_CELL, it->first);
+		OutputWriter->CreateVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, it->first);
 	}
 	OutputWriter->MakeCaseFile();
 	OutputWriter->MakeGeoFile();
@@ -45,7 +45,6 @@ int main(int argc, const char * argv[]) {
 	for (auto it = mesh_props.begin(); it != mesh_props.end(); ++it)
 	{
 		OutputWriter->SetVariable(it->first, it->second);
-		int h = 4;
 	}
 
 	OutputWriter->DumpVariables();

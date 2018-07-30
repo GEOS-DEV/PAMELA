@@ -24,13 +24,10 @@ int main(int argc, const char * argv[]) {
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
 
-	EnsightGold::EnsightGoldWriter* OutputWriter = new EnsightGold::EnsightGoldWriter(MainMesh, "UnstructuredGridExample");
-	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR, EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_CELL, "Partition");
-	OutputWriter->MakeCaseFile();
-	OutputWriter->MakeGeoFile();
-
+	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "UnstructuredGridExample");
+	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->Init();
 	OutputWriter->SetVariable("Partition", Communicator::worldRank());
-
 	OutputWriter->DumpVariables();
 	Communicator::finalize();
 

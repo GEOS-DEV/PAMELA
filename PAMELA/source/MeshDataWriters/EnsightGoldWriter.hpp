@@ -1,6 +1,7 @@
 #pragma once
 // Library includes
 #include "MeshDataWriters/MeshDataWriter.hpp"
+#include "Mesh/Mesh.hpp"
 #include <iterator> 
 
 #if defined( _WIN32)
@@ -15,27 +16,47 @@ namespace PAMELA
 
 	//TODO variables in parallel, vector and tensors data
 
-	namespace EnsightGold
+	enum class ENSIGHT_GOLD_TYPE { UNKNOWN = -1, ESG_POINT = 1, ESG_BAR2 = 2, ESG_TRIA3 = 4, ENS_QUAD4 = 6, ENS_TETRA4 = 8, ENS_PYRAMID5 = 10, ENS_PENTA6 = 12, ENS_HEXA8 = 14 };
+
+	////Maps
+	//const std::unordered_map<ELEMENTS::TYPE, ENSIGHT_GOLD_TYPE> VTKToEnsightGold
+	//	=
+	//{
+	//	{ ELEMENTS::TYPE::VTK_VERTEX ,ENSIGHT_GOLD_TYPE::ESG_POINT },
+	//	{ ELEMENTS::TYPE::VTK_LINE ,ENSIGHT_GOLD_TYPE::ESG_BAR2 },
+	//	{ ELEMENTS::TYPE::VTK_TRIANGLE ,ENSIGHT_GOLD_TYPE::ESG_TRIA3 },
+	//	{ ELEMENTS::TYPE::VTK_QUAD ,ENSIGHT_GOLD_TYPE::ENS_QUAD4 },
+	//	{ ELEMENTS::TYPE::VTK_TETRA ,ENSIGHT_GOLD_TYPE::ENS_TETRA4 },
+	//	{ ELEMENTS::TYPE::VTK_HEXAHEDRON ,ENSIGHT_GOLD_TYPE::ENS_HEXA8 },
+	//	{ ELEMENTS::TYPE::VTK_WEDGE ,ENSIGHT_GOLD_TYPE::ENS_PENTA6 },
+	//	{ ELEMENTS::TYPE::VTK_PYRAMID ,ENSIGHT_GOLD_TYPE::ENS_PYRAMID5 }
+	//};
+
+
+	class EnsightGoldWriter : public MeshDataWriter
 	{
 
-		enum class ENSIGHT_GOLD_TYPE { UNKNOWN = -1, ESG_POINT = 1, ESG_BAR2 = 2, ESG_TRIA3 = 4, ENS_QUAD4 = 6, ENS_TETRA4 = 8, ENS_PYRAMID5 = 10, ENS_PENTA6 = 12, ENS_HEXA8 = 14 };
+	public:
 
-		//Maps
-		const std::unordered_map<ELEMENTS::TYPE, ENSIGHT_GOLD_TYPE> VTKToEnsightGold
-			=
-		{
-			{ ELEMENTS::TYPE::VTK_VERTEX ,ENSIGHT_GOLD_TYPE::ESG_POINT },
-			{ ELEMENTS::TYPE::VTK_LINE ,ENSIGHT_GOLD_TYPE::ESG_BAR2 },
-			{ ELEMENTS::TYPE::VTK_TRIANGLE ,ENSIGHT_GOLD_TYPE::ESG_TRIA3 },
-			{ ELEMENTS::TYPE::VTK_QUAD ,ENSIGHT_GOLD_TYPE::ENS_QUAD4 },
-			{ ELEMENTS::TYPE::VTK_TETRA ,ENSIGHT_GOLD_TYPE::ENS_TETRA4 },
-			{ ELEMENTS::TYPE::VTK_HEXAHEDRON ,ENSIGHT_GOLD_TYPE::ENS_HEXA8 },
-			{ ELEMENTS::TYPE::VTK_WEDGE ,ENSIGHT_GOLD_TYPE::ENS_PENTA6 },
-			{ ELEMENTS::TYPE::VTK_PYRAMID ,ENSIGHT_GOLD_TYPE::ENS_PYRAMID5 }
-		};
+		EnsightGoldWriter(Mesh * mesh, std::string name) : MeshDataWriter(mesh,name) {}
+
+		void Init();
+		void DumpVariables();
 
 
+	private:
 
+		void MakeCaseFile();
+		void MakeGeoFile();
+
+		//Geo
+		void MakeGeoFile_Header();
+		
+		template<typename T>
+		void MakeGeoFile_AddParts(const PartMap<T>* parts);
+
+		template<typename T>
+		void DumpVariables_Parts(const PartMap<T>* parts);
 
 
 		const std::unordered_map<ELEMENTS::TYPE, std::string> ElementToLabel
@@ -67,359 +88,224 @@ namespace PAMELA
 		enum class ENSIGHT_GOLD_VARIABLE_TYPE { UNKNOWN = -1, SCALAR = 1, VECTOR = 3, TENSOR_SYMM = 6 };
 		enum class ENSIGHT_GOLD_VARIABLE_LOCATION { UNKNOWN = -1, PER_NODE = 1, PER_CELL = 2 };
 
-		class EnsightGoldWriter : public MeshDataWriter
+		std::ofstream m_caseFile;
+		std::ofstream m_geoFile;
+
+
+	};
+
+
+
+	/**
+	 * \brief
+	 * \tparam T
+	 * \param ipart
+	 * \param parts
+	 * \param prefixLabel
+	 */
+	template <typename T>
+	void EnsightGoldWriter::MakeGeoFile_AddParts(const PartMap<T>* parts)
+	{
+
+		for (auto it = parts->begin(); it != parts->end(); ++it)			//Loop over Parts that are defined from the mesh input
 		{
 
-			template <typename T>
-			using PartMap = std::unordered_map<std::string, Part<T>*>;
+			auto partptr = it->second;
 
-		public:
+			m_geoFile << "part" << std::endl;
+			m_geoFile << std::setw(10);
+			m_geoFile << partptr->Index << std::endl;
+			m_geoFile << partptr->Label << std::endl;
 
-			EnsightGoldWriter(Mesh* mesh, std::string name) :m_mesh(mesh), m_name(name), m_partition(Communicator::worldRank()), m_nPartition(Communicator::worldSize()) { Init(); }
-
-			void CreateVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name, std::string part);
-			void CreateVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name);
-			void MakeCaseFile();
-			void MakeGeoFile();
-
-			void SetVariable(std::string label, double univalue);
-			void SetVariable(std::string label, std::string part, double univalue);
-			void SetVariable(std::string label,  const std::vector<double>& values); // this one assume only one part
-			void SetVariable(std::string label, std::string part, const std::vector<double>& values);
-			void DumpVariables();
+			//Coordinates
+			m_geoFile << "coordinates" << std::endl;
+			m_geoFile << std::setw(10);
+			m_geoFile << partptr->Points.size() << std::endl;
 
 
-		private:
-
-			void Init();
-
-			template<typename T>
-			void FillParts(std::string prefixLabel, PartMap<T>* parts);
-
-			//Geo
-			void MakeGeoFile_Header();
-			template<typename T>
-			void MakeGeoFile_AddParts(const PartMap<T>* parts);
-			template<typename T>
-			void DumpVariables_Parts(const PartMap<T>* parts);
-
-			std::string PartitionNumberForExtension();
-			std::string TimeStepNumberForExtension();
-
-			Mesh* m_mesh;
-			std::string m_name;
-			std::ofstream m_caseFile;
-			std::ofstream m_geoFile;
-			int m_nDigitsExtensionPartition;
-			int m_nDigitsExtensionTime;
-
-			Types::uint_t m_partition;
-			Types::uint_t m_nPartition;
-
-			double m_currentTime;
-			int m_currentTimeStep;
-
-			//Parts
-			PartMap<Point*>   m_PointParts;
-			PartMap<Line*>  m_LineParts;
-			PartMap<Polygon*>  m_PolygonParts;
-			PartMap<Polyhedron*>  m_PolyhedronParts;
-
-
-			//Property
-			std::unordered_map<VariableKey, Variable*, VariableKeyHash> m_Variable;
-			
-			
-		};
-
-
-
-		/**
-		 * \brief
-		 * \tparam T
-		 * \param parts
-		 */
-		template<typename T>
-		void EnsightGoldWriter::FillParts(std::string prefixLabel, PartMap<T>* parts)
-		{
-			//--Iterate over polygon parts
-			for (auto it = parts->begin(); it != parts->end(); ++it)	//Loop over group and act on active groups
+			//--Id
+			for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)
 			{
-				auto partptr = it->second;
+				m_geoFile << std::setw(10);
+				m_geoFile << (*it2)->get_globalIndex() << std::endl;
+			}
 
-				//Update Label
-				partptr->Label = prefixLabel + "_" + partptr->Label;
+			//--x
+			for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)		//Loop over Points 
+			{
+				m_geoFile << std::setw(12);
+				m_geoFile << (*it2)->get_coordinates().x << std::endl;
+			}
 
-				//----Count number of elements per part
-				for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
+			//--y
+			for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)		//Loop over Points 
+			{
+				m_geoFile << std::setw(12);
+				m_geoFile << (*it2)->get_coordinates().y << std::endl;
+			}
+
+			//--z
+			for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)		//Loop over Points 
+			{
+				m_geoFile << std::setw(12);
+				m_geoFile << (*it2)->get_coordinates().z << std::endl;
+			}
+
+			//Elements
+
+			for (auto it2 = partptr->SubParts.begin(); it2 != partptr->SubParts.end(); ++it2)
+			{
+				if (it2->second->SubCollection.size_owned() > 0)
 				{
-					auto vtkType = (*it2)->get_vtkType();
-					partptr->numberOfElementsPerSubPart[vtkType] = partptr->numberOfElementsPerSubPart.at(vtkType) + 1;
-				}
-				//----Create as many subparts as there are different elements
-				for (auto it2 = partptr->numberOfElementsPerSubPart.begin(); it2 != partptr->numberOfElementsPerSubPart.end(); ++it2)
-				{
-					partptr->SubParts[it2->first] = new SubPart<T>(it2->second, it2->first);
-				}
-				//----Fill subparts with elements
-				for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
-				{
-					auto vtkType = (*it2)->get_vtkType();
-					//auto ensightGoldType = EnsightGold::VTKToEnsightGold.at(vtkType);
-					partptr->SubParts[vtkType]->SubCollection.push_back_owned_unique(*it2);
-				}
-
-				//----Mapping from local to global
-				int id = 0;
-				for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
-				{
-					auto vtkType = (*it2)->get_vtkType();
-					//auto ensightGoldType = EnsightGold::VTKToEnsightGold.at(vtkType);
-					auto subpart = partptr->SubParts[vtkType];
-					//Map local indexes
-					subpart->IndexMapping.push_back(id);
-					id++;
-
-					//std::set<Point*> PointsSet;
-
-					//Insert vertices
-					auto vertexlist = (*it2)->get_vertexList();
-					int vertexsize = static_cast<int>(vertexlist.size());
-					for (auto i = 0; i != vertexsize; ++i)
+					auto subpart = it2->second;
+					auto elementType = subpart->ElementType;
+					std::string ENSTypeLabel = ElementToLabel.at(elementType);
+					m_geoFile << ENSTypeLabel << std::endl;
+					m_geoFile << std::setw(10);
+					//----dimension
+					m_geoFile << subpart->SubCollection.size_owned() << std::endl;
+					//----Id
+					for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3)
 					{
-						partptr->Points.push_back(vertexlist[i]);
+						m_geoFile << std::setw(10) << (*it3)->get_globalIndex() << std::endl;
 					}
-					
+					//----Connectivity
+					for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3)
+					{
+						auto VertexList = (*it3)->get_vertexList();
+						auto nVertex = VertexList.size();
+						for (auto j = 0; j != nVertex; ++j)
+						{
+							m_geoFile << std::setw(10) << partptr->GlobalToLocalPointMapping.at(VertexList[j]->get_globalIndex()) + 1;
+						}
+						m_geoFile << std::endl;
+					}
 				}
+			}
+		}
 
-				std::sort(partptr->Points.begin(), partptr->Points.end());
-				partptr->Points.erase(std::unique(partptr->Points.begin(), partptr->Points.end()), partptr->Points.end());
+	}
+
+	template <typename T>
+	void EnsightGoldWriter::DumpVariables_Parts(const PartMap<T>* parts)
+	{
+
+		//Polyhedron
+		for (auto it = parts->begin(); it != parts->end(); ++it)			//Loop over Parts that are defined from the mesh input
+		{
+			auto partptr = it->second;
 
 
-				//----Map Point Coordinates
-				int i = 0;
-				for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)
+			//PerElementVariables
+			for (auto it2 = partptr->PerElementVariable.begin(); it2 != partptr->PerElementVariable.end(); ++it2)
+			{
+
+				auto variableptr = (*it2);
+
+				//Create file
+				std::ofstream variableFile;
+				variableFile.open("./" + partptr->Label + "_" + variableptr->Label + "_" + TimeStepNumberForExtension(), std::fstream::in | std::fstream::out | std::fstream::trunc);
+
+				//write
+				variableFile << variableptr->Label << std::endl;
+				variableFile << "part" << std::endl;
+				variableFile << std::setw(10);
+				variableFile << partptr->Index << std::endl;
+
+
+				for (auto it3 = partptr->SubParts.begin(); it3 != partptr->SubParts.end(); ++it3)
 				{
-					partptr->GlobalToLocalPointMapping[(*it2)->get_globalIndex()] = i;
-					i++;
+					if (it3->second->SubCollection.size_owned() > 0)
+					{
+						auto subpart = it3->second;
+						auto elementType = subpart->ElementType;
+						std::string ENSTypeLabel = ElementToLabel.at(elementType);
+						variableFile << ENSTypeLabel << std::endl;
+						variableFile << std::setw(10);
+						for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned(); ++it4)
+						{
+							auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
+							auto variableIndex = subpart->IndexMapping[collectionIndex];
+							auto variableData = variableptr->get_data(variableIndex);
+							for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
+							{
+								variableFile << std::setw(12) << (*it5) << std::endl;
+							}
+						}
+
+					}
 				}
 
 			}
 
-		}
-
-
-		/**
-		 * \brief
-		 * \tparam T
-		 * \param ipart
-		 * \param parts
-		 * \param prefixLabel
-		 */
-		template <typename T>
-		void EnsightGoldWriter::MakeGeoFile_AddParts(const PartMap<T>* parts)
-		{
-
-			for (auto it = parts->begin(); it != parts->end(); ++it)			//Loop over Parts that are defined from the mesh input
+			//PerNodeVariables
+			for (auto it2 = partptr->PerNodeVariable.begin(); it2 != partptr->PerNodeVariable.end(); ++it2)
 			{
 
-				auto partptr = it->second;
+				auto variableptr = (*it2);
 
-				m_geoFile << "part" << std::endl;
-				m_geoFile << std::setw(10);
-				m_geoFile << partptr->Index << std::endl;
-				m_geoFile << partptr->Label << std::endl;
+				//Create file
+				std::ofstream variableFile;
+				variableFile.open("./" + partptr->Label + "_" + variableptr->Label + "_" + TimeStepNumberForExtension(), std::fstream::in | std::fstream::out | std::fstream::trunc);
 
-				//Coordinates
-				m_geoFile << "coordinates" << std::endl;
-				m_geoFile << std::setw(10);
-				m_geoFile << partptr->Points.size() << std::endl;
-
-
-				//--Id
-				for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)
+				//write
+				variableFile << variableptr->Label << std::endl;
+				variableFile << "part" << std::endl;
+				variableFile << std::setw(10);
+				variableFile << partptr->Index << std::endl;
+				variableFile << "coordinates" << std::endl;
+				for (auto it3 = partptr->Points.begin(); it3 != partptr->Points.end(); ++it3)
 				{
-					m_geoFile << std::setw(10);
-					m_geoFile << (*it2)->get_globalIndex() << std::endl;
-				}
 
-				//--x
-				for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)		//Loop over Points 
-				{
-					m_geoFile << std::setw(12);
-					m_geoFile << (*it2)->get_coordinates().x << std::endl;
-				}
-
-				//--y
-				for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)		//Loop over Points 
-				{
-					m_geoFile << std::setw(12);
-					m_geoFile << (*it2)->get_coordinates().y << std::endl;
-				}
-
-				//--z
-				for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)		//Loop over Points 
-				{
-					m_geoFile << std::setw(12);
-					m_geoFile << (*it2)->get_coordinates().z << std::endl;
-				}
-
-				//Elements
-
-				for (auto it2 = partptr->SubParts.begin(); it2 != partptr->SubParts.end(); ++it2)
-				{
-					if (it2->second->SubCollection.size_owned() > 0)
+					//TODO does not work
+					auto collectionIndex = std::distance(partptr->Points.begin(), it3);
+					auto variableData = variableptr->get_data(static_cast<int>(collectionIndex));
+					for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
 					{
-						auto subpart = it2->second;
+						variableFile << std::setw(12) << (*it5) << std::endl;
+					}
+					////y
+					//for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
+					//{
+					//	variableFile << std::setw(12) << (*it5) << std::endl;
+					//}
+					////z
+					//	for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
+					//{
+					//	variableFile << std::setw(12) << (*it5) << std::endl;
+					//}
+				}
+
+
+				/*for (auto it3 = partptr->SubParts.begin(); it3 != partptr->SubParts.end(); ++it3)
+				{
+					if (it3->second->SubCollection.size_owned() > 0)
+					{
+						auto subpart = it3->second;
 						auto elementType = subpart->ElementType;
 						std::string ENSTypeLabel = EnsightGold::ElementToLabel.at(elementType);
-						m_geoFile << ENSTypeLabel << std::endl;
-						m_geoFile << std::setw(10);
-						//----dimension
-						m_geoFile << subpart->SubCollection.size_owned() << std::endl;
-						//----Id
-						for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3)
+						variableFile << ENSTypeLabel << std::endl;
+						variableFile << std::setw(10);
+						for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned(); ++it4)
 						{
-							m_geoFile << std::setw(10) << (*it3)->get_globalIndex() << std::endl;
-						}
-						//----Connectivity
-						for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3)
-						{
-							auto VertexList = (*it3)->get_vertexList();
-							auto nVertex = VertexList.size();
-							for (auto j = 0; j != nVertex; ++j)
+							auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
+							auto variableIndex = subpart->IndexMapping[collectionIndex];
+							auto variableData = variableptr->get_data(static_cast<int>(collectionIndex));
+							for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
 							{
-								m_geoFile << std::setw(10) << partptr->GlobalToLocalPointMapping.at(VertexList[j]->get_globalIndex()) + 1;
+								variableFile << std::setw(12) << (*it5) << std::endl;
 							}
-							m_geoFile << std::endl;
+
 						}
+
 					}
-				}
+				}*/
+
 			}
 
 		}
 
-		template <typename T>
-		void EnsightGoldWriter::DumpVariables_Parts(const PartMap<T>* parts)
-		{
 
-			//Polyhedron
-			for (auto it = parts->begin(); it != parts->end(); ++it)			//Loop over Parts that are defined from the mesh input
-			{
-				auto partptr = it->second;
-
-
-				//PerElementVariables
-				for (auto it2 = partptr->PerElementVariable.begin(); it2 != partptr->PerElementVariable.end(); ++it2)
-				{
-
-					auto variableptr = (*it2);
-
-					//Create file
-					std::ofstream variableFile;
-					variableFile.open("./" + partptr->Label + "_" + variableptr->Label + "_" + TimeStepNumberForExtension(), std::fstream::in | std::fstream::out | std::fstream::trunc);
-
-					//write
-					variableFile << variableptr->Label << std::endl;
-					variableFile << "part" << std::endl;
-					variableFile << std::setw(10);
-					variableFile << partptr->Index << std::endl;
-
-
-					for (auto it3 = partptr->SubParts.begin(); it3 != partptr->SubParts.end(); ++it3)
-					{
-						if (it3->second->SubCollection.size_owned() > 0)
-						{
-							auto subpart = it3->second;
-							auto elementType = subpart->ElementType;
-							std::string ENSTypeLabel = EnsightGold::ElementToLabel.at(elementType);
-							variableFile << ENSTypeLabel << std::endl;
-							variableFile << std::setw(10);
-							for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned();  ++it4)
-							{
-								auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
-								auto variableIndex = subpart->IndexMapping[collectionIndex];
-								auto variableData = variableptr->get_data(variableIndex);
-								for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
-								{
-									variableFile << std::setw(12) << (*it5) << std::endl;
-								}
-							}
-
-						}
-					}
-
-				}
-
-				//PerNodeVariables
-				for (auto it2 = partptr->PerNodeVariable.begin(); it2 != partptr->PerNodeVariable.end(); ++it2)
-				{
-
-					auto variableptr = (*it2);
-
-					//Create file
-					std::ofstream variableFile;
-					variableFile.open("./" + partptr->Label + "_" + variableptr->Label + "_" + TimeStepNumberForExtension(), std::fstream::in | std::fstream::out | std::fstream::trunc);
-
-					//write
-					variableFile << variableptr->Label << std::endl;
-					variableFile << "part" << std::endl;
-					variableFile << std::setw(10);
-					variableFile << partptr->Index << std::endl;
-					variableFile << "coordinates" << std::endl;
-					for (auto it3 = partptr->Points.begin(); it3 != partptr->Points.end(); ++it3)
-					{
-
-						//TODO does not work
-						auto collectionIndex = std::distance(partptr->Points.begin(), it3);
-						auto variableData = variableptr->get_data(static_cast<int>(collectionIndex));
-						for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
-						{
-							variableFile << std::setw(12) << (*it5) << std::endl;
-						}
-						////y
-						//for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
-						//{
-						//	variableFile << std::setw(12) << (*it5) << std::endl;
-						//}
-						////z
-						//	for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
-						//{
-						//	variableFile << std::setw(12) << (*it5) << std::endl;
-						//}
-					}
-
-
-					/*for (auto it3 = partptr->SubParts.begin(); it3 != partptr->SubParts.end(); ++it3)
-					{
-						if (it3->second->SubCollection.size_owned() > 0)
-						{
-							auto subpart = it3->second;
-							auto elementType = subpart->ElementType;
-							std::string ENSTypeLabel = EnsightGold::ElementToLabel.at(elementType);
-							variableFile << ENSTypeLabel << std::endl;
-							variableFile << std::setw(10);
-							for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned(); ++it4)
-							{
-								auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
-								auto variableIndex = subpart->IndexMapping[collectionIndex];
-								auto variableData = variableptr->get_data(static_cast<int>(collectionIndex));
-								for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
-								{
-									variableFile << std::setw(12) << (*it5) << std::endl;
-								}
-
-							}
-
-						}
-					}*/
-
-				}
-
-			}
-
-
-		}
 	}
 
 }

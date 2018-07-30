@@ -1,11 +1,8 @@
 #pragma once
 // Library includes
-#include "Mesh/Mesh.hpp"
-#include "Utils/Types.hpp"
+#include "MeshDataWriters/Part.hpp"
+#include "MeshDataWriters/Variable.hpp"
 #include "Utils/Communicator.hpp"
-#include "Elements/Element.hpp"
-#include <iterator> 
-
 #if defined( _WIN32)
 #include <direct.h>
 #else
@@ -18,148 +15,132 @@ namespace PAMELA
 
 	enum class FAMILY { POLYHEDRON = 3, POLYGON = 2, LINE = 1, POINT = 0, UNKNOWN = -1 };
 
-	//////VARIABLES
-	//Variable types
-	enum class VARIABLE_TYPE { UNKNOWN = -1, SCALAR = 1, VECTOR = 3, TENSOR_SYMM = 6 };
-	//Variable locations
-	enum class VARIABLE_LOCATION { UNKNOWN = -1, PER_NODE = 1, PER_CELL = 2 };
-	//Variable size
-	const std::unordered_map<VARIABLE_TYPE, int> VariableTypeToSize =
-	{
-		{ VARIABLE_TYPE::SCALAR,1 },
-	{ VARIABLE_TYPE::VECTOR,3 },
-	{ VARIABLE_TYPE::TENSOR_SYMM,6 },
-	};
-
-	struct Variable
-	{
-		Variable(VARIABLE_TYPE dtype, std::string label, int size) : Label(label), dType(dtype)
-		{
-			offset = VariableTypeToSize.at(dtype);
-			Data = std::vector<double>(size*offset);
-		}
-
-		std::string Label;
-		int offset;
-		VARIABLE_TYPE dType;
-
-		void set_data(double cst)
-		{
-			std::fill(Data.begin(), Data.end(), cst);
-		}
-
-		void set_data(std::vector<double> vec)
-		{
-			ASSERT(vec.size() == Data.size(), "Mismatch sizes");
-			Data = vec;
-		}
-
-		std::vector<double> get_data(int i)
-		{
-			if (offset == 1)
-				return{ Data[i] };
-			std::vector<double> vec(&Data[i*offset], &Data[(i + 1)*offset - 1]);
-			return vec;
-		}
-
-	private:
-		std::vector<double> Data;
-
-	};
-
-
-	struct VariableKey
-	{
-		std::string first;
-		std::string second;
-
-		VariableKey(std::string first, std::string second)
-		{
-			this->first = first;
-			this->second = second;
-		}
-
-		bool operator==(const VariableKey &other) const
-		{
-			return (first == other.first
-				&& second == other.second);
-		}
-	};
-
-	struct VariableKeyHash
-	{
-		std::size_t operator()(const VariableKey& k) const
-		{
-			auto hfirst = std::hash<std::string>()(k.first);
-			auto hsecond = std::hash<std::string>()(k.second);
-			return hfirst ^ hsecond;
-		}
-	};
-
-
-	////////PARTS
-	template <class T>
-	struct SubPart
-	{
-		SubPart(int size, ELEMENTS::TYPE elementtype) { ElementType = elementtype; IndexMapping.reserve(size); SubCollection.reserve(size); }
-		ELEMENTS::TYPE ElementType;
-		std::vector<int> IndexMapping;  //Subpart to Part
-		Ensemble<T, ElementHash<T>, ElementEqual<T>> SubCollection;
-	};
-
-
-	template <class T>
-	struct Part
-	{
-		Part(std::string label, int index, Ensemble<T, ElementHash<T>, ElementEqual<T>>* collection) { Label = label; Collection = collection; Index = index; };
-		Variable* AddVariable(VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string label);
-
-		int Index;   // global including all families
-		std::string Label;
-		Ensemble<T, ElementHash<T>, ElementEqual<T>>* Collection;
-		std::vector<Point*> Points;
-		std::unordered_map<int, int> GlobalToLocalPointMapping;
-		std::unordered_map<ELEMENTS::TYPE, SubPart<T>*> SubParts;
-		std::unordered_map<ELEMENTS::TYPE, int> numberOfElementsPerSubPart
-			=
-		{
-			{ ELEMENTS::TYPE::VTK_VERTEX,0 },
-		{ ELEMENTS::TYPE::VTK_LINE,0 },
-		{ ELEMENTS::TYPE::VTK_TRIANGLE,0 },
-		{ ELEMENTS::TYPE::VTK_QUAD ,0 },
-		{ ELEMENTS::TYPE::VTK_TETRA,0 },
-		{ ELEMENTS::TYPE::VTK_HEXAHEDRON ,0 },
-		{ ELEMENTS::TYPE::VTK_WEDGE,0 },
-		{ ELEMENTS::TYPE::VTK_PYRAMID,0 }
-		};
-
-		std::vector<Variable*> PerElementVariable;
-		std::vector<Variable*> PerNodeVariable;
-
-	};
-
-
-	template <class T>
-	Variable* Part<T>::AddVariable(VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string label)
-	{
-		if (dloc == VARIABLE_LOCATION::PER_CELL)
-		{
-			PerElementVariable.push_back(new Variable(dtype, label, Collection->size_owned()));
-			return PerElementVariable.back();
-		}
-		if (dloc == VARIABLE_LOCATION::PER_NODE)
-		{
-			PerNodeVariable.push_back(new Variable(dtype, label, static_cast<int>(Points.size())));
-			return PerNodeVariable.back();
-		}
-
-		return nullptr;
-
-	}
-
-
+	class Mesh;
 
 	class MeshDataWriter
-	{};
+	{
+		template <typename T>
+		using PartMap = std::unordered_map<std::string, Part<T>*>;
+
+	public:
+
+		MeshDataWriter(Mesh * mesh, std::string name);
+
+		virtual void Init() = 0;
+
+		void DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name, std::string part);
+		void DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name);
+		void SetVariable(std::string label, double univalue);
+		void SetVariable(std::string label, std::string part, double univalue);
+		void SetVariable(std::string label, const std::vector<double>& values); // this one assume only one part
+		void SetVariable(std::string label, std::string part, const std::vector<double>& values);
+		virtual void DumpVariables()=0;
+
+		template<typename T>
+		void FillParts(std::string prefixLabel, PartMap<T>* parts);
+
+	protected:
+
+		std::string PartitionNumberForExtension();
+		std::string TimeStepNumberForExtension();
+
+		Mesh* m_mesh;
+
+		std::string m_name;
+
+		Types::uint_t m_partition;
+		Types::uint_t m_nPartition;
+
+		double m_currentTime;
+		int m_currentTimeStep;
+
+		int m_nDigitsExtensionPartition;
+		int m_nDigitsExtensionTime;
+		
+		//Parts
+		PartMap<Point*>   m_PointParts;
+		PartMap<Line*>  m_LineParts;
+		PartMap<Polygon*>  m_PolygonParts;
+		PartMap<Polyhedron*>  m_PolyhedronParts;
+
+
+		//Property
+		std::unordered_map<VariableKey, Variable*, VariableKeyHash> m_Variable;
+	
+	};
+
+	/**
+	* \brief
+	* \tparam T
+	* \param parts
+	*/
+	template<typename T>
+	void MeshDataWriter::FillParts(std::string prefixLabel, PartMap<T>* parts)
+	{
+		//--Iterate over polygon parts
+		for (auto it = parts->begin(); it != parts->end(); ++it)	//Loop over group and act on active groups
+		{
+			auto partptr = it->second;
+
+			//Update Label
+			partptr->Label = prefixLabel + "_" + partptr->Label;
+
+			//----Count number of elements per part
+			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
+			{
+				auto vtkType = (*it2)->get_vtkType();
+				partptr->numberOfElementsPerSubPart[vtkType] = partptr->numberOfElementsPerSubPart.at(vtkType) + 1;
+			}
+			//----Create as many subparts as there are different elements
+			for (auto it2 = partptr->numberOfElementsPerSubPart.begin(); it2 != partptr->numberOfElementsPerSubPart.end(); ++it2)
+			{
+				partptr->SubParts[it2->first] = new SubPart<T>(it2->second, it2->first);
+			}
+			//----Fill subparts with elements
+			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
+			{
+				auto vtkType = (*it2)->get_vtkType();
+				//auto ensightGoldType = EnsightGold::VTKToEnsightGold.at(vtkType);
+				partptr->SubParts[vtkType]->SubCollection.push_back_owned_unique(*it2);
+			}
+
+			//----Mapping from local to global
+			int id = 0;
+			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
+			{
+				auto vtkType = (*it2)->get_vtkType();
+				//auto ensightGoldType = EnsightGold::VTKToEnsightGold.at(vtkType);
+				auto subpart = partptr->SubParts[vtkType];
+				//Map local indexes
+				subpart->IndexMapping.push_back(id);
+				id++;
+
+				//std::set<Point*> PointsSet;
+
+				//Insert vertices
+				auto vertexlist = (*it2)->get_vertexList();
+				int vertexsize = static_cast<int>(vertexlist.size());
+				for (auto i = 0; i != vertexsize; ++i)
+				{
+					partptr->Points.push_back(vertexlist[i]);
+				}
+
+			}
+
+			std::sort(partptr->Points.begin(), partptr->Points.end());
+			partptr->Points.erase(std::unique(partptr->Points.begin(), partptr->Points.end()), partptr->Points.end());
+
+
+			//----Map Point Coordinates
+			int i = 0;
+			for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)
+			{
+				partptr->GlobalToLocalPointMapping[(*it2)->get_globalIndex()] = i;
+				i++;
+			}
+
+		}
+
+	}
 
 }

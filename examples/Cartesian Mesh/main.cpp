@@ -27,11 +27,11 @@ int main(int argc, const char * argv[])
 
 	//Output
 	//--Create 
-	EnsightGold::EnsightGoldWriter* OutputWriter = new EnsightGold::EnsightGoldWriter(MainMesh, "Cartesian");
+	EnsightGoldWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "Cartesian");
 	//--Create variables
-	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR, EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_CELL, "Partition", "DEFAULT");
-	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR,EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_CELL,"Pressure","DEFAULT");
-	OutputWriter->CreateVariable(EnsightGold::FAMILY::POLYHEDRON, EnsightGold::ENSIGHT_GOLD_VARIABLE_TYPE::SCALAR, EnsightGold::ENSIGHT_GOLD_VARIABLE_LOCATION::PER_NODE, "Test", "DEFAULT");
+	OutputWriter->CreateVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition", "DEFAULT");
+	OutputWriter->CreateVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL,"Pressure","DEFAULT");
+	OutputWriter->CreateVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_NODE, "Test", "DEFAULT");
 
 	//--Make files
 	OutputWriter->MakeCaseFile();

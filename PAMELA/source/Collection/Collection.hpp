@@ -6,6 +6,9 @@
 #include <set>
 #include "Collection/Indexing.hpp"
 #include "Elements/Point.hpp"
+#include "Elements/Line.hpp"
+#include "Elements/Polygon.hpp"
+#include "Elements/Polyhedron.hpp"
 #include "Collection/Ensemble.hpp"
 
 namespace PAMELA

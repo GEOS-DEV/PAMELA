@@ -28,7 +28,7 @@ namespace PAMELA
 		//--Add active parts
 		for (auto it = ActiveGroupMapLine.begin(); it != ActiveGroupMapLine.end(); ++it)	//Loop over group and act on active groups
 		{
-			if (it->second == true)
+			if (it->second)
 			{
 				std::string grplabel = it->first;
 				auto groupEnsemble = LineCollection->get_Group(grplabel);
@@ -46,7 +46,7 @@ namespace PAMELA
 		//--Add active parts
 		for (auto it = ActiveGroupMapPolygon.begin(); it != ActiveGroupMapPolygon.end(); ++it)	//Loop over group and act on active groups
 		{
-			if (it->second == true)
+			if (it->second)
 			{
 				std::string grplabel = it->first;
 				auto groupEnsemble = PolygonCollection->get_Group(grplabel);
@@ -63,7 +63,7 @@ namespace PAMELA
 		//--Add active parts
 		for (auto it = ActiveGroupMapPolyhedron.begin(); it != ActiveGroupMapPolyhedron.end(); ++it)	//Loop over group and act on active groups
 		{
-			if (it->second == true)
+			if (it->second )
 			{
 				std::string grplabel = it->first;
 				auto groupEnsemble = PolyhedronCollection->get_Group(grplabel);
@@ -74,8 +74,7 @@ namespace PAMELA
 		FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYHEDRON", &m_PolyhedronParts);
 
 		LOGINFO("*** Done");
-
-	}
+			}
 
 
 	void MeshDataWriter::DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name, std::string part)
@@ -103,7 +102,6 @@ namespace PAMELA
 	void MeshDataWriter::DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name)
 	{
 
-		std::string part;
 		switch (family)
 		{
 		case FAMILY::POINT:
@@ -144,6 +142,13 @@ namespace PAMELA
 			auto var = m_Variable.at(VariableKey(label, part.first));
 			var->set_data(univalue);
 		}
+
+		for (auto const& part : m_PolygonParts)
+		{
+			auto var = m_Variable.at(VariableKey(label, part.first));
+			var->set_data(univalue);
+		}
+
 	}
 
 

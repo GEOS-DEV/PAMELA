@@ -26,6 +26,7 @@ int main(int argc, const char * argv[]) {
 
 	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "UnstructuredGridExample");
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->Init();
 	OutputWriter->SetVariable("Partition", Communicator::worldRank());
 	OutputWriter->DumpVariables();

@@ -36,8 +36,7 @@ namespace PAMELA
 		void SetVariable(std::string label, std::string part, const std::vector<double>& values);
 		virtual void DumpVariables()=0;
 
-		template<typename T>
-		void FillParts(std::string prefixLabel, PartMap<T>* parts);
+		
 
 	protected:
 
@@ -63,6 +62,8 @@ namespace PAMELA
 		PartMap<Polygon*>  m_PolygonParts;
 		PartMap<Polyhedron*>  m_PolyhedronParts;
 
+		template<typename T>
+		void FillParts(std::string prefixLabel, PartMap<T>* parts);
 
 		//Property
 		std::unordered_map<VariableKey, Variable*, VariableKeyHash> m_Variable;

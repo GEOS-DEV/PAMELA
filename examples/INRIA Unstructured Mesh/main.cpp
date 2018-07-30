@@ -22,16 +22,17 @@ int main(int argc, const char * argv[]) {
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
-	MeshDataWriter* Writer = new EnsightGoldWriter(MainMesh, "UnstructuredGridExample");
-	Writer->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "UnstructuredGridExample");
+	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	//Writer->AddElementScalarVariable("Pressure");
 	
-	Writer->Init();
+	OutputWriter->Init();
 
-	Writer->SetVariable("Partition", Communicator::worldRank());
+	OutputWriter->SetVariable("Partition", Communicator::worldRank());
 
 	//Dump variables
-	Writer->DumpVariables();
+	OutputWriter->DumpVariables();
 
 	Communicator::finalize();
 

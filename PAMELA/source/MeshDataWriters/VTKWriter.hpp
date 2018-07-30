@@ -12,11 +12,6 @@
 namespace PAMELA
 {
 
-	namespace VTK_
-	{
-
-		class VTKWriter;
-
-	}
+	class VTKWriter;
 
 }

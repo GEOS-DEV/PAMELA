@@ -46,14 +46,14 @@ namespace PAMELA
 				for (auto it2 = part->PerElementVariable.begin(); it2 != part->PerElementVariable.end(); ++it2)
 				{
 					m_caseFile << "scalar per element:" << "     " << 1 << std::setw(5);
-					m_caseFile << "     " << (*it2)->Label << " " << (*it2)->Label << "_" + stars << std::endl;
+					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" + (*it2)->Label << "_" << stars << std::endl;
 				}
 
 				//Per Node Variable
 				for (auto it2 = part->PerNodeVariable.begin(); it2 != part->PerNodeVariable.end(); ++it2)
 				{
 					m_caseFile << "scalar per node:" << "     " << 1 << std::setw(5);
-					m_caseFile << "     " << (*it2)->Label << " " << (*it2)->Label << "_" + stars << std::endl;
+					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" + (*it2)->Label << "_" << stars << std::endl;
 				}
 			}
 
@@ -66,14 +66,14 @@ namespace PAMELA
 				for (auto it2 = part->PerElementVariable.begin(); it2 != part->PerElementVariable.end(); ++it2)
 				{
 					m_caseFile << "scalar per element:" << "     " << 1 << std::setw(5);
-					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" << (*it2)->Label << "_" + stars << std::endl;
+					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" + (*it2)->Label << "_" << stars << std::endl;
 				}
 
 				//Per Node Variable
 				for (auto it2 = part->PerNodeVariable.begin(); it2 != part->PerNodeVariable.end(); ++it2)
 				{
 					m_caseFile << "scalar per node:" << "     " << 1 << std::setw(5);
-					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" << (*it2)->Label << "_" + stars << std::endl;
+					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" + (*it2)->Label << "_" << stars << std::endl;
 				}
 			}
 
@@ -87,14 +87,14 @@ namespace PAMELA
 				for (auto it2 = part->PerElementVariable.begin(); it2 != part->PerElementVariable.end(); ++it2)
 				{
 					m_caseFile << "scalar per element:" << "     " << 1 << std::setw(5);
-					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" << (*it2)->Label << "_" + stars << std::endl;
+					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" + (*it2)->Label << "_" << stars << std::endl;
 				}
 
 				//Per Node Variable
 				for (auto it2 = part->PerNodeVariable.begin(); it2 != part->PerNodeVariable.end(); ++it2)
 				{
 					m_caseFile << "scalar per node:" << "     " << 1 << std::setw(5);
-					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" << (*it2)->Label << "_" + stars << std::endl;
+					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" + (*it2)->Label << "_" << stars << std::endl;
 				}
 			}
 
@@ -108,14 +108,14 @@ namespace PAMELA
 				for (auto it2 = part->PerElementVariable.begin(); it2 != part->PerElementVariable.end(); ++it2)
 				{
 					m_caseFile << "scalar per element:" << "     " << 1 << std::setw(5);
-					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" << (*it2)->Label << "_" + stars << std::endl;
+					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" + (*it2)->Label << "_" << stars << std::endl;
 				}
 
 				//Per Node Variable
 				for (auto it2 = part->PerNodeVariable.begin(); it2 != part->PerNodeVariable.end(); ++it2)
 				{
 					m_caseFile << "scalar per node:" << "     " << 1 << std::setw(5);
-					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" << (*it2)->Label << "_" + stars << std::endl;
+					m_caseFile << "     " << (*it2)->Label << " " << part->Label << "_" + (*it2)->Label << "_" << stars << std::endl;
 				}
 			}
 		}

@@ -16,7 +16,6 @@ namespace PAMELA
     class VTKWriter : public MeshDataWriter{
         public:
             VTKWriter(Mesh * mesh, std::string name) : MeshDataWriter(mesh,name) {}
-
             virtual void Init() final;
             virtual void DumpVariables() final;
 

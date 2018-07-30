@@ -28,11 +28,15 @@ int main(int argc, const char * argv[]) {
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
-	////Output
+
+	////-------------------------Output
 	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "EclipseGridExample");
 
 	//Variable declarations
+	
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+
 	auto mesh_props = MainMesh->get_PolyhedronProperty()->get_PropertyMap();
 	for (auto it = mesh_props.begin(); it != mesh_props.end(); ++it)
 	{
@@ -51,7 +55,6 @@ int main(int argc, const char * argv[]) {
 
 	//Dump
 	OutputWriter->DumpVariables();
-
 
 	Communicator::finalize();
 

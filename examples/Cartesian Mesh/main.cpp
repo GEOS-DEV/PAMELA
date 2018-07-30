@@ -27,15 +27,15 @@ int main(int argc, const char * argv[])
 
 	//Output
 	//--Create 
-	EnsightGoldWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "Cartesian");
+	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "Cartesian");
 	//--Create variables
-	OutputWriter->CreateVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition", "DEFAULT");
-	OutputWriter->CreateVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL,"Pressure","DEFAULT");
-	OutputWriter->CreateVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_NODE, "Test", "DEFAULT");
+	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL,"Pressure");
+	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_NODE, "Test");
 
 	//--Make files
-	OutputWriter->MakeCaseFile();
-	OutputWriter->MakeGeoFile();
+	OutputWriter->Init();
 
 	//--Set variables
 	//Set variable values

@@ -137,18 +137,24 @@ namespace PAMELA
 	void MeshDataWriter::SetVariable(std::string label, double univalue)
 	{
 
-		for (auto const& part : m_PolyhedronParts)
-		{
-			auto var = m_Variable.at(VariableKey(label, part.first));
-			var->set_data(univalue);
-		}
 
-		for (auto const& part : m_PolygonParts)
+		if (m_PolyhedronParts.find("label") != m_PolyhedronParts.end())
 		{
-			auto var = m_Variable.at(VariableKey(label, part.first));
-			var->set_data(univalue);
+			for (auto const& part : m_PolyhedronParts)
+			{
+				auto var = m_Variable.at(VariableKey(label, part.first));
+				var->set_data(univalue);
+			}
 		}
-
+		
+		if (m_PolygonParts.find("label") != m_PolygonParts.end())
+		{
+			for (auto const& part : m_PolygonParts)
+			{
+				auto var = m_Variable.at(VariableKey(label, part.first));
+				var->set_data(univalue);
+			}
+		}
 	}
 
 

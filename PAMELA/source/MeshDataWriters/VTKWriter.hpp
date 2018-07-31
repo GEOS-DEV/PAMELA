@@ -1,8 +1,10 @@
 #pragma once
 // Library includes
 #include "MeshDataWriters/MeshDataWriter.hpp"
+
 #include <vtkXMLPMultiBlockDataWriter.h>
 #include <vtkSmartPointer.h>
+#include <vtkMPIController.h>
 
 #if defined( _WIN32)
 #include <direct.h>
@@ -40,5 +42,8 @@ namespace PAMELA
         private:
             /// VTU file
             vtkSmartPointer<vtkXMLPMultiBlockDataWriter> vtm_ {vtkXMLPMultiBlockDataWriter::New()};
+
+            /// MPI controller for vtk
+            vtkSmartPointer<vtkMPIController> vtk_controller_ {vtkMPIController::New()};
     };
 }

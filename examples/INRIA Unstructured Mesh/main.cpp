@@ -14,9 +14,11 @@ int main(int argc, char * argv[]) {
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
 	Communicator::initialize();
+#ifdef WITH_VTK
         vtkSmartPointer<vtkMPIController> controler = vtkMPIController::New();
         controler->Initialize(&argc,&argv,true);
         vtkMultiProcessController::SetGlobalController(controler.Get());
+#endif
 
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/INRIA Unstructured Mesh/trivial.mesh");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/INRIA Unstructured Mesh/small.mesh");

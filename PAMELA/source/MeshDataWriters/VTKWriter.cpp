@@ -1,4 +1,5 @@
 
+#ifdef WITH_VTK
 #include "MeshDataWriters/VTKWriter.hpp" 
 #include "Mesh/Mesh.hpp"
 #include "MeshDataWriters/Variable.hpp"
@@ -22,7 +23,6 @@ namespace PAMELA
         DeclareAllVariables();
         MakeChildFiles();
         MakeParentFile();
-        LOGINFO("number of blocks: " + std::to_string(block_->GetNumberOfBlocks()));
     }
 
     void VTKWriter::DumpVariables() {
@@ -38,13 +38,10 @@ namespace PAMELA
     void VTKWriter::MakeChildFile(const PartMap<T>* parts, const std::string& prefix) {
 
         int part = 0;
-        LOGINFO("NEW PARTMAP");
         for (auto it = parts->begin();
                 it != parts->end();
                 ++it) {
-        LOGINFO("NEW PART");
             block_->SetNumberOfBlocks(block_->GetNumberOfBlocks()+1);
-            LOGINFO(std::to_string(part));
             vtkSmartPointer<vtkUnstructuredGrid> ug = vtkUnstructuredGrid::New();
             vtkSmartPointer<vtkPoints> vertices = vtkPoints::New();
             auto partptr = it->second;
@@ -101,7 +98,6 @@ namespace PAMELA
                             {
                                 dataarray->InsertNextTuple1(*it5);
                             }
-                            LOGINFO("CREATE NEW ARRAY " + variableptr->Label );
                         }
                         cell_data->AddArray(dataarray);
 
@@ -147,14 +143,10 @@ namespace PAMELA
         }
         else {
             multi_block->SetBlock(0, block_);
-            LOGINFO("SET BLOCK 0");
             for(int proc = 1 ; proc < Communicator::worldSize(); proc++) {
                 vtkSmartPointer< vtkMultiBlockDataSet> block = vtkMultiBlockDataSet::New();
-                LOGINFO("nb of sous blocs " + std::to_string(block->GetNumberOfBlocks() ));
                 controler->Receive(block,proc,proc);
                      multi_block->SetBlock(proc, block);
-                LOGINFO("nb of sous blocs " + std::to_string(block->GetNumberOfBlocks() ));
-            LOGINFO("SET BLOCK " + std::to_string(proc));
             }
         }
         if(Communicator::worldRank() == 0 ) {
@@ -165,17 +157,7 @@ namespace PAMELA
             write->SetFileName(filename.c_str());
             write->Write();
         }
-
-        /*
-            LOGINFO("t la");
-            std::string filename = m_name + ".vtm";
-            vtm_->SetInputData(multi_block);
-            vtm_->SetFileName(filename.c_str());
-            vtm_->Write();
-            LOGINFO("oui.");
-            */
-
-
     }
 
 }
+#endif

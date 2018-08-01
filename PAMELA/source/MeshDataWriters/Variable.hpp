@@ -44,7 +44,7 @@ namespace PAMELA
 			std::fill(Data.begin(), Data.end(), cst);
 		}
 
-		void set_data(std::vector<double> vec)
+		void set_data(const std::vector<double>& vec)
 		{
 			ASSERT(vec.size() == Data.size(), "Mismatch sizes");
 			Data = vec;

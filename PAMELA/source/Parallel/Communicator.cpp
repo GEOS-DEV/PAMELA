@@ -172,9 +172,11 @@ namespace PAMELA
 		std::vector<int> send_disp(send_displs.begin(), send_displs.end());
 		std::vector<int> recv_cnt(recv_counts.begin(), recv_counts.end());
 		std::vector<int> recv_disp(recv_displs.begin(), recv_displs.end());
-		int err = MPI_Neighbor_alltoallv(send_buf.data(), send_cnt.dataAtTime(), send_disp.dataAtTime(), MPI_DOUBLE,
-			recv_buf.data(), recv_cnt.dataAtTime(), recv_disp.dataAtTime(), MPI_DOUBLE, m_comm);
-		handle_error(err);
+                //TODO this code seems weird : dataAtTime is not a member function
+                //of std::vector...
+		//int err = MPI_Neighbor_alltoallv(send_buf.data(), send_cnt.dataAtTime(), send_disp.dataAtTime(), MPI_DOUBLE,
+			//recv_buf.data(), recv_cnt.dataAtTime(), recv_disp.dataAtTime(), MPI_DOUBLE, m_comm);
+		//handle_error(err);
 #else
 	// Extract neighbor topology information
 	// Reverse terminology: MPI sources are processes we recieve from (recv_procs),

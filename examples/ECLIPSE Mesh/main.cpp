@@ -17,8 +17,6 @@ int main(int argc, const char * argv[]) {
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/Johansen/FULLFIELD_IMAXJMAX.GRDECL");
 	Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/Norne/GRID/IRAP_1005.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/ReducedNorne/IRAP_1005.GRDECL");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/Faulted/TEST10K_FLT_LGR_NNC.grdecl");
-    //Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/SPE9/SPE9.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/OW2P-MUFITS/OW2P-RT.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/INRIA Unstructured Mesh/spe10_one_layer.mesh");
 
@@ -26,9 +24,10 @@ int main(int argc, const char * argv[]) {
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
+        /*
 
 	////-------------------------Output
-	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "EclipseGridExample");
+//	MeshDataWriter* OutputWriter = new VTKWriter(MainMesh, "EclipseGridExample");
 
 	//Variable declarations
 	
@@ -56,5 +55,6 @@ int main(int argc, const char * argv[]) {
 
 	Communicator::finalize();
 
+        */
 	return 0;
 }

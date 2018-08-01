@@ -40,8 +40,8 @@ namespace PAMELA
 
 		EnsightGoldWriter(Mesh * mesh, std::string name) : MeshDataWriter(mesh,name) {}
 
-		void Init();
-		void DumpVariables();
+		virtual void Init() final;
+		virtual void DumpVariables() final;
 
 
 	private:

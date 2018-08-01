@@ -2,25 +2,23 @@
 #include <iostream>
 #include "Mesh/MeshFactory.hpp"
 #include "Mesh/Mesh.hpp"
-#include "Utils/Communicator.hpp"
+#include "Parallel/Communicator.hpp"
 #include <thread>
-#include <chrono>
-#include "Adjacency/Adjacency.hpp"
 #include "MeshDataWriters/EnsightGoldWriter.hpp"
 
 int main(int argc, const char * argv[]) {
 
 	using namespace  PAMELA;
 
-	//std::this_thread::sleep_for(std::chrono::seconds(10));
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 	Communicator::initialize();
 
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/SAIGUP/SAIGUP.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/Johansen/FULLFIELD_IMAXJMAX.GRDECL");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/Norne/GRID/IRAP_1005.GRDECL");
+	Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/Norne/GRID/IRAP_1005.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/ReducedNorne/IRAP_1005.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/Faulted/TEST10K_FLT_LGR_NNC.grdecl");
-    Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/SPE9/SPE9.GRDECL");
+    //Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/SPE9/SPE9.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/OW2P-MUFITS/OW2P-RT.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/INRIA Unstructured Mesh/spe10_one_layer.mesh");
 

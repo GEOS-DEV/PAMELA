@@ -65,7 +65,7 @@ namespace PAMELA
 	{
 
 		Adjacency* adj = new Adjacency(source, target, base);
-		int collectionSize = source->size_all();
+		auto collectionSize = source->size_all();
 		int nbVertex = 0;
 		int vertexIndex = 0;
 		int PolyhedronIndex = 0;
@@ -73,13 +73,13 @@ namespace PAMELA
 		int nrow = 0;
 
 		adj->m_adjacencySparseMatrix->rowPtr.push_back(0);
-		for (int i = 0; i < collectionSize; i++)
+		for (auto i = 0; i != collectionSize; i++)
 		{
-			Polyhedron* polyhedron = source->operator[](i);
+			Polyhedron* polyhedron = source->operator[](static_cast<int>(i));
 			PolyhedronIndex = polyhedron->get_localIndex();
 			const std::vector<Point*>& vertexList = polyhedron->get_vertexList();
 			nbVertex = static_cast<int>(vertexList.size());
-			for (int j = 0; j < nbVertex; j++)
+			for (auto j = 0; j < nbVertex; j++)
 			{
 				vertexIndex = vertexList[j]->get_localIndex();
 				adj->m_adjacencySparseMatrix->columnIndex.push_back(vertexIndex);

@@ -1,5 +1,5 @@
 // Header includes
-#include <Utils/Communicator.hpp>
+#include <Parallel/Communicator.hpp>
 // Project includes
 #include <Utils/Assert.hpp>
 

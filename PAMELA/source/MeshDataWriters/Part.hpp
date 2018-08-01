@@ -21,19 +21,19 @@ namespace PAMELA
 		SubPart(int size, ELEMENTS::TYPE elementtype) { ElementType = elementtype; IndexMapping.reserve(size); SubCollection.reserve(size); }
 		ELEMENTS::TYPE ElementType;
 		std::vector<int> IndexMapping;  //Subpart to Part
-		Ensemble<T, ElementHash<T>, ElementEqual<T>> SubCollection;
+		ElementEnsemble<T, ElementHash<T>, ElementEqual<T>> SubCollection;
 	};
 
 
 	template <class T>
 	struct Part
 	{
-		Part(std::string label, int index, Ensemble<T, ElementHash<T>, ElementEqual<T>>* collection) { Label = label; Collection = collection; Index = index; };
+		Part(std::string label, int index, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* collection) { Label = label; Collection = collection; Index = index; };
 		Variable* AddVariable(VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string label);
 
 		int Index;   // global including all families
 		std::string Label;
-		Ensemble<T, ElementHash<T>, ElementEqual<T>>* Collection;
+		ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* Collection;
 		std::vector<Point*> Points;
 		std::unordered_map<int, int> GlobalToLocalPointMapping;
 		std::unordered_map<ELEMENTS::TYPE, SubPart<T>*> SubParts;

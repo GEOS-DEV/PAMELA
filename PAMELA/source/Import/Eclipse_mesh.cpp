@@ -4,7 +4,7 @@
 #include "Elements/ElementFactory.hpp"
 #include "Elements/Element.hpp"
 #include <map>
-#include "Utils/Communicator.hpp"
+#include "Parallel/Communicator.hpp"
 #include "Utils/File.hpp"
 #include <iostream>
 

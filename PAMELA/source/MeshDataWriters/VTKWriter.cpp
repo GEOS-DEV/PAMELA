@@ -2,7 +2,7 @@
 #include "MeshDataWriters/VTKWriter.hpp" 
 #include "Mesh/Mesh.hpp"
 #include "MeshDataWriters/Variable.hpp"
-#include "Utils/Communicator.hpp"
+#include "Parallel/Communicator.hpp"
 #include "Utils/Logger.hpp"
 
 #include <vtkBlockIdScalars.h>

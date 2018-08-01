@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Mesh/MeshFactory.hpp"
 #include "Mesh/Mesh.hpp"
-#include "Utils/Communicator.hpp"
+#include "Parallel/Communicator.hpp"
 #include <thread>
 #include "Adjacency/Adjacency.hpp"
 #include "MeshDataWriters/EnsightGoldWriter.hpp"
@@ -22,8 +22,6 @@ int main(int argc, char * argv[]) {
 	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/INRIA Unstructured Mesh/small.mesh");
 //	mesh* mainmesh = meshfactory::makemesh("e:/gitlabrepository/parallel mesh library/examples/inria unstructured mesh/final_very_coarse.mesh");
 	Mesh * MainMesh = MeshFactory::makeMesh("/home/amazuyer/dev/PAMELA/examples/INRIA Unstructured Mesh/small.mesh");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PAMELA - PArallel MEsh LibrAry/examples/INRIA Unstructured Mesh/spe10_one_layer.mesh");
-
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 

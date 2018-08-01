@@ -1,7 +1,7 @@
 #include "Mesh/Mesh.hpp"
 #include "Elements/ElementFactory.hpp"
 #include "Adjacency/Adjacency.hpp"
-#include "Utils/Communicator.hpp"
+#include "Parallel//Communicator.hpp"
 #include <functional>
 #ifdef WITH_MPI
 #include <metis.h>
@@ -36,10 +36,10 @@ namespace PAMELA
 		ElementCollection<Polyhedron*>* source = &m_PolyhedronCollection;
 		ElementCollection<Polygon*>* target = &m_PolygonCollection;
 		ElementCollection<Polyhedron*>* base = &m_PolyhedronCollection;
-		int InitPolyhedronCollectionSize = target->size_all();
+		auto InitPolyhedronCollectionSize = target->size_all();
 		Adjacency* adj = new Adjacency(source, target, base);
 
-		int collectionSize = source->size_all();
+		auto collectionSize = source->size_all();
 		int nbFace = 0;
 		int FaceIndex = 0;
 		int PolyhedronIndex = 0;
@@ -65,7 +65,7 @@ namespace PAMELA
 			adj->m_adjacencySparseMatrix->rowPtr[nrow] = nval;
 		}
 		adj->m_adjacencySparseMatrix->nnz = nval;
-		adj->m_adjacencySparseMatrix->dimColumn = target->size_all();
+		adj->m_adjacencySparseMatrix->dimColumn = static_cast<int>(target->size_all());
 		adj->m_adjacencySparseMatrix->sortRowIndexAndMoveValues();
 		adj->m_adjacencySparseMatrix->checkMatrix();
 
@@ -178,7 +178,7 @@ namespace PAMELA
 		//POLYHEDRON
 		//--OWNED POLYHEDRA
 		int ind = 0;
-		for (int i = 0; i < PolyhedronAffiliation.size(); ++i)
+		for (int i = 0; i != PolyhedronAffiliation.size(); ++i)
 		{
 			if (PolyhedronAffiliation[i] == ipartition)
 			{
@@ -279,7 +279,7 @@ namespace PAMELA
 		m_PolyhedronCollection.ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
 		m_PolygonCollection.ClearAfterPartitioning(PolygonOwned, PolygonGhost);
 		m_PointCollection.ClearAfterPartitioning(PointOwned, PointGhost);
-
+		m_PolyhedronProperty->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
 		LOGINFO("*** Done...");
 
 	}
@@ -304,7 +304,7 @@ namespace PAMELA
 		METIS_SetDefaultOptions(options);
 
 		// Some type casts and constants
-		idx_t nnodes = adjacency->get_sourceElementCollection()->size_all();
+		idx_t nnodes = static_cast<idx_t>(adjacency->get_sourceElementCollection()->size_all());
 		idx_t nparts = npartition;
 		idx_t nconst = 1;
 		idx_t objval = 0;

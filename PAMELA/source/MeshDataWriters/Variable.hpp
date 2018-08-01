@@ -29,14 +29,14 @@ namespace PAMELA
 
 	struct Variable
 	{
-		Variable(VARIABLE_TYPE dtype, std::string label, int size) : Label(label), dType(dtype)
+		Variable(VARIABLE_TYPE dtype, std::string label, size_t size) : Label(label), dType(dtype)
 		{
 			offset = VariableTypeToSize.at(dtype);
 			Data = std::vector<double>(size*offset);
 		}
 
 		std::string Label;
-		int offset;
+		size_t offset;
 		VARIABLE_TYPE dType;
 
 		void set_data(double cst)
@@ -44,12 +44,21 @@ namespace PAMELA
 			std::fill(Data.begin(), Data.end(), cst);
 		}
 
-		void set_data(const std::vector<double>& vec)
+		/*void set_data(std::vector<double> vec)
+>>>>>>> master
 		{
 			ASSERT(vec.size() == Data.size(), "Mismatch sizes");
 			Data = vec;
+		}*/
+
+		void set_data(std::vector<double>::iterator it_begin_vec, std::vector<double>::iterator it_end_vec)
+		{
+			auto vec_size = static_cast<size_t>(it_end_vec - it_begin_vec);
+			ASSERT(vec_size == Data.size(), "Mismatch sizes");
+			Data.assign(it_begin_vec, it_end_vec);
 		}
 
+		
 		std::vector<double> get_data(int i)
 		{
 			if (offset == 1)

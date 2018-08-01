@@ -2,7 +2,7 @@
 // Library includes
 #include "MeshDataWriters/Part.hpp"
 #include "MeshDataWriters/Variable.hpp"
-#include "Utils/Communicator.hpp"
+#include "Parallel/Communicator.hpp"
 #if defined( _WIN32)
 #include <direct.h>
 #else
@@ -30,14 +30,53 @@ namespace PAMELA
 
 		void DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name, std::string part);
 		void DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name);
-		void SetVariable(std::string label, double univalue);
-		void SetVariable(std::string label, std::string part, double univalue);
-		void SetVariable(std::string label, const std::vector<double>& values); // this one assume only one part
-		void SetVariable(std::string label, std::string part, const std::vector<double>& values);
-		virtual void DumpVariables()=0;
+		template<class T>
+		void SetVariable(std::string label, T univalue)
+		{
+			
+				for (auto const& part : m_PolyhedronParts)
+				{
+					if (m_Variable.find(VariableKey(label, part.first))!=m_Variable.end())
+					{
+						auto var = m_Variable.at(VariableKey(label, part.first));
+						var->set_data(univalue);
+					}
+				}
 
-		
+				for (auto const& part : m_PolygonParts)
+				{
+					if (m_Variable.find(VariableKey(label, part.first)) != m_Variable.end())
+					{
+						auto var = m_Variable.at(VariableKey(label, part.first));
+						var->set_data(univalue);
+					}
+				}
 
+		}
+		template<class T>
+		void SetVariable(std::string label, std::string part, T univalue)
+		{
+			auto var = m_Variable.at(VariableKey(label, part));
+			var->set_data(univalue);
+		}
+
+		template<class T>
+		void SetVariable(std::string label, ParallelEnsemble<T>& values)
+		{
+			auto var = m_Variable.at(VariableKey(label, m_PolyhedronParts.begin()->first));
+			var->set_data(values.begin_owned(), values.end_owned());
+		}
+
+		template<class T>
+		void SetVariable(std::string label, std::string part, ParallelEnsemble<T>& values)
+		{
+			auto var = m_Variable.at(VariableKey(label, part));
+			var->set_data(values);
+		}
+
+		virtual void DumpVariables() = 0;
+
+	
 	protected:
 
 		std::string PartitionNumberForExtension();

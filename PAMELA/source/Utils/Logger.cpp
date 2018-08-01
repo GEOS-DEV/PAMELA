@@ -1,6 +1,6 @@
 // Header include
 #include "Logger.hpp"
-#include "Utils/Communicator.hpp"
+#include "Parallel/Communicator.hpp"
 
 #define LEVEL_LOG_FILE "DEBUG"
 #define LEVEL_LOG_SCREEN "BRIEF"

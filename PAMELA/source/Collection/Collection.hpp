@@ -9,7 +9,7 @@
 #include "Elements/Line.hpp"
 #include "Elements/Polygon.hpp"
 #include "Elements/Polyhedron.hpp"
-#include "Collection/Ensemble.hpp"
+#include "Collection/ElementEnsemble.hpp"
 
 namespace PAMELA
 {
@@ -157,7 +157,7 @@ namespace PAMELA
 	 */
 
 	template <class T>
-	class ElementCollection : public Ensemble<T, ElementHash<T>, ElementEqual<T>>
+	class ElementCollection : public ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>
 	{
 	public:
 
@@ -205,10 +205,10 @@ namespace PAMELA
 		}
 
 		//Groups
-		void addAndCreateGroup(std::string label) { m_labelToGroup[label] = new Ensemble<T, ElementHash<T>, ElementEqual<T>>(); }
+		void addAndCreateGroup(std::string label) { m_labelToGroup[label] = new ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>(); }
 		void activeGroup(std::string label) { ASSERT(groupExist(label), "The group does not exist"); m_activeGroup[label] = true; }
 		std::unordered_map<std::string, bool>& get_ActiveGroupsMap() { return m_activeGroup; }
-		Ensemble<T, ElementHash<T>, ElementEqual<T>>* get_Group(std::string label) { ASSERT(groupExist(label), "The group does not exist"); return m_labelToGroup.at(label); }
+		ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* get_Group(std::string label) { ASSERT(groupExist(label), "The group does not exist"); return m_labelToGroup.at(label); }
 
 		//Parallel
 		void ClearAfterPartitioning(std::set<int> owned, std::set<int> ghost);
@@ -220,7 +220,7 @@ namespace PAMELA
 
 		//Groups
 		bool groupExist(std::string label) { return m_labelToGroup.count(label) == 1; }
-		std::unordered_map<std::string, Ensemble<T, ElementHash<T>, ElementEqual<T>>*> m_labelToGroup;
+		std::unordered_map<std::string, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>*> m_labelToGroup;
 		std::unordered_map<std::string, bool> m_activeGroup;
 
 	};

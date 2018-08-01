@@ -23,20 +23,20 @@ namespace PAMELA
 	public:
 
 		CSRMatrix* get_adjacencySparseMatrix() { return m_adjacencySparseMatrix; }
-		EnsembleBase* get_sourceElementCollection() const { return m_sourceElementCollection; }
-		EnsembleBase* get_targetElementCollection() const { return m_targetElementCollection; }
-		EnsembleBase* get_baseElementCollection() const { return m_baseElementCollection; }
+		ParallelEnsembleBase* get_sourceElementCollection() const { return m_sourceElementCollection; }
+		ParallelEnsembleBase* get_targetElementCollection() const { return m_targetElementCollection; }
+		ParallelEnsembleBase* get_baseElementCollection() const { return m_baseElementCollection; }
 		std::pair<std::vector<int>, std::vector<int>> get_SingleElementAdjacency(int i) const;
 
 	private:
 
-		Adjacency(EnsembleBase* source, EnsembleBase* target, EnsembleBase* base) :
-			m_sourceElementCollection(source), m_targetElementCollection(target), m_baseElementCollection(base), m_adjacencySparseMatrix(new CSRMatrix(source->size_all(), target->size_all())) {};
+		Adjacency(ParallelEnsembleBase* source, ParallelEnsembleBase* target, ParallelEnsembleBase* base) :
+			m_sourceElementCollection(source), m_targetElementCollection(target), m_baseElementCollection(base), m_adjacencySparseMatrix(new CSRMatrix(static_cast<int>(source->size_all()), static_cast<int>(target->size_all()))) {};
 
 		//Components
-		EnsembleBase* m_sourceElementCollection;
-		EnsembleBase* m_targetElementCollection;
-		EnsembleBase* m_baseElementCollection;
+		ParallelEnsembleBase* m_sourceElementCollection;
+		ParallelEnsembleBase* m_targetElementCollection;
+		ParallelEnsembleBase* m_baseElementCollection;
 
 		//data
 		CSRMatrix* m_adjacencySparseMatrix;

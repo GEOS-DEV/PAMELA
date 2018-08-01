@@ -38,9 +38,11 @@ namespace PAMELA
     void VTKWriter::MakeChildFile(const PartMap<T>* parts, const std::string& prefix) {
 
         int part = 0;
+        LOGINFO("NEW PARTMAP");
         for (auto it = parts->begin();
                 it != parts->end();
                 ++it) {
+        LOGINFO("NEW PART");
             block_->SetNumberOfBlocks(block_->GetNumberOfBlocks()+1);
             LOGINFO(std::to_string(part));
             vtkSmartPointer<vtkUnstructuredGrid> ug = vtkUnstructuredGrid::New();
@@ -88,9 +90,10 @@ namespace PAMELA
                     {
                         auto subpart = it3->second;
                         auto elementType = subpart->ElementType;
+                            auto dataarray = vtkDoubleArray::New();
+                            dataarray->SetName(variableptr->Label.c_str());
                         for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned(); ++it4)
                         {
-                            auto dataarray = vtkDoubleArray::New();
                             auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
                             auto variableIndex = subpart->IndexMapping[collectionIndex];
                             auto variableData = variableptr->get_data(variableIndex);
@@ -98,12 +101,13 @@ namespace PAMELA
                             {
                                 dataarray->InsertNextTuple1(*it5);
                             }
+                            LOGINFO("CREATE NEW ARRAY " + variableptr->Label );
                         }
+                        cell_data->AddArray(dataarray);
 
                     }
                 }
 
-                /*
                 vtkSmartPointer<vtkDataArray> data_array;
                 if( variableptr->dType == VARIABLE_TYPE::SCALAR){
                 }
@@ -114,11 +118,8 @@ namespace PAMELA
                 else {
                     continue;
                 }
-                */
-                data_array->SetName(variableptr->Label.c_str());
                 auto type = variableptr->dType;
                 
-                //cell_data->Add;
             }
         }
 

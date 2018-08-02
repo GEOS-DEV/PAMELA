@@ -37,7 +37,7 @@ namespace PAMELA
 		ElementCollection<Polygon*>* target = &m_PolygonCollection;
 		ElementCollection<Polyhedron*>* base = &m_PolyhedronCollection;
 		auto InitPolyhedronCollectionSize = target->size_all();
-		Adjacency* adj = new Adjacency(source, target, base);
+		Adjacency* adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON,source, target, base);
 
 		auto collectionSize = source->size_all();
 		int nbFace = 0;

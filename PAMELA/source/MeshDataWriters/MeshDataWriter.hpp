@@ -3,6 +3,7 @@
 #include "MeshDataWriters/Part.hpp"
 #include "MeshDataWriters/Variable.hpp"
 #include "Parallel/Communicator.hpp"
+#include "Adjacency/Adjacency.hpp"
 #if defined( _WIN32)
 #include <direct.h>
 #else
@@ -17,6 +18,17 @@ namespace PAMELA
 
 	class Mesh;
 
+
+	struct AdjacencyData
+	{
+		AdjacencyData(std::string lab) :label(lab) {};
+		std::string label;
+		std::vector<Point> NodesVector;
+		std::vector<int> iSource;
+		std::vector<int> iTarget;
+	};
+
+
 	class MeshDataWriter
 	{
 		template <typename T>
@@ -29,7 +41,9 @@ namespace PAMELA
 		virtual void Init() = 0;
 
 		void DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name, std::string part);
+
 		void DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name);
+
 		template<class T>
 		void SetVariable(std::string label, T univalue)
 		{
@@ -53,6 +67,7 @@ namespace PAMELA
 				}
 
 		}
+
 		template<class T>
 		void SetVariable(std::string label, std::string part, T univalue)
 		{
@@ -74,7 +89,9 @@ namespace PAMELA
 			var->set_data(values);
 		}
 
-		virtual void DumpVariables() = 0;
+		void DeclareAdjacency(std::string label, Adjacency* adjacency);
+
+		virtual void Dump() = 0;
 
 	
 	protected:
@@ -106,6 +123,9 @@ namespace PAMELA
 
 		//Property
 		std::unordered_map<VariableKey, Variable*, VariableKeyHash> m_Variable;
+
+		//Adjacency
+		std::vector<AdjacencyData> m_Adjacency;
 	
 	};
 

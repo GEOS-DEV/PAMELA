@@ -2,6 +2,7 @@
 #include <iostream>
 #include "Mesh/MeshFactory.hpp"
 #include "Mesh/Mesh.hpp"
+#include "Adjacency/Adjacency.hpp"
 #include "Parallel/Communicator.hpp"
 #include <thread>
 #include "MeshDataWriters/EnsightGoldWriter.hpp"
@@ -41,6 +42,9 @@ int main(int argc, const char * argv[]) {
 		OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, it->first);
 	}
 
+	//
+	OutputWriter->DeclareAdjacency("Volume to Volume",MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
+
 	//Init
 	OutputWriter->Init();
 
@@ -52,7 +56,7 @@ int main(int argc, const char * argv[]) {
 	}
 
 	//Dump
-	OutputWriter->DumpVariables();
+	OutputWriter->Dump();
 
 	Communicator::finalize();
 

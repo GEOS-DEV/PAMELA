@@ -64,7 +64,7 @@ namespace PAMELA
 	Adjacency* MeshAdjacency::get_Adjacency(PolyhedronCollection* source, PointCollection* target, PolyhedronCollection* base)
 	{
 
-		Adjacency* adj = new Adjacency(source, target, base);
+		Adjacency* adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, source, target, base);
 		auto collectionSize = source->size_all();
 		int nbVertex = 0;
 		int vertexIndex = 0;
@@ -142,7 +142,7 @@ namespace PAMELA
 
 	Adjacency* MeshAdjacency::transposed(Adjacency* input)
 	{
-		Adjacency* adj = new Adjacency(input->m_targetElementCollection, input->m_sourceElementCollection, input->m_baseElementCollection);
+		Adjacency* adj = new Adjacency(input->get_targetFamily(), input->get_sourceFamily(), input->get_baseFamily(),input->m_targetElementCollection, input->m_sourceElementCollection, input->m_baseElementCollection);
 		adj->m_adjacencySparseMatrix = CSRMatrix::transpose(input->m_adjacencySparseMatrix);
 		return  adj;
 	}
@@ -150,7 +150,7 @@ namespace PAMELA
 
 	Adjacency* MeshAdjacency::multiply(Adjacency* input_lhs, Adjacency* input_rhs)
 	{
-		Adjacency* adj = new Adjacency(input_rhs->m_targetElementCollection, input_lhs->m_sourceElementCollection, input_lhs->m_targetElementCollection);
+		Adjacency* adj = new Adjacency(input_rhs->get_targetFamily(), input_lhs->get_sourceFamily(), input_lhs->get_targetFamily(),input_rhs->m_targetElementCollection, input_lhs->m_sourceElementCollection, input_lhs->m_targetElementCollection);
 		adj->m_adjacencySparseMatrix = CSRMatrix::product(input_lhs->m_adjacencySparseMatrix, input_rhs->m_adjacencySparseMatrix);
 		return adj;
 	}

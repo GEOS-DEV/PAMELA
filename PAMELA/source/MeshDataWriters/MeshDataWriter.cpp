@@ -154,6 +154,56 @@ namespace PAMELA
 		return  Ext;
 	}
 
+
+	void MeshDataWriter::DeclareAdjacency(std::string label, Adjacency* adjacency)
+	{
+
+		//Reference
+		m_Adjacency.emplace_back(label);
+		auto& adj_data = m_Adjacency.back();
+
+		//CSR Matrix
+		auto csr_matrix = adjacency->get_adjacencySparseMatrix();
+		auto dimRow = csr_matrix->dimRow;
+		auto nnz = csr_matrix->nnz;
+		auto columIndex = csr_matrix->columnIndex;
+		auto rowPtr = csr_matrix->rowPtr;
+
+
+		if ((adjacency->get_sourceFamily() == ELEMENTS::FAMILY::POLYHEDRON) && (adjacency->get_targetFamily() == ELEMENTS::FAMILY::POLYHEDRON))
+		{
+			auto sourcetarget = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
+
+			//Compute Node coordinates
+			int isource=0, itarget=0;
+			int cpt = 0;
+			for (auto irow = 0; irow != dimRow; ++irow)
+			{
+				auto it = m_mesh->get_PolyhedronCollection()->begin_owned() + irow;
+				auto xyz = (*it)->get_centroidCoordinates();
+				Point source_point = Point(isource,xyz[0], xyz[1], xyz[2]);
+				adj_data.NodesVector.push_back(source_point);
+				itarget = isource;
+				for (auto icol = rowPtr[irow]; icol != rowPtr[irow + 1]; ++icol)
+				{
+					itarget=itarget+1;
+					auto it = m_mesh->get_PolyhedronCollection()->begin_owned() + columIndex[icol];
+					auto xyz = (*it)->get_centroidCoordinates();
+					Point target_point = Point(itarget, xyz[0], xyz[1], xyz[2]);
+					adj_data.NodesVector.push_back(target_point);
+					adj_data.iSource.push_back(isource);
+					adj_data.iTarget.push_back(itarget);
+				}
+				isource = itarget + 1;
+				cpt++;
+			}
+
+		}
+
+		auto pp = 4;
+
+	}
+
 	/**
 	* \brief
 	* \return

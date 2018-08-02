@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Mesh/MeshFactory.hpp"
 #include "Mesh/Mesh.hpp"
-#include "Utils/Communicator.hpp"
+#include "Parallel//Communicator.hpp"
 #include <thread>
 #include "MeshDataWriters/EnsightGoldWriter.hpp"
 
@@ -44,7 +44,7 @@ int main(int argc, const char * argv[])
 	OutputWriter->SetVariable("Partition", Communicator::worldRank());
 	
 	//Dump variables
-	OutputWriter->DumpVariables();
+	OutputWriter->Dump();
 
 	Communicator::finalize();
 

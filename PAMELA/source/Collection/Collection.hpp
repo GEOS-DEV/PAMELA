@@ -208,6 +208,7 @@ namespace PAMELA
 		void addAndCreateGroup(std::string label) { m_labelToGroup[label] = new ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>(); }
 		void activeGroup(std::string label) { ASSERT(groupExist(label), "The group does not exist"); m_activeGroup[label] = true; }
 		std::unordered_map<std::string, bool>& get_ActiveGroupsMap() { return m_activeGroup; }
+		std::unordered_map<std::string, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>*>& get_labelToGroupMap() { return m_labelToGroup; }
 		ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* get_Group(std::string label) { ASSERT(groupExist(label), "The group does not exist"); return m_labelToGroup.at(label); }
 
 		//Parallel

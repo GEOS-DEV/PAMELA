@@ -31,5 +31,3 @@ endif(COMPILE_EXAMPLES)
    # add_subdirectory(tests)
 # endif(COMPILE_TESTS)
 
-
-

@@ -45,6 +45,7 @@ namespace PAMELA
 		}
 
 		/*void set_data(std::vector<double> vec)
+>>>>>>> master
 		{
 			ASSERT(vec.size() == Data.size(), "Mismatch sizes");
 			Data = vec;

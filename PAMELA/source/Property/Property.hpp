@@ -1,6 +1,7 @@
 #pragma once
 
 
+
 namespace PAMELA
 {
 	template <class T1,class T2>
@@ -32,7 +33,7 @@ namespace PAMELA
 		void SetConstantProperty(std::string label, T2 val)
 		{
 			ASSERT(m_data.count(label) == 1, "Property does not exist");
-			m_data[label] = Ensemble<T2>(m_Owner->size_owned(),val);
+			this->m_data[label] = ElementEnsemble<T2>(m_Owner->size_owned(),val);
 		}
 
 		void SetProperty(std::string label, std::vector<T2> val)

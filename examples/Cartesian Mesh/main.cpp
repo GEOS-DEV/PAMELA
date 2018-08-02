@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Mesh/MeshFactory.hpp"
 #include "Mesh/Mesh.hpp"
-#include "Parallel//Communicator.hpp"
+#include "Parallel/Communicator.hpp"
 #include <thread>
 #include "MeshDataWriters/EnsightGoldWriter.hpp"
 

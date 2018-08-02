@@ -19,7 +19,7 @@ namespace PAMELA
                 std::string filename = file_path.substr(file_path.find_last_of("/") + 1);
 		std::string file_extension = filename.substr(file_path.find_last_of(".") + 1);
                 std::string file_wo_extension
-                    = filename.substr(0,file_path.find_last_of(".") - 1);
+                    = filename.substr(0,file_path.find_last_of("."));
 		if ((file_extension == "vtm") || (file_extension == "VTM"))
 		{
 			LOGINFO("VTM OUTPUT MESH FORMAT IDENTIFIED");

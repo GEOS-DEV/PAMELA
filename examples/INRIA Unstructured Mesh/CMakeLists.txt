@@ -18,3 +18,5 @@ if(${USE_VTK})
 endif(${USE_VTK})
 include_directories(${PAMELA_INCLUDE_DIRS})
 
+message(STATUS "Includes!!!!!" ${PAMELA_INCLUDE_DIRS})
+

@@ -29,7 +29,7 @@ int main(int argc, const char * argv[]) {
 	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->Init();
 	OutputWriter->SetVariable("Partition", Communicator::worldRank());
-	OutputWriter->DumpVariables();
+	OutputWriter->Dump();
 	Communicator::finalize();
 
 	return 0;

@@ -30,9 +30,9 @@ if(COMPILE_EXECUTABLE)
    add_subdirectory(executable)
 endif(COMPILE_EXECUTABLE)
 
-# #Tests
-# if(COMPILE_TESTS)
-   # include(CTest)
-   # add_subdirectory(tests)
-# endif(COMPILE_TESTS)
+#Tests
+if(COMPILE_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif(COMPILE_TESTS)
 

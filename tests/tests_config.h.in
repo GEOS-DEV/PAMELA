@@ -1,0 +1,9 @@
+#pragma once
+#include <string>
+namespace PAMELA
+{
+    static const std::string test_path = "@TEST_DIRECTORY@/";
+    static const std::string test_data_path = "@TEST_DATA_INPUT_DIRECTORY@/";
+    static const std::string test_output_path = "@TEST_DATA_OUTPUT_DIRECTORY@/";
+}
+

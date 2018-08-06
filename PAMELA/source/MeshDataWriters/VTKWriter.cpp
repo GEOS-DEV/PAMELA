@@ -151,6 +151,7 @@ namespace PAMELA
         }
         if(Communicator::worldRank() == 0 ) {
             std::string filename = m_name + ".vtm";
+            LOGINFO(filename);
             vtkSmartPointer< vtkXMLMultiBlockDataWriter> write =
                 vtkXMLMultiBlockDataWriter::New();
             write->SetInputData(multi_block);

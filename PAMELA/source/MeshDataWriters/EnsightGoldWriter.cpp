@@ -15,7 +15,7 @@ namespace PAMELA
 		LOGINFO("*** Make Ensight Gold .case file");
 
 		//Create file
-		m_caseFile.open("./" + m_name + "_" + PartitionNumberForExtension() + ".case", std::fstream::in | std::fstream::out | std::fstream::trunc);
+		m_caseFile.open(m_name + "_" + PartitionNumberForExtension() + ".case", std::fstream::in | std::fstream::out | std::fstream::trunc);
 
 		int nb_files = Communicator::worldSize();
 
@@ -145,7 +145,7 @@ namespace PAMELA
 		LOGINFO("*** Init Ensight Gold .geo file");
 
 		//Create file
-		m_geoFile.open("./" + m_name + "_" + PartitionNumberForExtension() + ".geo", std::fstream::in | std::fstream::out | std::fstream::trunc);
+		m_geoFile.open( m_name + "_" + PartitionNumberForExtension() + ".geo", std::fstream::in | std::fstream::out | std::fstream::trunc);
 
 		//Header
 		MakeGeoFile_Header();

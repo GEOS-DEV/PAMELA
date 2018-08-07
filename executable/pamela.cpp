@@ -34,9 +34,6 @@ int main(int argc, char **argv)
     {
         parser.ParseCLI(argc, argv);
 
-        std::cout << "nx = " << args::get(nx) << std::endl;
-
-
         if (!output) {
             std::cerr<< "No output mesh defined" << std::endl;
             exit(1);

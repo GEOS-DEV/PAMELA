@@ -14,6 +14,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 #Options
 option(COMPILE_TESTS "Compile test" OFF)
+option(COMPILE_EXAMPLES "Compile Examples" OFF)
 option(COMPILE_EXECUTABLE "Compile executable" ON)
 
 #PAMELA
@@ -23,6 +24,11 @@ add_subdirectory (PAMELA)
 if(COMPILE_EXECUTABLE)
    add_subdirectory(executable)
 endif(COMPILE_EXECUTABLE)
+
+# Examples
+if(COMPILE_EXAMPLES)
+   add_subdirectory(examples)
+endif(COMPILE_EXAMPLES)
 
 #Tests
 if(COMPILE_TESTS)

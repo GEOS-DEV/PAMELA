@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(PROJECT_NAME "CartesianMesh")
+set(PROJECT_NAME "EXAMPLE_CartesianMesh")
 project(${PROJECT_NAME} C CXX)
 set(SOURCE main.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE})

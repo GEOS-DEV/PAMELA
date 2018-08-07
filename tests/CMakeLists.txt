@@ -16,16 +16,16 @@ set(test_config_file_in ${TEST_DIRECTORY}/tests_config.h.in)
 set(test_config_file ${PROJECT_BINARY_DIR}/tests_config.h)
 configure_file(${test_config_file_in} ${test_config_file})
 	
-add_executable("small" small.cpp)
-target_link_libraries("small" PAMELA)
+add_executable("TEST_small" small.cpp)
+target_link_libraries("TEST_small" PAMELA)
 add_test(NAME small COMMAND small)
 
-add_executable("medium" medium.cpp)
-target_link_libraries("medium" PAMELA)
+add_executable("TEST_medium" medium.cpp)
+target_link_libraries("TEST_medium" PAMELA)
 add_test(NAME medium COMMAND medium)
 
-add_executable("big" big.cpp)
-target_link_libraries("big" PAMELA)
+add_executable("TEST_big" big.cpp)
+target_link_libraries("TEST_big" PAMELA)
 add_test(NAME big COMMAND big)
 
 if(${USE_VTK})

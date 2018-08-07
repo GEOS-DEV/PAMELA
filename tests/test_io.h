@@ -36,7 +36,7 @@ namespace PAMELA {
             std::string file_wo_extension
                 = filename.substr(0,filename.find_last_of("."));
             const std::string filename_out = test_output_path + file_wo_extension;
-            //save(filename_out+".vtm",input_mesh);
+            save(filename_out+".vtm",input_mesh);
             save(filename_out+".case",input_mesh);
         }
     }

@@ -340,6 +340,7 @@ namespace PAMELA
 
 #else
 		LOGERROR("METIS partitioner is not available");
+		return {};
 #endif
 
 	}

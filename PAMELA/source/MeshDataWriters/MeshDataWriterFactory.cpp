@@ -20,12 +20,17 @@ namespace PAMELA
 		std::string file_extension = filename.substr(filename.find_last_of(".") + 1);
                 std::string file_wo_extension
                     = file_path.substr(0,file_path.find_last_of("."));
+#ifdef WITH_VTK
 		if ((file_extension == "vtm") || (file_extension == "VTM"))
 		{
+
 			LOGINFO("VTM OUTPUT MESH FORMAT IDENTIFIED");
-                        VTKWriter * writer = new VTKWriter( mesh,file_wo_extension);
+			VTKWriter* writer = new VTKWriter(mesh, file_wo_extension);
 			return  writer;
+
 		}
+#endif // WITH_VTK
+
 		if ((file_extension == "case") || (file_extension == "CASE"))
 		{
 			LOGINFO("ENSIGHT GOLD OUTPUT MESH FORMAT IDENTIFIED");

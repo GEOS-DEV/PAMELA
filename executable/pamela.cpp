@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 
 
 	//Dump variables
-	output_mesh->DumpVariables();
+	output_mesh->Dump();
 	Communicator::finalize();
 
 

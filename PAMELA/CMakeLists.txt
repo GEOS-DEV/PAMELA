@@ -94,11 +94,7 @@ endif()
 
 #VTK
 if(USE_VTK)
-	#if(USE_MPI)
-		find_package(VTK REQUIRED COMPONENTS vtkParallelMPI vtkIOParallelXML)
-	#else()	
-	#	find_package(VTK REQUIRED)
-	#endif()
+  find_package(VTK REQUIRED COMPONENTS vtkParallelMPI vtkIOParallelXML)
   if(VTK_FOUND)
     add_definitions(-DWITH_VTK)
     add_definitions(${VTK_DEFINITIONS})
@@ -111,9 +107,12 @@ if(USE_VTK)
    endif()
 endif()
 
+get_property(include_directories_propert TARGET ${PROJECT_NAME} PROPERTY INCLUDE_DIRECTORIES)
+set(${PROJECT_NAME}_INCLUDE_DIRS ${include_directories_propert} CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
+
 # Expose includes
-set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_INC_DIR}
-    CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
+#set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_INC_DIR}
+#    CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
 
 
 

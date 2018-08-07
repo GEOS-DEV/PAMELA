@@ -17,14 +17,14 @@ namespace PAMELA
 	               m_PolygonCollection(PolygonCollection(ELEMENTS::FAMILY::POLYGON)),
 	               m_PolyhedronCollection(PolyhedronCollection(ELEMENTS::FAMILY::POLYHEDRON)),
 				   m_PolyhedronProperty(new Property<PolyhedronCollection,double>(&m_PolyhedronCollection)),
-	               m_adjacency(new MeshAdjacency(this))
+	               m_Adjacency(new MeshAdjacency(this))
 	{
 	}
 
 
 	MeshAdjacency* Mesh::getMeshAdjacency() const
 	{
-		return m_adjacency;
+		return m_Adjacency;
 	}
 
 	void Mesh::CreateFacesFromCells()
@@ -47,9 +47,9 @@ namespace PAMELA
 		int nrow = 0;
 
 		adj->m_adjacencySparseMatrix->rowPtr.push_back(0);
-		for (int i = 0; i < collectionSize; i++)
+		for (auto it = source->begin(); it!= source->end();++it)
 		{
-			Polyhedron* polyhedron = source->operator[](i);
+			Polyhedron* polyhedron = *it;
 			PolyhedronIndex = polyhedron->get_localIndex();
 			auto faces = polyhedron->CreateFaces();
 			nbFace = static_cast<int>(faces.size());
@@ -69,9 +69,8 @@ namespace PAMELA
 		adj->m_adjacencySparseMatrix->sortRowIndexAndMoveValues();
 		adj->m_adjacencySparseMatrix->checkMatrix();
 
-
 		//Add to map
-		m_adjacency->adjacencyMap[std::make_tuple(source->get_family(), target->get_family(), base->get_family())] = adj;
+		m_Adjacency->adjacencyMap[std::make_tuple(source->get_family(), target->get_family(), base->get_family())] = adj;
 
 		//
 		LOGINFO(std::to_string(target->size_all() - InitPolyhedronCollectionSize) + " polygons have been created");
@@ -84,6 +83,16 @@ namespace PAMELA
 		Point* element = ElementFactory::makePoint(elementType, index, x, y, z);
 		auto returnedElement = m_PointCollection.AddElement(groupLabel, element);
 		if (element!=returnedElement)
+		{
+			//LOGWARNING("Try to add an existing element");
+		}
+		return returnedElement;
+	}
+
+	Point* Mesh::addPoint(std::string groupLabel, Point* point)
+	{
+		auto returnedElement = m_PointCollection.AddElement(groupLabel, point);
+		if (point != returnedElement)
 		{
 			//LOGWARNING("Try to add an existing element");
 		}
@@ -149,6 +158,9 @@ namespace PAMELA
 		std::set<int> LineGhost;
 		std::set<int> PointGhost;
 
+
+
+
 		//Get adjacencies
 		auto adjacencyForPartitioning = getMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, edgeElement);
 		auto adjacencyForGhosts = getMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, ghostBaseElement);
@@ -173,16 +185,18 @@ namespace PAMELA
 			PolyhedronAffiliation = TRIVIALPartitioning();
 		}
 
+		//PolyhedronAffiliation = METISPartitioning(adjacencyForPartitioning, 2);
+
 		int nbPolyhedronInPartition = static_cast<int>(std::count(PolyhedronAffiliation.begin(), PolyhedronAffiliation.end(), ipartition));
 
 		//POLYHEDRON
 		//--OWNED POLYHEDRA
 		int ind = 0;
-		for (int i = 0; i != PolyhedronAffiliation.size(); ++i)
+		for (size_t i = 0; i != PolyhedronAffiliation.size(); ++i)
 		{
 			if (PolyhedronAffiliation[i] == ipartition)
 			{
-				PolyhedronOwned.insert(i);
+				PolyhedronOwned.insert(static_cast<int>(i));
 				ind++;
 			}
 		}
@@ -208,11 +222,11 @@ namespace PAMELA
 		for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
 		{
 			auto adj_Polyhedron2Polygon = PolyhedronPolygonAdj->get_SingleElementAdjacency(*it);
-			int adj_Polyhedron2PolygonSize = static_cast<int>(adj_Polyhedron2Polygon.first.size());
-			for (auto i = 0; i < adj_Polyhedron2PolygonSize; ++i)
+			auto adj_Polyhedron2PolygonSize = adj_Polyhedron2Polygon.first.size();
+			for (size_t i = 0; i < adj_Polyhedron2PolygonSize; ++i)
 			{
 				auto adj_Polygon2Polyhedron = PolygonPolyhedronAdj->get_SingleElementAdjacency(adj_Polyhedron2Polygon.first[i]);
-				int adj_Polygon2PolyhedronSize = static_cast<int>(adj_Polygon2Polyhedron.first.size());
+				auto adj_Polygon2PolyhedronSize = adj_Polygon2Polyhedron.first.size();
 				auto PolyToPart = vectorUtils::Vector2VectorMapping(adj_Polygon2Polyhedron.first, PolyhedronAffiliation);
 				if ((std::equal(PolyToPart.begin() + 1, PolyToPart.end(), PolyToPart.begin())) || PolyToPart.size() == 1)
 				{
@@ -281,6 +295,15 @@ namespace PAMELA
 		m_PointCollection.ClearAfterPartitioning(PointOwned, PointGhost);
 		m_PolyhedronProperty->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
 		LOGINFO("*** Done...");
+		LOGINFO("Clean Adjacency...");
+		m_Adjacency->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost, PolygonOwned, PolygonGhost);
+		LOGINFO("*** Done...");
+
+		////Recreate Polyhedron to Polyhedron connectivity
+		//LOGINFO("Recreate Polyhedron to Polyhedron connectivity...");
+		//CreateFacesFromCells();
+		LOGINFO("*** Done...");
+
 
 	}
 

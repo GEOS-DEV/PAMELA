@@ -83,7 +83,11 @@ namespace PAMELA
 	class ElementBase
 	{
 	public:
-		ElementBase() : m_vtkType(ELEMENTS::TYPE::UNKNOWN), m_family(ELEMENTS::FAMILY::UNKNOWN), m_index(-1), m_partitionOwner(0) {}
+		ElementBase() : m_vtkType(ELEMENTS::TYPE::UNKNOWN), m_family(ELEMENTS::FAMILY::UNKNOWN), m_index(-1),
+		                m_partitionOwner(0), m_IsGhost(false)
+		{
+		}
+
 		//ElementBase(ELEMENTS::FAMILY family,ELEMENTS::TYPE elementType) : m_vtkType(elementType), m_family(family), m_index(-1) {};
 		//ElementBase(ELEMENTS::FAMILY family, ELEMENTS::TYPE elementType, int index) : m_vtkType(elementType), m_family(family), m_index(index), m_partitionOwner(0) {};
 		//ElementBase(ELEMENTS::FAMILY family, ELEMENTS::TYPE elementType, int index, int partition_owner) : m_vtkType(elementType), m_family(family), m_index(index), m_partitionOwner(partition_owner) {};
@@ -100,6 +104,7 @@ namespace PAMELA
 		void set_localIndex(int i) { m_index.Local = i; }
 		void set_globalIndex(int i) { m_index.Global = i; }
 		void set_partionOwner(int i) { m_partitionOwner = i; }
+		void set_IsGhost() { m_IsGhost = true; }
 
 	protected:
 
@@ -109,7 +114,10 @@ namespace PAMELA
 
 		//Index
 		IndexData m_index;
+
+		//
 		int m_partitionOwner;
+		bool m_IsGhost;
 
 	};
 

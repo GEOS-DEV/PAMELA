@@ -200,8 +200,6 @@ namespace PAMELA
 
 		}
 
-		auto pp = 4;
-
 	}
 
 	/**

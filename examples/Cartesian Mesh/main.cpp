@@ -11,12 +11,14 @@ int main(int argc, const char * argv[])
 
 	using namespace PAMELA;
 
-	//std::this_thread::sleep_for(std::chrono::seconds(5));
+	
 
 	Communicator::initialize();
 
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+
 	//Make mesh
-	Mesh* MainMesh = MeshFactory::makeMesh(2, 2, 1, 1./5, 1./3, 1./4);
+	Mesh* MainMesh = MeshFactory::makeMesh(6, 5, 3, 1./5, 1./3, 1./4);
 	MainMesh->CreateFacesFromCells();
 
 	//Distort Mesh
@@ -24,6 +26,7 @@ int main(int argc, const char * argv[])
 	
 	//Partitioning
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
+
 
 	//Output
 	//--Create 
@@ -33,6 +36,9 @@ int main(int argc, const char * argv[])
 	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL,"Pressure");
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_NODE, "Test");
+
+	//
+	OutputWriter->DeclareAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
 	//--Make files
 	OutputWriter->Init();

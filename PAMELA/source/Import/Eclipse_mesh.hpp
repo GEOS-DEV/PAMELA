@@ -25,6 +25,7 @@ namespace PAMELA
 		static Mesh* ConvertMesh();
 		static void FillMeshWithProperties(Mesh* mesh);
 
+
 		static std::string m_label;
 		static int m_dimension;
 		static int m_nvertices;
@@ -40,6 +41,8 @@ namespace PAMELA
 		static std::vector<bool>  m_ACTNUM;
 		static int  m_nCOORD;
 		static int  m_nZCORN;
+		static int m_nActiveCells;
+		static int m_nTotalCells;
 
 		//Duplicate
 		static std::vector<double> m_Duplicate_Element;

@@ -11,24 +11,21 @@ int main(int argc, const char * argv[]) {
 
 	using namespace  PAMELA;
 
-	std::this_thread::sleep_for(std::chrono::seconds(2));
+
 	Communicator::initialize();
 
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/SAIGUP/SAIGUP.GRDECL");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/Johansen/FULLFIELD_IMAXJMAX.GRDECL");
-	Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/Norne/GRID/IRAP_1005.GRDECL");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/ReducedNorne/IRAP_1005.GRDECL");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/ECLIPSE Mesh/OW2P-MUFITS/OW2P-RT.GRDECL");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:\GitLabRepository\PArallel MEsh LibrAry\examples/INRIA Unstructured Mesh/spe10_one_layer.mesh");
+	//std::this_thread::sleep_for(std::chrono::seconds(10));
 
+	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/SAIGUP/SAIGUP.GRDECL");
+	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/Johansen/FULLFIELD_IMAXJMAX.GRDECL");
+	Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/ReducedNorne/IRAP_1005.GRDECL");
+	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/OW2P-MUFITS/OW2P-RT.GRDECL");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
-        /*
-
 	////-------------------------Output
-//	MeshDataWriter* OutputWriter = new VTKWriter(MainMesh, "EclipseGridExample");
+	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "EclipseGridExample");
 
 	//Variable declarations
 	
@@ -59,6 +56,6 @@ int main(int argc, const char * argv[]) {
 
 	Communicator::finalize();
 
-        */
+        
 	return 0;
 }

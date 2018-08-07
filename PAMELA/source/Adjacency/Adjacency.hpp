@@ -70,6 +70,10 @@ namespace PAMELA
 
 		//General getter
 		Adjacency* get_Adjacency(ELEMENTS::FAMILY source, ELEMENTS::FAMILY target, ELEMENTS::FAMILY base);
+		void ClearAfterPartitioning(std::set<int> PolyhedronOwned, std::set<int> PolyhedronGhost,
+		                            std::set<int> PolygonOwned,
+		                            std::set<int> PolygonGhost);
+
 
 	private:
 

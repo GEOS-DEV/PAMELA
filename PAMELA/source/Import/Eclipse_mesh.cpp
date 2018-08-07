@@ -19,6 +19,8 @@ namespace PAMELA
 
 	int Eclipse_mesh::m_nCOORD = 0;
 	int Eclipse_mesh::m_nZCORN = 0;
+	int Eclipse_mesh::m_nActiveCells = 0;
+	int Eclipse_mesh::m_nTotalCells = 0;
 	std::vector<int> Eclipse_mesh::m_SPECGRID = {0,0,0};
 	std::vector<double>  Eclipse_mesh::m_COORD = {};
 	std::vector<double>  Eclipse_mesh::m_ZCORN = {}; 
@@ -177,6 +179,7 @@ namespace PAMELA
 		int icellTotal = 0;
 		int icell = 0;
 		int cpt = 0;
+		int ipoint = 0;
 		for (auto k = 0; k != nz; ++k)
 		{
 			for (auto j = 0; j != ny; ++j)
@@ -217,7 +220,8 @@ namespace PAMELA
 						x_pos[0] = slope*(m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 						y_pos[0] = slope*(m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-						vertexTemp[0] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]);
+						//vertexTemp[0] = new Point(i, x_pos[0], y_pos[0], z_pos[0]);
+					//vertexTemp[0] = mesh->addPoint(elementType, ipoint, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]);
 
 						//5
 						i0 = np  * 6 - 1;
@@ -232,7 +236,8 @@ namespace PAMELA
 						x_pos[4] = slope*(m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 						y_pos[4] = slope*(m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-						vertexTemp[4] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]);
+						//vertexTemp[4] = new Point(i, x_pos[4], y_pos[4], z_pos[4]); 
+					//vertexTemp[4] = mesh->addPoint(elementType, ipoint, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]);
 
 						////Pillar 2
 						np = i + 1 + (nx + 1)*j;
@@ -249,7 +254,8 @@ namespace PAMELA
 						x_pos[1] = slope*(m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 						y_pos[1] = slope*(m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-						vertexTemp[1] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]);
+						//vertexTemp[1] = new Point(i, x_pos[1], y_pos[1], z_pos[1]); 
+					//vertexTemp[1] = mesh->addPoint(elementType, ipoint, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]);
 
 						//6
 						if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
@@ -263,7 +269,8 @@ namespace PAMELA
 						x_pos[5] = slope*(m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 						y_pos[5] = slope*(m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-						vertexTemp[5] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]);
+						//vertexTemp[5] = new Point(i, x_pos[5], y_pos[5], z_pos[5]); 
+					//vertexTemp[5] = mesh->addPoint(elementType, ipoint, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]);
 
 						////Pillar 3
 						np = i + (nx + 1)*(j+1);
@@ -280,7 +287,8 @@ namespace PAMELA
 						x_pos[2] = slope*(m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 						y_pos[2] = slope*(m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-						vertexTemp[3] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]);
+						//vertexTemp[3] = new Point(i, x_pos[2], y_pos[2], z_pos[2]); 
+					//vertexTemp[3] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]);
 
 						//7
 						i0 = np * 6 - 1;
@@ -295,7 +303,8 @@ namespace PAMELA
 						x_pos[6] = slope*(m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 						y_pos[6] = slope*(m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 						
-						vertexTemp[7] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]);
+						//vertexTemp[7] = new Point(i, x_pos[6], y_pos[6], z_pos[6]); 
+					//vertexTemp[7] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]);
 
 						////Pillar 4
 						np = i + (nx + 1)*(j + 1)+1 ;
@@ -312,7 +321,8 @@ namespace PAMELA
 						x_pos[3] = slope*(m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 						y_pos[3] = slope*(m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-						vertexTemp[2] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]);
+						//vertexTemp[2] = new Point(i, x_pos[3], y_pos[3], z_pos[3]); 
+					//vertexTemp[2] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]);
 
 						//8
 						i0 = np  * 6 - 1;
@@ -327,29 +337,41 @@ namespace PAMELA
 						x_pos[7] = slope*(m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 						y_pos[7] = slope*(m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-						vertexTemp[6] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]);
+						//vertexTemp[6] = new Point(i, x_pos[7], y_pos[7], z_pos[7]); 
+					//vertexTemp[6] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]);
 					
-						//Create Hexa
-						elementType = m_TypeMap[ECLIPSE_MESH_TYPE::HEXAHEDRON];
 
 						if (m_ACTNUM[icellTotal])
 						{
 							icell++;
-						}
 
-						mesh->get_PolyhedronCollection()->activeGroup("POLYHEDRON_GROUP");
-						auto returned_element = mesh->addPolyhedron(elementType, icell, "POLYHEDRON_GROUP", vertexTemp);
+							//Points
+							vertexTemp[0] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint-7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]);
+							vertexTemp[4] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 6, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]);
+							vertexTemp[1] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 5, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]);
+							vertexTemp[5] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 4, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]);
+							vertexTemp[3] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 3, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]);
+							vertexTemp[7] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 2, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]);
+							vertexTemp[2] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 1, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]);
+							vertexTemp[6] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]);
 
-						if (returned_element != nullptr)
-						{
-							//m_Duplicate_Element[returned_element->get_globalIndex()] = 1;
-							m_Duplicate_Element.push_back(2);
-							cpt++;
+							//Hexa
+							mesh->get_PolyhedronCollection()->activeGroup("POLYHEDRON_GROUP");
+							auto returned_element = mesh->addPolyhedron(m_TypeMap[ECLIPSE_MESH_TYPE::HEXAHEDRON], icell, "POLYHEDRON_GROUP", vertexTemp);
+
+							if (returned_element != nullptr)
+							{
+								//m_Duplicate_Element[returned_element->get_globalIndex()] = 1;
+								m_Duplicate_Element.push_back(2);
+								cpt++;
+							}
+							else
+							{
+								m_Duplicate_Element.push_back(0);
+							}
+
 						}
-						else
-						{
-							m_Duplicate_Element.push_back(0);
-						}
+				
 						layer.push_back(k);
 						actnum.push_back(m_ACTNUM[icellTotal]);
 						icellTotal++;
@@ -365,7 +387,34 @@ namespace PAMELA
 			m_Properties["Layer"] = layer;
 			m_Properties["ACTNUM"] = actnum;
 
-			
+
+			//Remove non-active properties
+			auto iacthexas = icell;
+			std::vector<double> temp; 
+			for (auto it = m_Properties.begin(); it != m_Properties.end(); ++it)
+			{
+				if (it->first!="ACTNUM")
+				{
+					temp.clear();
+					temp.reserve(iacthexas);
+					auto& prop = it->second;
+					for (size_t i = 0; i != prop.size(); ++i)
+					{
+						if ((actnum[i]) == 1)
+						{
+							temp.push_back(prop[i]);
+						}
+					}
+					prop = temp;
+				}
+				
+			}
+
+			m_Properties.erase("ACTNUM");
+
+			m_nActiveCells = iacthexas;
+			m_nTotalCells = icellTotal;
+
 			LOGINFO(std::to_string(icellTotal) + "  total hexas");
 			LOGINFO(std::to_string(icell) + "  active hexas");
 			LOGINFO(std::to_string(cpt) + "  duplicated hexas");
@@ -380,12 +429,12 @@ namespace PAMELA
 		auto props = mesh->get_PolyhedronProperty();
 
 		//Clean from duplicate elements
-		auto dim_g = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
+		//auto dim_g = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 		auto cpt = 0;
 			for (auto it = m_Properties.begin(); it != m_Properties.end(); ++it)
 			{
 				cpt = 0;
-				for (auto i = 0; i != dim_g; ++i)
+				for (auto i = 0; i != m_nActiveCells; ++i)
 				{
 					if (m_Duplicate_Element[i]==2)
 					{

@@ -1,4 +1,3 @@
-#pragma once
 #include "Mesh/MeshFactory.hpp"
 #include "Import/INRIA_mesh.hpp"
 #include "Import/Eclipse_mesh.hpp"

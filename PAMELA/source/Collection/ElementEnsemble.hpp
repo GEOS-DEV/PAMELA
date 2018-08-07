@@ -111,7 +111,7 @@ namespace PAMELA
 
 
 		//Getter
-		auto& get_GlobalToLocalIndex() { return m_GlobalToLocalIndex; };
+		std::unordered_map<int, int> & get_GlobalToLocalIndex() { return m_GlobalToLocalIndex; };
 
 
 		//Make Empty

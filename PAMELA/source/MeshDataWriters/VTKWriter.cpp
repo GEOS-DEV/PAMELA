@@ -6,13 +6,16 @@
 #include "Parallel/Communicator.hpp"
 #include "Utils/Logger.hpp"
 
-#include <vtkBlockIdScalars.h>
+#include <vtkMPIController.h>
+#include <vtkXMLMultiBlockDataWriter.h>
+//#include <vtkBlockIdScalars.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkCellArray.h>
-#include <vtkXMLUnstructuredGridWriter.h>
-#include <vtkInformation.h>
+//#include <vtkXMLUnstructuredGridWriter.h>
+//#include <vtkXMLMultiBlockDataWriter.h>
+//#include <vtkInformation.h>
 #include <vtkCellData.h>
-#include <vtkAOSDataArrayTemplate.h>
+//#include <vtkAOSDataArrayTemplate.h>
 #include <vtkDoubleArray.h>
 
 #include <iomanip>
@@ -25,7 +28,7 @@ namespace PAMELA
         MakeParentFile();
     }
 
-    void VTKWriter::DumpVariables() {
+    void VTKWriter::Dump() {
     }
     
     /// -------------- PRIVATE METHODS
@@ -66,8 +69,8 @@ namespace PAMELA
                         cell_types.emplace_back(vtkTypeLabel);
                         auto VertexList = (*it3)->get_vertexList();
                         auto nVertex = VertexList.size();
-                        vtkIdType corners[nVertex];
-                        for (auto j = 0; j != nVertex; ++j)
+	                    auto*corners = new vtkIdType[nVertex];
+                        for (size_t j = 0; j != nVertex; ++j)
                         {
                             corners[j] = partptr->GlobalToLocalPointMapping.at(VertexList[j]->get_globalIndex());
                         }
@@ -143,7 +146,7 @@ namespace PAMELA
         }
         else {
             multi_block->SetBlock(0, block_);
-            for(int proc = 1 ; proc < Communicator::worldSize(); proc++) {
+            for(Types::uint_t proc = 1 ; proc < Communicator::worldSize(); proc++) {
                 vtkSmartPointer< vtkMultiBlockDataSet> block = vtkMultiBlockDataSet::New();
                 controler->Receive(block,proc,proc);
                      multi_block->SetBlock(proc, block);

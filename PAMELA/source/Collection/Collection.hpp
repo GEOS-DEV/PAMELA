@@ -23,11 +23,12 @@ namespace PAMELA
 		{
 			auto vect_ver = ele->get_vertexList();
 			int hc = 0;
-			for (int i = 0; i < static_cast<int>(vect_ver.size()); i++)
+			for (size_t i = 0; i < static_cast<int>(vect_ver.size()); i++)
 			{
 				hc += vect_ver[i]->get_localIndex();
 			}
 
+			//return 1;
 			return hc;
 		}
 	};
@@ -65,7 +66,7 @@ namespace PAMELA
 
 			std::set<size_t> test_set;
 
-			for (auto i = 0; i < nb_vertex_lhs; i++)
+			for (size_t i = 0; i < nb_vertex_lhs; i++)
 			{
 				test_set.insert(vertexlist_lhs[i]->get_localIndex());
 				test_set.insert(vertexlist_rhs[i]->get_localIndex());
@@ -96,9 +97,9 @@ namespace PAMELA
 		{
 			auto lhs_vertex_list = lhs->get_vertexList();
 			auto rhs_vertex_list = rhs->get_vertexList();
-			for (auto i = 0; i < lhs_vertex_list.size(); i++)
+			for (size_t i = 0; i < lhs_vertex_list.size(); i++)
 			{
-				if (lhs_vertex_list[i]->get_globalIndex() != rhs_vertex_list[i]->get_globalIndex())
+				if (lhs_vertex_list[i]->get_localIndex() != rhs_vertex_list[i]->get_localIndex())
 				{
 					return false;
 				}
@@ -117,9 +118,9 @@ namespace PAMELA
 			auto rhs_vertex_list = rhs->get_vertexList();
 			std::sort(lhs_vertex_list.begin(), lhs_vertex_list.end());
 			std::sort(rhs_vertex_list.begin(), rhs_vertex_list.end());
-			for (auto i = 0; i < lhs_vertex_list.size(); i++)
+			for (size_t i = 0; i < lhs_vertex_list.size(); i++)
 			{
-				if (lhs_vertex_list[i]->get_globalIndex() != rhs_vertex_list[i]->get_globalIndex())
+				if (lhs_vertex_list[i]->get_localIndex() != rhs_vertex_list[i]->get_localIndex())
 				{
 					return false;
 				}
@@ -138,15 +139,14 @@ namespace PAMELA
 			auto rhs_vertex_list = rhs->get_vertexList();
 			std::sort(lhs_vertex_list.begin(), lhs_vertex_list.end());
 			std::sort(rhs_vertex_list.begin(), rhs_vertex_list.end());
-			for (auto i = 0; i < lhs_vertex_list.size(); i++)
+			for (size_t i = 0; i < lhs_vertex_list.size(); i++)
 			{
-				if (lhs_vertex_list[i]->get_globalIndex() != rhs_vertex_list[i]->get_globalIndex())
+				if (lhs_vertex_list[i]->get_localIndex() != rhs_vertex_list[i]->get_localIndex())
 				{
 					return false;
 				}
 			}
-			//return true;
-			return false;
+			return true;		//TODO:When can it happen?
 		}
 	};
 
@@ -208,6 +208,7 @@ namespace PAMELA
 		void addAndCreateGroup(std::string label) { m_labelToGroup[label] = new ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>(); }
 		void activeGroup(std::string label) { ASSERT(groupExist(label), "The group does not exist"); m_activeGroup[label] = true; }
 		std::unordered_map<std::string, bool>& get_ActiveGroupsMap() { return m_activeGroup; }
+		std::unordered_map<std::string, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>*>& get_labelToGroupMap() { return m_labelToGroup; }
 		ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* get_Group(std::string label) { ASSERT(groupExist(label), "The group does not exist"); return m_labelToGroup.at(label); }
 
 		//Parallel

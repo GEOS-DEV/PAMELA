@@ -60,11 +60,72 @@ namespace PAMELA
 
 	}
 
+	void MeshAdjacency::ClearAfterPartitioning(std::set<int> PolyhedronOwned, std::set<int> PolyhedronGhost, std::set<int> PolygonOwned, std::set<int> PolygonGhost)
+	{
+
+		//Update Polyhedron to face adjacency
+		auto adjacency = get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON);
+		auto polyhedra = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
+		auto polygons = static_cast<PolygonCollection*>(adjacency->get_targetElementCollection());
+
+		auto csr_matrix = adjacency->get_adjacencySparseMatrix();
+		auto dimRow = csr_matrix->dimRow;
+		auto nnz = csr_matrix->nnz;
+		auto& columIndex = csr_matrix->columnIndex;
+		auto& rowPtr = csr_matrix->rowPtr;
+		auto& val = csr_matrix->values;
+		auto dimColumn = csr_matrix->dimColumn;
+		
+		CSRMatrix* new_csr_matrix = new CSRMatrix;
+		auto& new_dimRow_ghost =  new_csr_matrix->dimRow_ghost = static_cast<int>(polyhedra->size_ghost());
+		auto& new_dimRow_owned = new_csr_matrix->dimRow_owned = static_cast<int>(polyhedra->size_owned());
+		auto& new_dimRow = new_csr_matrix->dimRow = static_cast<int>(polyhedra->size_all());
+		auto& new_dimColumn_ghost = new_csr_matrix->dimColumn_ghost = static_cast<int>(polygons->size_ghost());
+		auto& new_dimColumn_owned = new_csr_matrix->dimColumn_owned = static_cast<int>(polygons->size_owned());
+		auto& new_dimColumn = new_csr_matrix->dimColumn = static_cast<int>(polygons->size_all());
+		auto& new_nnz = new_csr_matrix->nnz = 0;
+		auto& new_columIndex = new_csr_matrix->columnIndex;
+		auto& new_rowPtr = new_csr_matrix->rowPtr;
+		auto& new_val = new_csr_matrix->values;
+
+		for (auto it= polyhedra->begin();it!= polyhedra->end();++it)
+		{
+			auto polyhedron_global_index = (*it)->get_globalIndex();
+			auto polyhedron_local_index = (*it)->get_localIndex();
+			auto i0 = rowPtr[polyhedron_global_index];
+			auto i1 = rowPtr[polyhedron_global_index + 1];
+			std::vector<int> sub_columnIndex(columIndex.begin() + i0, columIndex.begin() + i1);
+			std::vector<int> sub_val(val.begin() + i0, val.begin() + i1);
+			std::vector<int> temp;
+			for (size_t i = 0; i != sub_columnIndex.size(); ++i)
+			{
+				auto polygon_global_index = sub_columnIndex[i];
+				
+				if ((PolygonOwned.count(polygon_global_index) == 1) || (PolygonGhost.count(polygon_global_index) == 1))	//face is in the partition
+				{
+					auto polygon_local_index = polygons->get_GlobalToLocalIndex().at(polygon_global_index);
+					temp.push_back(polygon_local_index);
+					new_val.push_back(polyhedron_local_index);
+					++new_nnz;
+				}
+			}
+			std::sort(temp.begin(),temp.end());
+			new_columIndex.insert(new_columIndex.end(), temp.begin(),temp.end());
+			new_rowPtr.push_back(new_nnz);
+		}
+
+		Adjacency* new_adjacency = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, polyhedra, polyhedra, polygons);
+		new_adjacency->m_adjacencySparseMatrix = new_csr_matrix;
+		adjacencyMap.clear();
+		adjacencyMap[std::make_tuple(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON)] = new_adjacency;
+
+	}
+
 	// Polyhedra to Points adjacency 
 	Adjacency* MeshAdjacency::get_Adjacency(PolyhedronCollection* source, PointCollection* target, PolyhedronCollection* base)
 	{
 
-		Adjacency* adj = new Adjacency(source, target, base);
+		Adjacency* adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, source, target, base);
 		auto collectionSize = source->size_all();
 		int nbVertex = 0;
 		int vertexIndex = 0;
@@ -73,7 +134,7 @@ namespace PAMELA
 		int nrow = 0;
 
 		adj->m_adjacencySparseMatrix->rowPtr.push_back(0);
-		for (auto i = 0; i != collectionSize; i++)
+		for (size_t i = 0; i != collectionSize; i++)
 		{
 			Polyhedron* polyhedron = source->operator[](static_cast<int>(i));
 			PolyhedronIndex = polyhedron->get_localIndex();
@@ -136,13 +197,17 @@ namespace PAMELA
 	Adjacency* MeshAdjacency::adjacencyExist(ELEMENTS::FAMILY source, ELEMENTS::FAMILY target, ELEMENTS::FAMILY base)
 	{
 		familyTriplet tri = std::make_tuple(source, target, base);
-		return adjacencyMap[tri];
+		if (adjacencyMap.find(tri) != adjacencyMap.end())
+		{
+			return adjacencyMap.at(tri);
+		}
+		return nullptr;
 	}
 
 
 	Adjacency* MeshAdjacency::transposed(Adjacency* input)
 	{
-		Adjacency* adj = new Adjacency(input->m_targetElementCollection, input->m_sourceElementCollection, input->m_baseElementCollection);
+		Adjacency* adj = new Adjacency(input->get_targetFamily(), input->get_sourceFamily(), input->get_baseFamily(),input->m_targetElementCollection, input->m_sourceElementCollection, input->m_baseElementCollection);
 		adj->m_adjacencySparseMatrix = CSRMatrix::transpose(input->m_adjacencySparseMatrix);
 		return  adj;
 	}
@@ -150,7 +215,7 @@ namespace PAMELA
 
 	Adjacency* MeshAdjacency::multiply(Adjacency* input_lhs, Adjacency* input_rhs)
 	{
-		Adjacency* adj = new Adjacency(input_rhs->m_targetElementCollection, input_lhs->m_sourceElementCollection, input_lhs->m_targetElementCollection);
+		Adjacency* adj = new Adjacency(input_rhs->get_targetFamily(), input_lhs->get_sourceFamily(), input_lhs->get_targetFamily(),input_rhs->m_targetElementCollection, input_lhs->m_sourceElementCollection, input_lhs->m_targetElementCollection);
 		adj->m_adjacencySparseMatrix = CSRMatrix::product(input_lhs->m_adjacencySparseMatrix, input_rhs->m_adjacencySparseMatrix);
 		return adj;
 	}

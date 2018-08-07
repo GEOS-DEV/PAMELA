@@ -3,9 +3,7 @@
 #include "MeshDataWriters/MeshDataWriter.hpp"
 
 #ifdef WITH_VTK
-#include <vtkXMLPMultiBlockDataWriter.h>
 #include <vtkSmartPointer.h>
-#include <vtkMPIController.h>
 #include <vtkMultiBlockDataSet.h>
 
 #if defined( _WIN32)
@@ -22,7 +20,7 @@ namespace PAMELA
         public:
             VTKWriter(Mesh * mesh, std::string name) : MeshDataWriter(mesh,name) {}
             virtual void Init() final;
-            virtual void DumpVariables() final;
+            virtual void Dump() final;
 
         private:
 
@@ -46,7 +44,7 @@ namespace PAMELA
 
         private:
             /// VTU file
-            vtkSmartPointer<vtkXMLPMultiBlockDataWriter> vtm_ {vtkXMLPMultiBlockDataWriter::New()};
+            //vtkSmartPointer<vtkXMLPMultiBlockDataWriter> vtm_ {vtkXMLPMultiBlockDataWriter::New()};
             vtkSmartPointer<vtkMultiBlockDataSet> block_ {vtkMultiBlockDataSet::New()};
 
             const std::unordered_map<ELEMENTS::TYPE, int> ElementToLabel

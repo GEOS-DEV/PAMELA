@@ -41,6 +41,7 @@ namespace PAMELA
 		///Functions to add elements or group to the mesh
 		//Add Element
 		Point* addPoint(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, double x, double y, double z);
+		Point* addPoint(std::string groupLabel, Point* point);
 		Line* addLine(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
 		Polygon* addPolygon(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
 		Polyhedron* addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
@@ -65,7 +66,7 @@ namespace PAMELA
 		Property<PolyhedronCollection,double>* m_PolyhedronProperty;
 
 		//Adjacency
-		MeshAdjacency* m_adjacency;
+		MeshAdjacency* m_Adjacency;
 
 		void ShrinkMesh(const std::set<int>& Polyhedron_owned, const std::set<int>& vector);
 	};

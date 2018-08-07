@@ -25,8 +25,8 @@ namespace PAMELA
 
 			if (rowPtr[row] == rowPtr[row + 1])
 			{
-				LOGERROR("The CSR matrix has an empty row");
-				return false;
+				LOGWARNING("The CSR matrix has an empty row");
+				//return false;
 			}
 
 			int row_stop = rowPtr[row + 1];
@@ -34,7 +34,7 @@ namespace PAMELA
 			{
 				if (columnIndex[nnz_index] >= columnIndex[nnz_index + 1])
 				{
-					//LOGERROR("The CSR matrix has a column index vector not sorted");
+					LOGWARNING("The CSR matrix has a column index vector not sorted");  //TODO:check this. Seems ok.
 					//return false;
 				}
 			}

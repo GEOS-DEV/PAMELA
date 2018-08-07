@@ -7,7 +7,13 @@ namespace PAMELA
 	struct CSRMatrix
 	{
 
-		CSRMatrix(int dim_row, int dim_col, int nnz) :nnz(nnz), dimRow(dim_row), dimColumn(dim_col) { values.resize(nnz); rowPtr.resize(dim_row + 1); columnIndex.resize(nnz); };
+		CSRMatrix(int dim_row, int dim_col, int nnz) : nnz(nnz), dimRow(dim_row), dimColumn(dim_col), dimRow_owned(dim_row),
+		                                               dimColumn_owned(dim_col), dimRow_ghost(0), dimColumn_ghost(0)
+		{
+			values.resize(nnz);
+			rowPtr.resize(dim_row + 1);
+			columnIndex.resize(nnz);
+		};
 		CSRMatrix(int dim_row, int dim_col) :CSRMatrix(dim_row, dim_col, 0) {};
 		CSRMatrix() :CSRMatrix(0, 0, 0) {};
 
@@ -21,6 +27,8 @@ namespace PAMELA
 
 		int nnz;
 		int dimRow, dimColumn;
+		int dimRow_owned, dimColumn_owned;
+		int dimRow_ghost, dimColumn_ghost;
 		std::vector<int> rowPtr, columnIndex;
 		std::vector<int> values;
 

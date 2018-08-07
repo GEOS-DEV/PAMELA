@@ -29,8 +29,6 @@ namespace PAMELA
 		//Defaut constructor for empty ensemble
 		ElementEnsemble() :ParallelEnsemble< T >() {}
 
-		//Getter
-		int get_Index(T element) { return m_pointerToIndex[element]; }
 
 		//Push back T
 		void push_back_owned(T data)  override
@@ -63,14 +61,13 @@ namespace PAMELA
 		{
 			T returned_element = NULL;
 			auto index = static_cast<int>(this->end_owned() - this->begin_owned());
-			auto insertion = m_pointerToIndex.insert(std::make_pair(data, index));
+			auto insertion = m_pointerToLocalIndex.insert(std::make_pair(data, index));
 			returned_element = insertion.first->first;
 			if (insertion.second) //the element is new and the map has been updated
 			{
 				this->m_data.insert(this->end_owned(), data);
 				(*data).set_localIndex(index);
 				this->Increment_owned();
-				m_elementToLocalIndexMap.insert(std::make_pair(data, index));
 				return data;
 			}
 			return insertion.first->first;
@@ -80,24 +77,26 @@ namespace PAMELA
 		{
 			T returned_element = NULL;
 			int index = static_cast<int>(this->end_ghost() - this->begin_ghost());
-			auto insertion = m_pointerToIndex.insert(std::make_pair(data, index));
+			auto insertion = m_pointerToLocalIndex.insert(std::make_pair(data, index));
 			returned_element = insertion.first->first;
 			if (insertion.second) //the element is new and the map has been updated
 			{
 				this->m_data.insert(this->end_ghost(), data);
 				(*data).set_localIndex(index);
 				this->Increment_ghost();
-				m_elementToLocalIndexMap.insert(std::make_pair(data, index));
+				//m_elementToLocalIndexMap.insert(std::make_pair(data, index));
 				return data;
 			}
 			return insertion.first->first;
 		}
 
+
+
 		T push_back_unique(T data)   //To be use before partitioning
 		{
 			T returned_element = NULL;
 			int index = static_cast<int>(this->end() - this->begin());
-			auto insertion = m_pointerToIndex.insert(std::make_pair(data, index));
+			auto insertion = m_pointerToLocalIndex.insert(std::make_pair(data, index));
 			returned_element = insertion.first->first;
 			if (insertion.second) //the element is new and the map has been updated
 			{
@@ -105,11 +104,15 @@ namespace PAMELA
 				(*data).set_localIndex(index);
 				(*data).set_globalIndex(index);
 				this->Increment_all();
-				m_elementToLocalIndexMap.insert(std::make_pair(data, index));
 				return data;
 			}
 			return insertion.first->first;
 		}
+
+
+		//Getter
+		auto& get_GlobalToLocalIndex() { return m_GlobalToLocalIndex; };
+
 
 		//Make Empty
 		void MakeEmpty() override
@@ -118,8 +121,7 @@ namespace PAMELA
 			this->m_sizeOwned = 0;
 			this->m_sizeGhost = 0;
 			this->m_data.clear();
-			m_pointerToIndex.clear();
-			m_elementToLocalIndexMap.clear();
+			m_pointerToLocalIndex.clear();
 		}
 
 		//Shrink
@@ -130,11 +132,12 @@ namespace PAMELA
 			std::vector<T> owned_vec_temp; ghost_vec_temp.reserve(owned.size());
 			for (auto it = this->m_data.begin(); it != this->m_data.end(); ++it)
 			{
-				if (ghost.count((*it)->get_localIndex()) == 1)
+				if (ghost.count((*it)->get_globalIndex()) == 1)
 				{
+					(*it)->set_IsGhost();
 					ghost_vec_temp.push_back(*it);
 				}
-				else if (owned.count((*it)->get_localIndex()) == 1)
+				else if (owned.count((*it)->get_globalIndex()) == 1)
 				{
 					owned_vec_temp.push_back(*it);
 				}
@@ -155,10 +158,13 @@ namespace PAMELA
 
 			//Update Numbering and map
 			int i = 0;
+			m_pointerToLocalIndex.clear();
+			m_GlobalToLocalIndex.clear();
 			for (auto it = this->m_data.begin(); it != this->m_data.end(); ++it)
 			{
 				(*it)->set_localIndex(i);
-				m_elementToLocalIndexMap.insert(std::make_pair((*it), static_cast<int>(it - this->m_data.begin())));
+				m_pointerToLocalIndex.insert(std::make_pair((*it), static_cast<int>(it - this->m_data.begin())));
+				m_GlobalToLocalIndex.insert(std::make_pair((*it)->get_globalIndex(), static_cast<int>(it - this->m_data.begin())));
 				i++;
 			}
 
@@ -170,10 +176,10 @@ namespace PAMELA
 	protected:
 
 		//Pointer to Index
-		std::unordered_map<T, int, HashStruct, EqualStruct> m_pointerToIndex;   //Working map only?
+		std::unordered_map<T, int, HashStruct, EqualStruct> m_pointerToLocalIndex;
 
-		//Map
-		std::unordered_map<T, int, HashStruct, EqualStruct> m_elementToLocalIndexMap;
+		std::unordered_map<int, int> m_GlobalToLocalIndex;
+
 
 	};
 

@@ -38,11 +38,10 @@ namespace PAMELA
 
 	public:
 
-		EnsightGoldWriter(Mesh * mesh, std::string name) : MeshDataWriter(mesh,name) {}
+		EnsightGoldWriter(Mesh * mesh, std::string name) : MeshDataWriter(mesh, name) {}
 
 		virtual void Init() final;
-		virtual void DumpVariables() final;
-
+		virtual void Dump() final;
 
 	private:
 
@@ -51,12 +50,16 @@ namespace PAMELA
 
 		//Geo
 		void MakeGeoFile_Header();
-		
+
 		template<typename T>
 		void MakeGeoFile_AddParts(const PartMap<T>* parts);
 
+		void MakeGeoFile_AddAdjacency();
+
 		template<typename T>
 		void DumpVariables_Parts(const PartMap<T>* parts);
+
+		void DumpAdjacency();
 
 
 		const std::unordered_map<ELEMENTS::TYPE, std::string> ElementToLabel
@@ -305,7 +308,7 @@ namespace PAMELA
 
 		}
 
-
 	}
-
 }
+
+

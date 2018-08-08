@@ -17,6 +17,8 @@
 #include <vtkCellData.h>
 //#include <vtkAOSDataArrayTemplate.h>
 #include <vtkDoubleArray.h>
+#include <vtkInformation.h>
+#include <vtkCompositeDataSet.h>
 
 #include <iomanip>
 namespace PAMELA
@@ -135,32 +137,40 @@ namespace PAMELA
         MakeChildFile(&m_PolyhedronParts, "polyhedron_");
     }
 
-    void VTKWriter::MakeParentFile() {
-        vtkSmartPointer<vtkMultiBlockDataSet> multi_block= 
-            vtkMultiBlockDataSet::New();
-        multi_block->SetNumberOfBlocks(Communicator::worldSize());
-        auto controler =
-            vtkMPIController::GetGlobalController();
-        if( Communicator::worldRank() != 0 ) {
-            controler->Send(block_,0,Communicator::worldRank());
-        }
-        else {
-            multi_block->SetBlock(0, block_);
-            for(Types::uint_t proc = 1 ; proc < Communicator::worldSize(); proc++) {
-                vtkSmartPointer< vtkMultiBlockDataSet> block = vtkMultiBlockDataSet::New();
-                controler->Receive(block,proc,proc);
-                     multi_block->SetBlock(proc, block);
-            }
-        }
-        if(Communicator::worldRank() == 0 ) {
-            std::string filename = m_name + ".vtm";
-            vtkSmartPointer< vtkXMLMultiBlockDataWriter> write =
-                vtkXMLMultiBlockDataWriter::New();
-            write->SetInputData(multi_block);
-            write->SetFileName(filename.c_str());
-            write->Write();
-        }
-    }
+	void VTKWriter::MakeParentFile()
+	{
+		vtkSmartPointer<vtkMultiBlockDataSet> multi_block = vtkMultiBlockDataSet::New();
+		multi_block->SetNumberOfBlocks(Communicator::worldSize());
+		std::stringstream  name;
+		auto controler = vtkMPIController::GetGlobalController();
+
+		if (Communicator::worldRank() != 0)
+		{
+			name << "RANK_" << Communicator::worldRank();
+			LOGINFO(name.str());
+			multi_block->GetMetaData(static_cast<unsigned>(Communicator::worldRank()))->Set(vtkCompositeDataSet::NAME(), name.str().c_str());
+			controler->Send(block_, 0, Communicator::worldRank());
+		}
+		else
+		{
+			multi_block->SetBlock(0, block_);
+			for (Types::uint_t proc = 1; proc < Communicator::worldSize(); proc++)
+			{
+				vtkSmartPointer< vtkMultiBlockDataSet> block = vtkMultiBlockDataSet::New();
+				controler->Receive(block, proc, proc);
+				multi_block->SetBlock(proc, block);
+			}
+		}
+		if (Communicator::worldRank() == 0)
+		{
+			std::string filename = m_name + ".vtm";
+			vtkSmartPointer< vtkXMLMultiBlockDataWriter> write =
+				vtkXMLMultiBlockDataWriter::New();
+			write->SetInputData(multi_block);
+			write->SetFileName(filename.c_str());
+			write->Write();
+		}
+	}
 
 }
 #endif

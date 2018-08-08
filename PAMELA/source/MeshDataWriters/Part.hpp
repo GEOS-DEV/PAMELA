@@ -53,7 +53,7 @@ namespace PAMELA
 		std::vector<Variable*> PerElementVariable;
 		std::vector<Variable*> PerNodeVariable;
 
-	};
+	}; //TODO: specialize init of numberOfElementsPerSubPart
 
 	template <class T>
 	Variable* Part<T>::AddVariable(VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string label)

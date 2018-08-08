@@ -1,19 +1,24 @@
 #include "PAMELA.hpp"
-#include <iostream>
 #include "Mesh/MeshFactory.hpp"
 #include "Mesh/Mesh.hpp"
 #include "Adjacency/Adjacency.hpp"
 #include "Parallel/Communicator.hpp"
 #include <thread>
-#include "MeshDataWriters/EnsightGoldWriter.hpp"
 #include "MeshDataWriters/MeshDataWriterFactory.hpp"
+#include <vtkMultiProcessController.h>
+#include <vtkMPIController.h>
 
-int main(int argc, const char * argv[]) {
+int main(int argc, char **argv) {
 
 	using namespace  PAMELA;
 
 
 	Communicator::initialize();
+#ifdef WITH_VTK
+	vtkSmartPointer<vtkMPIController> controler = vtkMPIController::New();
+	controler->Initialize(&argc, &argv, true);
+	vtkMultiProcessController::SetGlobalController(controler.Get());
+#endif
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
 	Mesh* MainMesh = MeshFactory::makeMesh("../../../data/eclipse/ReducedNorne/IRAP_1005.GRDECL");
@@ -43,9 +48,9 @@ int main(int argc, const char * argv[]) {
 
 	//Set
 	OutputWriter->SetVariable("Partition", Communicator::worldRank());
-	for (auto it = mesh_props.begin(); it != mesh_props.end(); ++it)
+	for (auto& mesh_prop : mesh_props)
 	{
-		OutputWriter->SetVariable(it->first, it->second);
+		OutputWriter->SetVariable(mesh_prop.first, mesh_prop.second);
 	}
 
 	//Dump

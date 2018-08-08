@@ -1,13 +1,16 @@
 #include "PAMELA.hpp"
-#include <iostream>
 #include "Mesh/MeshFactory.hpp"
 #include "Mesh/Mesh.hpp"
 #include "Parallel/Communicator.hpp"
 #include <thread>
-#include "MeshDataWriters/EnsightGoldWriter.hpp"
 #include "MeshDataWriters/MeshDataWriterFactory.hpp"
 
-int main(int argc, const char * argv[]) 
+#ifdef WITH_VTK
+#include<vtkSmartPointer.h>
+#include<vtkMPIController.h>
+#endif
+
+int main(int argc, char **argv)
 {
 
 	using namespace PAMELA;
@@ -15,7 +18,13 @@ int main(int argc, const char * argv[])
 
 	Communicator::initialize();
 
-	std::this_thread::sleep_for(std::chrono::seconds(1));
+#ifdef WITH_VTK
+	vtkSmartPointer<vtkMPIController> controler = vtkMPIController::New();
+	controler->Initialize(&argc, &argv, true);
+	vtkMultiProcessController::SetGlobalController(controler.Get());
+#endif
+
+	//std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	//Make mesh
 	Mesh* MainMesh = MeshFactory::makeMesh(6, 5, 3, 1./5, 1./3, 1./4);
@@ -30,7 +39,7 @@ int main(int argc, const char * argv[])
 
 	//Output
 	//--Create 
-	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "Cartesian.case");
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "Cartesian.vtm");
 
 	//--Create variables
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");

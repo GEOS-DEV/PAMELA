@@ -18,19 +18,23 @@ configure_file(${test_config_file_in} ${test_config_file})
 	
 add_executable("TEST_small" small.cpp)
 target_link_libraries("TEST_small" PAMELA)
+target_compile_definitions("TEST_small" PUBLIC "${PAMELA_DEFINITIONS}")
+target_include_directories("TEST_small" PUBLIC "${PROJECT_BINARY_DIR}")
+target_include_directories("TEST_small" PUBLIC "${PAMELA_INCLUDE_DIRS}")
 add_test(NAME small COMMAND small)
 
 add_executable("TEST_medium" medium.cpp)
 target_link_libraries("TEST_medium" PAMELA)
+target_compile_definitions("TEST_medium" PUBLIC "${PAMELA_DEFINITIONS}")
+target_include_directories("TEST_medium" PUBLIC "${PROJECT_BINARY_DIR}")
+target_include_directories("TEST_medium" PUBLIC "${PAMELA_INCLUDE_DIRS}")
 add_test(NAME medium COMMAND medium)
 
 add_executable("TEST_big" big.cpp)
 target_link_libraries("TEST_big" PAMELA)
+target_compile_definitions("TEST_big" PUBLIC "${PAMELA_DEFINITIONS}")
+target_include_directories("TEST_big" PUBLIC "${PROJECT_BINARY_DIR}")
+target_include_directories("TEST_big" PUBLIC "${PAMELA_INCLUDE_DIRS}")
 add_test(NAME big COMMAND big)
 
-if(${USE_VTK})
-    add_definitions(-DWITH_VTK)
-endif(${USE_VTK})
-include_directories(${PAMELA_INCLUDE_DIRS})
-include_directories(${PROJECT_BINARY_DIR})
 

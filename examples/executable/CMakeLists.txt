@@ -13,9 +13,6 @@ project(${PROJECT_NAME} C CXX)
 set(SOURCE pamela.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE})
 target_link_libraries(${PROJECT_NAME} PAMELA)
-if(${USE_VTK})
-        add_definitions(-DWITH_VTK)
-endif(${USE_VTK})
-include_directories(${PAMELA_INCLUDE_DIRS})
-
+target_compile_definitions(${PROJECT_NAME} PUBLIC "${PAMELA_DEFINITIONS}")
+target_include_directories(${PROJECT_NAME} PUBLIC "${PAMELA_INCLUDE_DIRS}")
 

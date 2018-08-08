@@ -20,11 +20,6 @@ option(COMPILE_EXECUTABLE "Compile executable" ON)
 #PAMELA
 add_subdirectory (PAMELA)
 
-# Executable
-if(COMPILE_EXECUTABLE)
-   add_subdirectory(executable)
-endif(COMPILE_EXECUTABLE)
-
 # Examples
 if(COMPILE_EXAMPLES)
    add_subdirectory(examples)

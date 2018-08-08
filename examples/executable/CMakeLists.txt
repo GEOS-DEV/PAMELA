@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(PROJECT_NAME "pamela")
+set(PROJECT_NAME "EXAMPLE_executable")
 project(${PROJECT_NAME} C CXX)
 set(SOURCE pamela.cpp)
 add_executable(${PROJECT_NAME} ${SOURCE})

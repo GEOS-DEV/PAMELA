@@ -11,7 +11,6 @@ int main(int argc, const char * argv[])
 
 	using namespace PAMELA;
 
-	
 
 	Communicator::initialize();
 

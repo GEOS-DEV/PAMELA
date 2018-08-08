@@ -6,6 +6,7 @@
 #include <thread>
 #include "Adjacency/Adjacency.hpp"
 #include "MeshDataWriters/EnsightGoldWriter.hpp"
+#include "MeshDataWriters/MeshDataWriterFactory.hpp"
 
 int main(int argc, const char * argv[]) {
 
@@ -14,17 +15,12 @@ int main(int argc, const char * argv[]) {
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
 	Communicator::initialize();
 
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/LocalGitRepository/PArallel MEsh LibrAry/examples/GMSH Unstructured Mesh/THM.msh");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/GMSH Unstructured Mesh/BoxWithFracs.msh");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/GMSH Unstructured Mesh/mesh.msh");
-	Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/GMSH Unstructured Mesh/modelA1_volume_meshed.msh");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/LocalGitRepository/PAMELA - PArallel MEsh LibrAry/examples/INRIA Unstructured Mesh/spe10_one_layer.mesh");
+	Mesh* MainMesh = MeshFactory::makeMesh("../../../data/gmsh/modelA1_volume_meshed.msh");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
-
-	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "UnstructuredGridExample");
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.case");
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->Init();

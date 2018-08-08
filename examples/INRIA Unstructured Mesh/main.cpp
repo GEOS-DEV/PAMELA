@@ -7,6 +7,7 @@
 #include "Adjacency/Adjacency.hpp"
 #include "MeshDataWriters/EnsightGoldWriter.hpp"
 #include "MeshDataWriters/VTKWriter.hpp"
+#include "MeshDataWriters/MeshDataWriterFactory.hpp"
 
 int main(int argc, char * argv[]) {
 
@@ -14,20 +15,13 @@ int main(int argc, char * argv[]) {
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
 	Communicator::initialize();
-#ifdef WITH_VTK
-        vtkSmartPointer<vtkMPIController> controler = vtkMPIController::New();
-        controler->Initialize(&argc,&argv,true);
-        vtkMultiProcessController::SetGlobalController(controler.Get());
-#endif
 
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/INRIA Unstructured Mesh/trivial.mesh");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/INRIA Unstructured Mesh/small.mesh");
-//	mesh* mainmesh = meshfactory::makemesh("e:/gitlabrepository/parallel mesh library/examples/inria unstructured mesh/final_very_coarse.mesh");
-	Mesh * MainMesh = MeshFactory::makeMesh("/home/amazuyer/dev/PAMELA/examples/INRIA Unstructured Mesh/small.mesh");
+	Mesh* MainMesh = MeshFactory::makeMesh("../../../data/medit/small.mesh");
+
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
-	MeshDataWriter* OutputWriter = new VTKWriter(MainMesh, "UnstructuredGridExample");
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.case");
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	//Writer->AddElementScalarVariable("Pressure");

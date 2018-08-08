@@ -5,6 +5,7 @@
 #include "Parallel/Communicator.hpp"
 #include <thread>
 #include "MeshDataWriters/EnsightGoldWriter.hpp"
+#include "MeshDataWriters/MeshDataWriterFactory.hpp"
 
 int main(int argc, const char * argv[]) 
 {
@@ -29,7 +30,8 @@ int main(int argc, const char * argv[])
 
 	//Output
 	//--Create 
-	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "Cartesian");
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "Cartesian.case");
+
 	//--Create variables
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");

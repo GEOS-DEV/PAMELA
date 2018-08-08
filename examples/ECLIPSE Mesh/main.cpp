@@ -6,6 +6,7 @@
 #include "Parallel/Communicator.hpp"
 #include <thread>
 #include "MeshDataWriters/EnsightGoldWriter.hpp"
+#include "MeshDataWriters/MeshDataWriterFactory.hpp"
 
 int main(int argc, const char * argv[]) {
 
@@ -15,17 +16,13 @@ int main(int argc, const char * argv[]) {
 	Communicator::initialize();
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
-
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/SAIGUP/SAIGUP.GRDECL");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/Johansen/FULLFIELD_IMAXJMAX.GRDECL");
-	Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/ReducedNorne/IRAP_1005.GRDECL");
-	//Mesh* MainMesh = MeshFactory::makeMesh("E:/GitLabRepository/PArallel MEsh LibrAry/examples/ECLIPSE Mesh/OW2P-MUFITS/OW2P-RT.GRDECL");
+	Mesh* MainMesh = MeshFactory::makeMesh("../../../data/eclipse/ReducedNorne/IRAP_1005.GRDECL");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
 	////-------------------------Output
-	MeshDataWriter* OutputWriter = new EnsightGoldWriter(MainMesh, "EclipseGridExample");
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.case");
 
 	//Variable declarations
 	

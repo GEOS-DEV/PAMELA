@@ -21,20 +21,22 @@ target_link_libraries("TEST_small" PAMELA)
 target_compile_definitions("TEST_small" PUBLIC "${PAMELA_DEFINITIONS}")
 target_include_directories("TEST_small" PUBLIC "${PROJECT_BINARY_DIR}")
 target_include_directories("TEST_small" PUBLIC "${PAMELA_INCLUDE_DIRS}")
-add_test(NAME small COMMAND small)
+add_test(NAME small COMMAND TEST_small)
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
+                  DEPENDS ExeName)
 
 add_executable("TEST_medium" medium.cpp)
 target_link_libraries("TEST_medium" PAMELA)
 target_compile_definitions("TEST_medium" PUBLIC "${PAMELA_DEFINITIONS}")
 target_include_directories("TEST_medium" PUBLIC "${PROJECT_BINARY_DIR}")
 target_include_directories("TEST_medium" PUBLIC "${PAMELA_INCLUDE_DIRS}")
-add_test(NAME medium COMMAND medium)
+add_test(NAME medium COMMAND TEST_medium)
 
 add_executable("TEST_big" big.cpp)
 target_link_libraries("TEST_big" PAMELA)
 target_compile_definitions("TEST_big" PUBLIC "${PAMELA_DEFINITIONS}")
 target_include_directories("TEST_big" PUBLIC "${PROJECT_BINARY_DIR}")
 target_include_directories("TEST_big" PUBLIC "${PAMELA_INCLUDE_DIRS}")
-add_test(NAME big COMMAND big)
+add_test(NAME big COMMAND TEST_big)
 
 

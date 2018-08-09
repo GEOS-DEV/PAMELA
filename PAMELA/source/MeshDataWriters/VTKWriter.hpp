@@ -45,7 +45,7 @@ namespace PAMELA
         private:
             /// VTU file
             //vtkSmartPointer<vtkXMLPMultiBlockDataWriter> vtm_ {vtkXMLPMultiBlockDataWriter::New()};
-            vtkSmartPointer<vtkMultiBlockDataSet> block_ {vtkMultiBlockDataSet::New()};
+            vtkSmartPointer<vtkMultiBlockDataSet> m_block_ {vtkMultiBlockDataSet::New()};
 
             const std::unordered_map<ELEMENTS::TYPE, int> ElementToLabel
                 =

@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	vtkMultiProcessController::SetGlobalController(controler.Get());
 #endif
 
-	//std::this_thread::sleep_for(std::chrono::seconds(10));
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	//Make mesh
 	Mesh* MainMesh = MeshFactory::makeMesh(6, 5, 3, 1./5, 1./3, 1./4);

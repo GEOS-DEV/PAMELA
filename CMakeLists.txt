@@ -17,6 +17,9 @@ option(COMPILE_TESTS "Compile test" OFF)
 option(COMPILE_EXAMPLES "Compile Examples" OFF)
 option(COMPILE_EXECUTABLE "Compile executable" ON)
 
+#Expose important paths
+set(PAMELA_PATH ${CMAKE_SOURCE_DIR} CACHE INTERNAL "PAMELA_PATH" FORCE)
+
 #PAMELA
 add_subdirectory (PAMELA)
 
@@ -30,4 +33,5 @@ if(COMPILE_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif(COMPILE_TESTS)
+
 

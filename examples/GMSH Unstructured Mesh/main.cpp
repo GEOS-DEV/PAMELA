@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 	vtkMultiProcessController::SetGlobalController(controler.Get());
 #endif
 
-	Mesh* MainMesh = MeshFactory::makeMesh("../../../data/gmsh/modelA1_volume_meshed.msh");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/gmsh/modelA1_volume_meshed.msh");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);

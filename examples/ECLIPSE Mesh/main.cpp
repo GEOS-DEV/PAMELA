@@ -21,7 +21,8 @@ int main(int argc, char **argv) {
 #endif
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
-	Mesh* MainMesh = MeshFactory::makeMesh("../../../data/eclipse/ReducedNorne/IRAP_1005.GRDECL");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/ReducedNorne/IRAP_1005.GRDECL");
+	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/SPE9/SPE9.GRDECL");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
@@ -58,6 +59,5 @@ int main(int argc, char **argv) {
 
 	Communicator::finalize();
 
-        
 	return 0;
 }

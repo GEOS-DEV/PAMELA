@@ -207,7 +207,7 @@ namespace PAMELA
 
 				//Create file
 				std::ofstream variableFile;
-				variableFile.open(m_name + partptr->Label + "_" + variableptr->Label + "_" + TimeStepNumberForExtension(), std::fstream::in | std::fstream::out | std::fstream::trunc);
+				variableFile.open(m_name + "_" + partptr->Label + "_" + variableptr->Label + "_" + TimeStepNumberForExtension(), std::fstream::in | std::fstream::out | std::fstream::trunc);
 
 				//write
 				variableFile << variableptr->Label << std::endl;

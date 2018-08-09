@@ -43,10 +43,9 @@ namespace PAMELA
     void VTKWriter::MakeChildFile(const PartMap<T>* parts, const std::string& prefix) {
 
         int part = 0;
-        for (auto it = parts->begin();
-                it != parts->end();
-                ++it) {
-            block_->SetNumberOfBlocks(block_->GetNumberOfBlocks()+1);
+        for (auto it = parts->begin();it != parts->end();++it) 
+		{
+			m_block_->SetNumberOfBlocks(m_block_->GetNumberOfBlocks()+1);
             vtkSmartPointer<vtkUnstructuredGrid> ug = vtkUnstructuredGrid::New();
             vtkSmartPointer<vtkPoints> vertices = vtkPoints::New();
             auto partptr = it->second;
@@ -57,9 +56,10 @@ namespace PAMELA
                 vertices->InsertNextPoint(point);
             }
             ug->SetPoints(vertices);
-            for (auto it2 = partptr->SubParts.begin();
-                    it2 != partptr->SubParts.end(); ++it2) {
-                if (it2->second->SubCollection.size_owned() > 0) {
+            for (auto it2 = partptr->SubParts.begin();it2 != partptr->SubParts.end(); ++it2)
+			{
+                if (it2->second->SubCollection.size_owned() > 0) 
+				{
                     auto subpart = it2->second;
                     auto elementType = subpart->ElementType;
                     auto vtkTypeLabel = ElementToLabel.at(elementType);
@@ -80,8 +80,12 @@ namespace PAMELA
                     }
                     ug->SetCells(cell_types.data(),vtkcells);
                 }
-                block_->SetBlock(block_->GetNumberOfBlocks()-1,ug);
             }
+			m_block_->SetBlock(m_block_->GetNumberOfBlocks() - 1, ug);
+			std::stringstream  name;
+			name << it->second->Label;
+			m_block_->GetMetaData(m_block_->GetNumberOfBlocks() - 1)->Set(vtkCompositeDataSet::NAME(), name.str().c_str());
+
             vtkSmartPointer< vtkCellData > cell_data= ug->GetCellData();
             for (auto it2 = partptr->PerElementVariable.begin(); it2 != partptr->PerElementVariable.end(); ++it2)
             {
@@ -141,28 +145,36 @@ namespace PAMELA
 	{
 		vtkSmartPointer<vtkMultiBlockDataSet> multi_block = vtkMultiBlockDataSet::New();
 		multi_block->SetNumberOfBlocks(Communicator::worldSize());
-		std::stringstream  name;
 		auto controler = vtkMPIController::GetGlobalController();
 
 		if (Communicator::worldRank() != 0)
 		{
-			name << "RANK_" << Communicator::worldRank();
-			LOGINFO(name.str());
-			multi_block->GetMetaData(static_cast<unsigned>(Communicator::worldRank()))->Set(vtkCompositeDataSet::NAME(), name.str().c_str());
-			controler->Send(block_, 0, Communicator::worldRank());
+			//Send blocks to master
+			controler->Send(m_block_, 0, Communicator::worldRank());
 		}
 		else
 		{
-			multi_block->SetBlock(0, block_);
 			for (Types::uint_t proc = 1; proc < Communicator::worldSize(); proc++)
 			{
+				//Receive blocks from slaves
 				vtkSmartPointer< vtkMultiBlockDataSet> block = vtkMultiBlockDataSet::New();
 				controler->Receive(block, proc, proc);
+				std::stringstream  name;
+				name << "RANK_" << proc;
+				multi_block->GetMetaData(static_cast<unsigned>(proc))->Set(vtkCompositeDataSet::NAME(), name.str().c_str());
 				multi_block->SetBlock(proc, block);
 			}
 		}
-		if (Communicator::worldRank() == 0)
+
+		if (Communicator::worldRank() == 0)		//Master
 		{
+			//Create own block
+			std::stringstream  name;
+			name << "RANK_" << 0;
+			multi_block->GetMetaData(static_cast<unsigned>(0))->Set(vtkCompositeDataSet::NAME(), name.str().c_str());
+			multi_block->SetBlock(0, m_block_);
+
+			//Create master file
 			std::string filename = m_name + ".vtm";
 			vtkSmartPointer< vtkXMLMultiBlockDataWriter> write =
 				vtkXMLMultiBlockDataWriter::New();

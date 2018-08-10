@@ -50,10 +50,11 @@ int main(int argc, char **argv) {
 	OutputWriter->Init();
 
 	//Set
-	OutputWriter->SetVariable("Partition", Communicator::worldRank());
+	OutputWriter->SetElementGlobalIndex();
+	OutputWriter->SetPartitionNumber();
 	for (auto& mesh_prop : mesh_props)
 	{
-		OutputWriter->SetVariable(mesh_prop.first, mesh_prop.second);
+		OutputWriter->SetVariableOnPolyhedron(mesh_prop.first, mesh_prop.second);
 	}
 
 	//Dump

@@ -25,10 +25,11 @@ int main(int argc, char **argv) {
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.case");
-	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
-	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->SetElementGlobalIndex();
+	OutputWriter->SetPartitionNumber();
 	OutputWriter->Init();
-	OutputWriter->SetVariable("Partition", Communicator::worldRank());
+	OutputWriter->SetElementGlobalIndex();
+	OutputWriter->SetPartitionNumber();
 	OutputWriter->Dump();
 	Communicator::finalize();
 

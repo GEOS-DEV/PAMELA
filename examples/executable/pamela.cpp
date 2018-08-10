@@ -71,14 +71,8 @@ int main(int argc, char **argv) {
 		MeshDataWriter* output_mesh = MeshDataWriterFactory::makeWriter(
 			input_mesh, output_mesh_filename);
 
-		output_mesh->DeclareVariable(
-			FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR,
-			VARIABLE_LOCATION::PER_CELL, "Partition");
-		output_mesh->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR,
-			VARIABLE_LOCATION::PER_CELL, "Partition");
-
-		output_mesh->SetVariable("Partition", Communicator::worldRank());
-
+                output_mesh->SetPartitionNumber();
+                output_mesh->SetElementGlobalIndex();
 		output_mesh->Init();
 
 

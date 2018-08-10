@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
 	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/ReducedNorne/IRAP_1005.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/SPE9/SPE9.GRDECL");
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/spe10/SPE10.GRDECL");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.grdecl");
 
 
 	MainMesh->CreateFacesFromCells();

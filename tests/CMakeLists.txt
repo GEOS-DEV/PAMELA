@@ -22,8 +22,6 @@ target_compile_definitions("TEST_small" PUBLIC "${PAMELA_DEFINITIONS}")
 target_include_directories("TEST_small" PUBLIC "${PROJECT_BINARY_DIR}")
 target_include_directories("TEST_small" PUBLIC "${PAMELA_INCLUDE_DIRS}")
 add_test(NAME small COMMAND TEST_small)
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
-                  DEPENDS ExeName)
 
 add_executable("TEST_medium" medium.cpp)
 target_link_libraries("TEST_medium" PAMELA)
@@ -39,4 +37,5 @@ target_include_directories("TEST_big" PUBLIC "${PROJECT_BINARY_DIR}")
 target_include_directories("TEST_big" PUBLIC "${PAMELA_INCLUDE_DIRS}")
 add_test(NAME big COMMAND TEST_big)
 
-
+add_custom_target(COMPILE_AND_RUN_TESTS COMMAND ${CMAKE_CTEST_COMMAND} -C Release
+                  DEPENDS "TEST_small" "TEST_medium" "TEST_big")

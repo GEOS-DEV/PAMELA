@@ -34,7 +34,7 @@ namespace PAMELA
 			{
 				if (columnIndex[nnz_index] >= columnIndex[nnz_index + 1])
 				{
-					LOGWARNING("The CSR matrix has a column index vector not sorted");  //TODO:check this. Seems ok.
+					//LOGWARNING("The CSR matrix has a column index vector not sorted");  //TODO:check this. Seems ok.
 					//return false;
 				}
 			}

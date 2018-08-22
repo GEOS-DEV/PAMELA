@@ -41,13 +41,17 @@ namespace PAMELA
 		if ((file_extension == "grdecl") || (file_extension == "GRDECL"))
 		{
 			LOGINFO("ECLIPSE GRDECL FORMAT IDENTIFIED");
-			return Eclipse_mesh::CreateMesh(file);
+			return Eclipse_mesh::CreateMeshFromGRDECL(file);
 		}
-		else
+		if ((file_extension == "EGRID") || (file_extension == "egrid"))
 		{
-			LOGERROR("Mesh file format ." + file_extension + " not supported");
-			return nullptr;
+			LOGINFO("ECLIPSE GRDECL FORMAT IDENTIFIED");
+			return Eclipse_mesh::CreateMeshFromEGRID(file);
 		}
+
+		LOGERROR("Mesh file format ." + file_extension + " not supported");
+		return nullptr;
+
 	}
 
 	/**

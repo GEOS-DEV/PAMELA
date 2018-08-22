@@ -12,6 +12,7 @@ namespace PAMELA
 	{
 
 		std::string FileToString(const std::string filepath);
+		std::string BinaryFileToString(const std::string filepath);
 
 		////Formatting
 		void Trim(std::string& str);

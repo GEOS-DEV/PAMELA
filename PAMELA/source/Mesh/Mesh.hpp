@@ -68,7 +68,7 @@ namespace PAMELA
 		//Adjacency
 		MeshAdjacency* m_Adjacency;
 
-		void ShrinkMesh(const std::set<int>& Polyhedron_owned, const std::set<int>& vector);
+		//void ShrinkMesh(const std::set<int>& Polyhedron_owned, const std::set<int>& vector);
 	};
 
 

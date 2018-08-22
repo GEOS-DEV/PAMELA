@@ -42,8 +42,8 @@ int main(int argc, char **argv)
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "Cartesian.vtm");
 
 	//--Create variables
-	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
-	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->SetElementGlobalIndex();
+	OutputWriter->SetPartitionNumber();
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL,"Pressure");
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_NODE, "Test");
 
@@ -55,9 +55,9 @@ int main(int argc, char **argv)
 
 	//--Set variables
 	//Set variable values
-	OutputWriter->SetVariable("Pressure", 55);
-	OutputWriter->SetVariable("Test", 0.1);
-	OutputWriter->SetVariable("Partition", Communicator::worldRank());
+	OutputWriter->SetVariableOnAllParts("Pressure", 55);
+	OutputWriter->SetVariableOnAllParts("Test", 0.1);
+	OutputWriter->SetVariableOnAllParts("Partition", Communicator::worldRank());
 	
 	//Dump variables
 	OutputWriter->Dump();

@@ -594,6 +594,7 @@ namespace PAMELA
 				m_SPECGRID[0] = buf_int[0];
 				m_SPECGRID[1] = buf_int[1];
 				m_SPECGRID[2] = buf_int[2];
+				m_dimension = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 				m_nCOORD = 6 * (m_SPECGRID[1] + 1) * 6 * (m_SPECGRID[0] + 1);
 				m_nZCORN = 8 * m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 				m_ZCORN.reserve(m_nZCORN);
@@ -723,7 +724,8 @@ namespace PAMELA
 				int kdim = 4;
 				std::vector<float> data;
 				EGRID_ExtractData(str, index, ksize, kdim, data);
-				EGRID_ConvertData(keyword, data);
+				std::vector<double> temp(data.begin(), data.end());
+				EGRID_ConvertData(keyword, temp);
 			}
 			else if (ktype == "CHAR")
 			{
@@ -778,88 +780,91 @@ namespace PAMELA
 		return res[0];
 	}
 
-        template<>
-            void Eclipse_mesh::EGRID_ConvertData<bool>(std::string keyword, std::vector<bool>& data)
-            {
 
-            }
-        template<>
-            void Eclipse_mesh::EGRID_ConvertData<double>(std::string keyword, std::vector<double>& data)
-            {
-                if (keyword == "COORD")
-                {
-                    LOGINFO("     o COORD processed");
-                    m_COORD = std::vector<double>(data.begin(), data.end());		//TODO not efficient
-                }
-                else if (keyword == "ZCORN")
-                {
-                    LOGINFO("     o ZCORN processed");
-                    m_ZCORN = std::vector<double>(data.begin(), data.end());
-                }
-                else if (keyword == "NNC")
-                {
-                    LOGINFO("     o NNC processed");
-                }
-                else if (keyword == "PORO")
-                {
-                    LOGINFO("     o PORO processed");
-                    m_Properties["PORO"] = std::vector<double>(data.begin(), data.end());
-                }
-                else if (keyword == "PORV")
-                {
-                    LOGINFO("     o PORV processed");
-                    m_Properties["PORV"] = std::vector<double>(data.begin(), data.end());
-                }
-                else if (keyword == "PERMX")
-                {
-                    LOGINFO("     o PERMX processed");
-                    m_Properties["PERMX"] = std::vector<double>(data.begin(), data.end());
-                }
-                else if (keyword == "PERMY")
-                {
-                    LOGINFO("     o PERMY processed");
-                    m_Properties["PERMY"] = std::vector<double>(data.begin(), data.end());
-                }
-                else if (keyword == "PERMZ")
-                {
-                    LOGINFO("     o PERMZ processed");
-                    m_Properties["PERMZ"] = std::vector<double>(data.begin(), data.end());
-                }
-                else if (keyword == "DEPTH")
-                {
-                    LOGINFO("     o DEPTH processed");
-                    m_Properties["DEPTH"] = std::vector<double>(data.begin(), data.end());
-                }
-                else if (keyword == "NTG")
-                {
-                    LOGINFO("     o NTG processed");
-                    m_Properties["NTG"] = std::vector<double>(data.begin(), data.end());
-                }
-                else
-                {
-                    LOGINFO("     o" + keyword+" ignored");
-                }
+	void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data)
+	{
+		if (keyword == "COORD")
+		{
+			LOGINFO("     o COORD processed");
+			m_COORD = std::vector<double>(data.begin(), data.end());		//TODO not efficient
+		}
+		else if (keyword == "ZCORN")
+		{
+			LOGINFO("     o ZCORN processed");
+			m_ZCORN = std::vector<double>(data.begin(), data.end());
+		}
+		/*else if (keyword == "NNC")
+		{
+			LOGINFO("     o NNC processed");
+		}
+		else if (keyword == "PORO")
+		{
+			LOGINFO("     o PORO processed");
+			m_Properties["PORO"] = std::vector<double>(data.begin(), data.end());
+		}
+		else if (keyword == "PORV")
+		{
+			LOGINFO("     o PORV processed");
+			m_Properties["PORV"] = std::vector<double>(data.begin(), data.end());
+		}
+		else if (keyword == "PERMX")
+		{
+			LOGINFO("     o PERMX processed");
+			m_Properties["PERMX"] = std::vector<double>(data.begin(), data.end());
+		}
+		else if (keyword == "PERMY")
+		{
+			LOGINFO("     o PERMY processed");
+			m_Properties["PERMY"] = std::vector<double>(data.begin(), data.end());
+		}
+		else if (keyword == "PERMZ")
+		{
+			LOGINFO("     o PERMZ processed");
+			m_Properties["PERMZ"] = std::vector<double>(data.begin(), data.end());
+		}
+		else if (keyword == "DEPTH")
+		{
+			LOGINFO("     o DEPTH processed");
+			m_Properties["DEPTH"] = std::vector<double>(data.begin(), data.end());
+		}
+		else if (keyword == "NTG")
+		{
+			LOGINFO("     o NTG processed");
+			m_Properties["NTG"] = std::vector<double>(data.begin(), data.end());
+		}*/
+		else
+		{
+			if (data.size() == m_dimension)
+			{
+				LOGINFO("     o" + keyword + " processed");
+				m_Properties[keyword] = std::vector<double>(data.begin(), data.end());
+			}
+			else
+			{
+				LOGINFO("     o" + keyword + " ignored");
+			}
+		}
 
-            }
+	}
 
-        template<>
-            void Eclipse_mesh::EGRID_ConvertData<int>(std::string keyword, std::vector<int>& data)
-            {
-                if (keyword == "GRIDHEAD")
-                {
-                    LOGINFO("     o GRIDHEAD Found");
-                    m_SPECGRID[0] = data[1];
-                    m_SPECGRID[1] = data[2];
-                    m_SPECGRID[2] = data[3];
-                }
-                else if (keyword == "ACTNUM")
-                {
-                    LOGINFO("     o ACTNUM processed");
-                    m_ACTNUM =  data;
-                }
+	void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<int>& data)
+	{
+		if (keyword == "GRIDHEAD")
+		{
+			LOGINFO("     o GRIDHEAD Found");
+			m_SPECGRID[0] = data[1];
+			m_SPECGRID[1] = data[2];
+			m_SPECGRID[2] = data[3];
+			m_dimension = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
+		}
+		else if (keyword == "ACTNUM")
+		{
+			LOGINFO("     o ACTNUM processed");
+			m_ACTNUM = data;
+		}
 
 
-            }
+	}
 
 
 

@@ -69,7 +69,6 @@ namespace PAMELA
 
 		//Egrid
 
-
 		template<class T>
 		static void EGRID_ExtractData(std::string& str, int& index, int dim, int type_size, std::vector<T>& output);
 
@@ -78,79 +77,75 @@ namespace PAMELA
 		{
 			LOGINFO("     o Skipping " + keyword);
 		}
+
+		static void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data);
+		static void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<int>& data);
+
 	};
 
 
-        template<>
-            void Eclipse_mesh::EGRID_ConvertData<bool>(std::string keyword, std::vector<bool>& data);
 
-        template<>
-            void Eclipse_mesh::EGRID_ConvertData<double>(std::string keyword, std::vector<double>& data);
+	template <class T>
+	void Eclipse_mesh::EGRID_ExtractData(std::string& str, int& index, int dim, int type_size, std::vector<T>& output)
+	{
+		output.reserve(dim);
 
-        template<>
-            void Eclipse_mesh::EGRID_ConvertData<int>(std::string keyword, std::vector<int>& data);
-
-        template <class T>
-            void Eclipse_mesh::EGRID_ExtractData(std::string& str, int& index, int dim, int type_size, std::vector<T>& output)
-            {
-                output.reserve(dim);
-
-                int block_size = 1000 * type_size;
-                int data_size = dim * type_size;
-                int nb_full_blocks = data_size / block_size;
-                auto buffer = new char[block_size];
+		int block_size = 1000 * type_size;
+		int data_size = dim * type_size;
+		int nb_full_blocks = data_size / block_size;
+		auto buffer = new char[block_size];
 
 
-                int n_loops;
+		int n_loops;
 
-                //Full blocks
-                n_loops = block_size / type_size;
-                for (auto nb = 0; nb < nb_full_blocks; ++nb)
-                {
-                    //Skip delimiter
-                    index = index + 4;
+		//Full blocks
+		n_loops = block_size / type_size;
+		for (auto nb = 0; nb < nb_full_blocks; ++nb)
+		{
+			//Skip delimiter
+			index = index + 4;
 
-                    for (auto n = 0; n < n_loops; ++n)
-                    {
+			for (auto n = 0; n < n_loops; ++n)
+			{
 
-                        T value = *reinterpret_cast<T *>(&str.substr(index, type_size)[0]);
-                        utils::bites_swap(&value);
-                        output.push_back(value);
-                        index = index + type_size;
+				T value = *reinterpret_cast<T *>(&str.substr(index, type_size)[0]);
+				utils::bites_swap(&value);
+				output.push_back(value);
+				index = index + type_size;
 
-                    }
+			}
 
-                    //Skip delimiter
-                    index = index + 4;
-                }
-
-
-                //Remaining partial blocks
-                block_size = dim * type_size - nb_full_blocks * block_size;
-
-                n_loops = block_size / type_size;
-
-                if (block_size != 0)
-                {
-                    //Skip delimiter
-                    index = index + 4;
-                    for (auto n = 0; n < n_loops; ++n)
-                    {
-
-                        T value = *reinterpret_cast<T *>(&str.substr(index, type_size)[0]);
-                        utils::bites_swap(&value);
-                        output.push_back(value);
-                        index = index + type_size;
-
-                    }
+			//Skip delimiter
+			index = index + 4;
+		}
 
 
-                    //Skip delimiter
-                    index = index + 4;
-                }
+		//Remaining partial blocks
+		block_size = dim * type_size - nb_full_blocks * block_size;
+
+		n_loops = block_size / type_size;
+
+		if (block_size != 0)
+		{
+			//Skip delimiter
+			index = index + 4;
+			for (auto n = 0; n < n_loops; ++n)
+			{
+
+				T value = *reinterpret_cast<T *>(&str.substr(index, type_size)[0]);
+				utils::bites_swap(&value);
+				output.push_back(value);
+				index = index + type_size;
+
+			}
 
 
-            }
+			//Skip delimiter
+			index = index + 4;
+		}
+
+
+	}
 
 
 }

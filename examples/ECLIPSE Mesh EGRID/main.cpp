@@ -33,31 +33,33 @@ int main(int argc, char **argv) {
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
 	////-------------------------Output
-	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.vtm");
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.case");
 
 	//Variable declarations
 	
-	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
-	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+//	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+//	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 
 	auto mesh_props = MainMesh->get_PolyhedronProperty()->get_PropertyMap();
 	for (auto it = mesh_props.begin(); it != mesh_props.end(); ++it)
 	{
 		OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, it->first);
+                std::cout << "DECLARING " << it->first << std::endl;
 	}
 	//
 	OutputWriter->DeclareAndSetElementGlobalIndex();
 	OutputWriter->DeclareAndSetPartitionNumber();
 	OutputWriter->DeclareAndSetAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
-	//Init
-	OutputWriter->Init();
-
 	//Set
 	for (auto& mesh_prop : mesh_props)
 	{
 		OutputWriter->SetVariableOnPolyhedron(mesh_prop.first, mesh_prop.second);
 	}
+
+	//Init
+	OutputWriter->Init();
+
 
 	//Dump
 	OutputWriter->Dump();

@@ -36,15 +36,10 @@ int main(int argc, char **argv) {
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.case");
 
 	//Variable declarations
-	
-//	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
-//	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
-
 	auto mesh_props = MainMesh->get_PolyhedronProperty()->get_PropertyMap();
 	for (auto it = mesh_props.begin(); it != mesh_props.end(); ++it)
 	{
 		OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, it->first);
-                std::cout << "DECLARING " << it->first << std::endl;
 	}
 	//
 	OutputWriter->DeclareAndSetElementGlobalIndex();

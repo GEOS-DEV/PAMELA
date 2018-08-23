@@ -45,18 +45,18 @@ int main(int argc, char **argv) {
 	{
 		OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, it->first);
 	}
-
 	//
-	OutputWriter->DeclareAdjacency("Volume to Volume",MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
+	OutputWriter->DeclareAndSetElementGlobalIndex();
+	OutputWriter->DeclareAndSetPartitionNumber();
+	OutputWriter->DeclareAndSetAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
 	//Init
 	OutputWriter->Init();
 
 	//Set
-	OutputWriter->SetVariable("Partition", Communicator::worldRank());
 	for (auto& mesh_prop : mesh_props)
 	{
-		OutputWriter->SetVariable(mesh_prop.first, mesh_prop.second);
+		OutputWriter->SetVariableOnPolyhedron(mesh_prop.first, mesh_prop.second);
 	}
 
 	//Dump

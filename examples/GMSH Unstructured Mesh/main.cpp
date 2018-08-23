@@ -28,12 +28,10 @@ int main(int argc, char **argv) {
 
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
-	OutputWriter->DeclareAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
-	OutputWriter->SetElementGlobalIndex();
-	OutputWriter->SetPartitionNumber();
+	OutputWriter->DeclareAndSetElementGlobalIndex();
+	OutputWriter->DeclareAndSetPartitionNumber();
+	OutputWriter->DeclareAndSetAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 	OutputWriter->Init();
-	OutputWriter->SetElementGlobalIndex();
-	OutputWriter->SetPartitionNumber();
 	OutputWriter->Dump();
 	Communicator::finalize();
 

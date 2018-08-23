@@ -39,6 +39,8 @@ namespace PAMELA
 		size_t offset;
 		VARIABLE_TYPE dType;
 
+		size_t size() { return Data.size(); };
+
 		void set_data(double cst)
 		{
 			std::fill(Data.begin(), Data.end(), cst);

@@ -155,7 +155,7 @@ namespace PAMELA
 	}
 
 
-	void MeshDataWriter::DeclareAdjacency(std::string label, Adjacency* adjacency)
+	void MeshDataWriter::DeclareAndSetAdjacency(std::string label, Adjacency* adjacency)
 	{
 
 		//Reference

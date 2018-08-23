@@ -25,11 +25,9 @@ int main(int argc, char **argv) {
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.case");
-	OutputWriter->SetElementGlobalIndex();
-	OutputWriter->SetPartitionNumber();
-	//Writer->AddElementScalarVariable("Pressure");
-
-	OutputWriter->DeclareAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
+	OutputWriter->DeclareAndSetElementGlobalIndex();
+	OutputWriter->DeclareAndSetPartitionNumber();
+	OutputWriter->DeclareAndSetAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
 	OutputWriter->Init();
 

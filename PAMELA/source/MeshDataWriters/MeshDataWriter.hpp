@@ -109,7 +109,7 @@ namespace PAMELA
 
 
 
-                void SetPartitionNumber() {
+                void DeclareAndSetPartitionNumber() {
                     DeclareVariable(
                             FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR,
                             VARIABLE_LOCATION::PER_CELL, "Partition");
@@ -122,7 +122,7 @@ namespace PAMELA
                     SetVariableOnAllParts("Partition", Communicator::worldRank());
                 }
 
-                void SetElementGlobalIndex() {
+                void DeclareAndSetElementGlobalIndex() {
                     DeclareVariable(
                             FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR,
                             VARIABLE_LOCATION::PER_CELL, "globalIndex");
@@ -140,7 +140,7 @@ namespace PAMELA
                     SetElementGlobalIndexOnPart(&m_PolygonParts);
                 }
 
-		void DeclareAdjacency(std::string label, Adjacency* adjacency);
+		void DeclareAndSetAdjacency(std::string label, Adjacency* adjacency);
 
 		virtual void Dump() = 0;
 
@@ -159,7 +159,6 @@ namespace PAMELA
                             {
                                 auto subpart = it2->second;
                                 for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3) {
-                                    LOGINFO(std::to_string((*it3)->get_globalIndex()));
                                     globalIndex.push_back_owned((*it3)->get_globalIndex());
                                 }
                             }

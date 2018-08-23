@@ -35,7 +35,8 @@ namespace PAMELA
     
     /// -------------- PRIVATE METHODS
     
-    void VTKWriter::DeclareAllVariables() {
+    void VTKWriter::DeclareAllVariables() 
+	{
         
     }
 
@@ -86,47 +87,53 @@ namespace PAMELA
 			name << it->second->Label;
 			m_block_->GetMetaData(m_block_->GetNumberOfBlocks() - 1)->Set(vtkCompositeDataSet::NAME(), name.str().c_str());
 
-            vtkSmartPointer< vtkCellData > cell_data= ug->GetCellData();
-            for (auto it2 = partptr->PerElementVariable.begin(); it2 != partptr->PerElementVariable.end(); ++it2)
-            {
-                auto variableptr = (*it2);
-                for (auto it3 = partptr->SubParts.begin(); it3 != partptr->SubParts.end(); ++it3)
-                {
-                    if (it3->second->SubCollection.size_owned() > 0)
-                    {
-                        auto subpart = it3->second;
-                        auto elementType = subpart->ElementType;
-                            auto dataarray = vtkDoubleArray::New();
-                            dataarray->SetName(variableptr->Label.c_str());
-                        for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned(); ++it4)
-                        {
-                            auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
-                            auto variableIndex = subpart->IndexMapping[collectionIndex];
-                            auto variableData = variableptr->get_data(variableIndex);
-                            for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
-                            {
-                                dataarray->InsertNextTuple1(*it5);
-                            }
-                        }
-                        cell_data->AddArray(dataarray);
+			vtkSmartPointer< vtkCellData > cell_data = ug->GetCellData();
+			for (auto it2 = partptr->PerElementVariable.begin(); it2 != partptr->PerElementVariable.end(); ++it2)
+			{
+				auto variableptr = (*it2);
 
-                    }
-                }
+				for (auto it3 = partptr->SubParts.begin(); it3 != partptr->SubParts.end(); ++it3)
+				{
+					
+					if (it3->second->SubCollection.size_owned() > 0)
+					{
+						auto subpart = it3->second;
+						auto elementType = subpart->ElementType;
+						auto dataarray = vtkDoubleArray::New();
+						dataarray->SetName(variableptr->Label.c_str());
+						std::vector<double> data_vector;
+						data_vector.reserve(it3->second->SubCollection.size_owned());
 
-                vtkSmartPointer<vtkDataArray> data_array;
-                if( variableptr->dType == VARIABLE_TYPE::SCALAR){
-                }
-                else if( variableptr->dType == VARIABLE_TYPE::VECTOR) {
-                }
-                else if( variableptr->dType == VARIABLE_TYPE::TENSOR_SYMM ) {
-                }
-                else {
-                    continue;
-                }
-                auto type = variableptr->dType;
-                
-            }
-        }
+						for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned(); ++it4)
+						{
+							auto collectionIndex = it4 - subpart->SubCollection.begin_owned();
+							auto variableIndex = subpart->IndexMapping[collectionIndex];
+							auto variableData = variableptr->get_data(variableIndex);
+							for (auto it5 = variableData.begin(); it5 != variableData.end(); ++it5)
+							{
+							dataarray->InsertNextTuple1(*it5);
+							//data_vector.push_back(*it5);
+							}
+						}
+						cell_data->AddArray(dataarray);
+
+					}
+				}
+
+				vtkSmartPointer<vtkDataArray> data_array;
+				if (variableptr->dType == VARIABLE_TYPE::SCALAR) {
+				}
+				else if (variableptr->dType == VARIABLE_TYPE::VECTOR) {
+				}
+				else if (variableptr->dType == VARIABLE_TYPE::TENSOR_SYMM) {
+				}
+				else {
+					continue;
+				}
+				auto type = variableptr->dType;
+
+			}
+		}
 
 
     }

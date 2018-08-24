@@ -280,13 +280,11 @@ namespace PAMELA
 		actnum.reserve(nx*ny*nz);
 		m_Duplicate_Element.reserve(nx*ny*nz);
 
-		//Check for ACTNUM
-		if (m_ACTNUM.size()==0)
+		if (m_ACTNUM.size() == 0)
 		{
-			m_ACTNUM = std::vector<int>(nx*ny*nz,1);
+			m_nActiveCells = m_nTotalCells;
+			m_ACTNUM = std::vector<int>(m_nTotalCells, 1);
 		}
-
-
 
 		int icellTotal = 0;
 		int icell = 0;
@@ -296,6 +294,7 @@ namespace PAMELA
 		{
 			for (auto j = 0; j != ny; ++j)
 			{
+
 				for (auto i = 0; i != nx; ++i)
 				{
 
@@ -497,18 +496,16 @@ namespace PAMELA
 
 		//Layers
 		m_Properties["Layer"] = layer;
-		m_Properties["ACTNUM"] = actnum;
-
-
+		
 		//Remove non-active properties
 		auto iacthexas = icell;
 		std::vector<double> temp;
 		for (auto it = m_Properties.begin(); it != m_Properties.end(); ++it)
 		{
-			if (it->first != "ACTNUM")
+			if ((it->second.size())==m_nTotalCells)	//Eliminate values on inactive blocks
 			{
 				temp.clear();
-				temp.reserve(iacthexas);
+				temp.reserve(m_nActiveCells);
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
@@ -519,16 +516,12 @@ namespace PAMELA
 				}
 				prop = temp;
 			}
-
+			
 		}
 
-		m_Properties.erase("ACTNUM");
 
-		m_nActiveCells = iacthexas;
-		m_nTotalCells = icellTotal;
-
-		LOGINFO(std::to_string(icellTotal) + "  total hexas");
-		LOGINFO(std::to_string(icell) + "  active hexas");
+		LOGINFO(std::to_string(m_nTotalCells) + "  total hexas");
+		LOGINFO(std::to_string(m_nActiveCells) + "  active hexas");
 		LOGINFO(std::to_string(cpt) + "  duplicated hexas");
 
 		return mesh;
@@ -593,11 +586,12 @@ namespace PAMELA
 				m_SPECGRID[0] = buf_int[0];
 				m_SPECGRID[1] = buf_int[1];
 				m_SPECGRID[2] = buf_int[2];
+				m_nTotalCells = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 				m_nCOORD = 6 * (m_SPECGRID[1] + 1) * 6 * (m_SPECGRID[0] + 1);
 				m_nZCORN = 8 * m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 				m_ZCORN.reserve(m_nZCORN);
 				m_COORD.reserve(m_nCOORD);
-				m_ACTNUM.reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				
 			}
 			else if (line == "COORD")
 			{
@@ -616,10 +610,10 @@ namespace PAMELA
 			else if (line == "ACTNUM")
 			{
 				LOGINFO("     o ACTNUM Found");
-				m_Properties["ACTNUM"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
 				StringUtils::FromStringTo(buffer, m_ACTNUM);
+				m_nActiveCells = std::accumulate(m_ACTNUM.begin(), m_ACTNUM.end(), 0);
 			}
 			else if (line == "NNC")
 			{
@@ -629,7 +623,7 @@ namespace PAMELA
 			else if (line == "PORO")
 			{
 				LOGINFO("     o PORO Found");
-				m_Properties["PORO"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_Properties["PORO"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
 				StringUtils::FromStringTo(buffer, m_Properties["PORO"]);
@@ -637,7 +631,7 @@ namespace PAMELA
 			else if (line == "PERMX")
 			{
 				LOGINFO("     o PERMX Found");
-				m_Properties["PERMX"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_Properties["PERMX"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
 				StringUtils::FromStringTo(buffer, m_Properties["PERMX"]);
@@ -645,7 +639,7 @@ namespace PAMELA
 			else if (line == "PERMY")
 			{
 				LOGINFO("     o PERMY Found");
-				m_Properties["PERMY"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_Properties["PERMY"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
 				StringUtils::FromStringTo(buffer, m_Properties["PERMY"]);
@@ -653,7 +647,7 @@ namespace PAMELA
 			else if (line == "PERMZ")
 			{
 				LOGINFO("     o PERMZ Found");
-				m_Properties["PERMZ"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_Properties["PERMZ"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
 				StringUtils::FromStringTo(buffer, m_Properties["PERMZ"]);
@@ -661,14 +655,14 @@ namespace PAMELA
 			else if (line == "NTG")
 			{
 				LOGINFO("     o NTG Found");
-				m_Properties["NTG"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_Properties["NTG"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
 				StringUtils::FromStringTo(buffer, m_Properties["NTG"]);
 			}
 		}
 
-		ASSERT(m_SPECGRID[0] != 0, "Mandatory SPECGRID keywords missing");
+		ASSERT(m_nTotalCells != 0, "Grid dimension information missing");
 
 	}
 

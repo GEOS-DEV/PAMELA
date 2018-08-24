@@ -279,6 +279,7 @@ namespace PAMELA
 
 		std::vector<double> z_pos(8, 0), y_pos(8, 0), x_pos(8, 0);
 
+
 		std::vector<int> layer;
 		std::vector<double> actnum;
 		std::vector<double> duplicate_polyhedron;
@@ -337,6 +338,7 @@ namespace PAMELA
 					x_pos[0] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[0] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
+
 					//5
 					i0 = np * 6 - 1;
 					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
@@ -349,6 +351,7 @@ namespace PAMELA
 					}
 					x_pos[4] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[4] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+
 
 					////Pillar 2
 					np = i + 1 + (nx + 1)*j;
@@ -379,6 +382,7 @@ namespace PAMELA
 					y_pos[5] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
 
+
 					////Pillar 3
 					np = i + (nx + 1)*(j + 1);
 					//3
@@ -394,6 +398,7 @@ namespace PAMELA
 					x_pos[2] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[2] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
+
 					//7
 					i0 = np * 6 - 1;
 					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
@@ -406,6 +411,7 @@ namespace PAMELA
 					}
 					x_pos[6] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[6] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+
 
 					////Pillar 4
 					np = i + (nx + 1)*(j + 1) + 1;
@@ -422,6 +428,7 @@ namespace PAMELA
 					x_pos[3] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[3] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
+
 					//8
 					i0 = np * 6 - 1;
 					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
@@ -434,6 +441,7 @@ namespace PAMELA
 					}
 					x_pos[7] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[7] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+
 
 
 					if (m_ACTNUM[icellTotal]==1)
@@ -483,11 +491,14 @@ namespace PAMELA
 		
 		//Remove non-active properties
 		auto iacthexas = icell;
+
 		std::vector<double> temp_double;
 		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
 		{
+
 			if ((it->second.size())==m_nTotalCells)	//Eliminate values on inactive blocks
 			{
+
 				temp_double.clear();
 				temp_double.reserve(m_nActiveCells);
 				auto& prop = it->second;
@@ -495,13 +506,16 @@ namespace PAMELA
 				{
 					if ((actnum[i]) == 1)
 					{
+
 						temp_double.push_back(prop[i]);
 					}
 				}
+
 				prop = temp_double;
 			}
 			
 		}
+
 
 		std::vector<int> temp_int;
 		for (auto it = m_CellProperties_integer.begin(); it != m_CellProperties_integer.end(); ++it)
@@ -520,9 +534,7 @@ namespace PAMELA
 				}
 				prop = temp_int;
 			}
-
 		}
-
 
 		LOGINFO(std::to_string(m_nTotalCells) + "  total hexas");
 		LOGINFO(std::to_string(m_nActiveCells) + "  active hexas");

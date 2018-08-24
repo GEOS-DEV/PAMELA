@@ -794,7 +794,8 @@ namespace PAMELA
 	}
 
 
-	void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data)
+        template<>
+            void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data)
 	{
 		if (keyword == "COORD")
 		{
@@ -822,6 +823,7 @@ namespace PAMELA
 
 	}
 
+        template<>
 	void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<int>& data)
 	{
 		if (keyword == "GRIDHEAD")

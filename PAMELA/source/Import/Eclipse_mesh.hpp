@@ -31,7 +31,6 @@ namespace PAMELA
 
 
 		static std::string m_label;
-		static int m_dimension;
 		static int m_nvertices;
 		static int m_nquadrilaterals;
 		static int m_nhexahedra;

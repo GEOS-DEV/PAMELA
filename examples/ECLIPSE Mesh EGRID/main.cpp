@@ -23,10 +23,10 @@ int main(int argc, char **argv) {
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
 	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/ReducedNorne/IRAP_1005.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/SPE9/SPE9_CP.EGRID");
-	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Slice/SECTOR.EGRID");
-	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Brugge/BRUGGE_0000.EGRID");
 	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Sector/SECTOR.EGRID");
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Skew_MPFAO/SKEWO.EGRID");
+	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Brugge/BRUGGE_0000.EGRID");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Sector/SECTOR.EGRID");
+	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Skew_MPFAO/SKEWO.EGRID");
 
 
 	MainMesh->CreateFacesFromCells();

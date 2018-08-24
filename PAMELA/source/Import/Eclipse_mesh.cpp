@@ -12,7 +12,6 @@ namespace PAMELA
 {
 
 	std::string Eclipse_mesh::m_label;
-	int Eclipse_mesh::m_dimension = 0;
 	int Eclipse_mesh::m_nvertices = 0;
 	int Eclipse_mesh::m_nquadrilaterals = 0;
 	int Eclipse_mesh::m_nhexahedra = 0;
@@ -594,7 +593,6 @@ namespace PAMELA
 				m_SPECGRID[0] = buf_int[0];
 				m_SPECGRID[1] = buf_int[1];
 				m_SPECGRID[2] = buf_int[2];
-				m_dimension = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 				m_nCOORD = 6 * (m_SPECGRID[1] + 1) * 6 * (m_SPECGRID[0] + 1);
 				m_nZCORN = 8 * m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 				m_ZCORN.reserve(m_nZCORN);
@@ -834,7 +832,7 @@ namespace PAMELA
 		}*/
 		else
 		{
-			if (data.size() == m_dimension)
+			if ((data.size() == m_nActiveCells))//|| (data.size() == m_nTotalCells))
 			{
 				LOGINFO("     o" + keyword + " processed");
 				m_Properties[keyword] = std::vector<double>(data.begin(), data.end());
@@ -855,12 +853,13 @@ namespace PAMELA
 			m_SPECGRID[0] = data[1];
 			m_SPECGRID[1] = data[2];
 			m_SPECGRID[2] = data[3];
-			m_dimension = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
+			m_nTotalCells = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 		}
 		else if (keyword == "ACTNUM")
 		{
 			LOGINFO("     o ACTNUM processed");
 			m_ACTNUM = data;
+			m_nActiveCells = std::accumulate(m_ACTNUM.begin(), m_ACTNUM.end(), 0);
 		}
 
 

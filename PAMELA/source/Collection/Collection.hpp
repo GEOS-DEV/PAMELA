@@ -23,12 +23,11 @@ namespace PAMELA
 		{
 			auto vect_ver = ele->get_vertexList();
 			int hc = 0;
-			for (size_t i = 0; i < static_cast<int>(vect_ver.size()); i++)
+			auto length = static_cast<int>(vect_ver.size());
+			for (int i = 0; i < length; i++)
 			{
-				hc += vect_ver[i]->get_localIndex();
+				hc += vect_ver[i]->get_localIndex() + i*100;
 			}
-
-			//return 1;
 			return hc;
 		}
 	};

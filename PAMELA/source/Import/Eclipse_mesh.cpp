@@ -20,6 +20,7 @@ namespace PAMELA
 	int Eclipse_mesh::m_nZCORN = 0;
 	int Eclipse_mesh::m_nActiveCells = 0;
 	int Eclipse_mesh::m_nTotalCells = 0;
+	int Eclipse_mesh::m_nNNCs = 0;
 	std::vector<int> Eclipse_mesh::m_SPECGRID = { 0,0,0 };
 	std::vector<double>  Eclipse_mesh::m_COORD = {};
 	std::vector<double>  Eclipse_mesh::m_ZCORN = {};
@@ -27,7 +28,12 @@ namespace PAMELA
 	std::vector<double> Eclipse_mesh::m_Duplicate_Element;
 
 	std::unordered_map<ECLIPSE_MESH_TYPE, ELEMENTS::TYPE> Eclipse_mesh::m_TypeMap;
-	std::unordered_map<std::string, std::vector<double>> Eclipse_mesh::m_Properties;
+
+
+	std::unordered_map<std::string, std::vector<double>> Eclipse_mesh::m_CellProperties_double;
+	std::unordered_map<std::string, std::vector<int>> Eclipse_mesh::m_CellProperties_integer;
+	std::unordered_map<std::string, std::vector<double>> Eclipse_mesh::m_OtherProperties_double;
+	std::unordered_map<std::string, std::vector<int>> Eclipse_mesh::m_OtherProperties_integer;
 
 	void Eclipse_mesh::InitElementsMapping()
 	{
@@ -273,20 +279,18 @@ namespace PAMELA
 
 		std::vector<double> z_pos(8, 0), y_pos(8, 0), x_pos(8, 0);
 
-		std::vector<double> layer;
+		std::vector<int> layer;
 		std::vector<double> actnum;
 		std::vector<double> duplicate_polyhedron;
 		layer.reserve(nx*ny*nz);
 		actnum.reserve(nx*ny*nz);
 		m_Duplicate_Element.reserve(nx*ny*nz);
 
-		//Check for ACTNUM
-		if (m_ACTNUM.size()==0)
+		if (m_ACTNUM.size() == 0)
 		{
-			m_ACTNUM = std::vector<int>(nx*ny*nz,1);
+			m_nActiveCells = m_nTotalCells;
+			m_ACTNUM = std::vector<int>(m_nTotalCells, 1);
 		}
-
-
 
 		int icellTotal = 0;
 		int icell = 0;
@@ -296,6 +300,7 @@ namespace PAMELA
 		{
 			for (auto j = 0; j != ny; ++j)
 			{
+
 				for (auto i = 0; i != nx; ++i)
 				{
 
@@ -332,9 +337,6 @@ namespace PAMELA
 					x_pos[0] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[0] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-					//vertexTemp[0] = new Point(i, x_pos[0], y_pos[0], z_pos[0]);
-				//vertexTemp[0] = mesh->addPoint(elementType, ipoint, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]);
-
 					//5
 					i0 = np * 6 - 1;
 					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
@@ -347,9 +349,6 @@ namespace PAMELA
 					}
 					x_pos[4] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[4] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
-
-					//vertexTemp[4] = new Point(i, x_pos[4], y_pos[4], z_pos[4]); 
-				//vertexTemp[4] = mesh->addPoint(elementType, ipoint, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]);
 
 					////Pillar 2
 					np = i + 1 + (nx + 1)*j;
@@ -366,8 +365,6 @@ namespace PAMELA
 					x_pos[1] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[1] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-					//vertexTemp[1] = new Point(i, x_pos[1], y_pos[1], z_pos[1]); 
-				//vertexTemp[1] = mesh->addPoint(elementType, ipoint, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]);
 
 					//6
 					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
@@ -381,8 +378,6 @@ namespace PAMELA
 					x_pos[5] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[5] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-					//vertexTemp[5] = new Point(i, x_pos[5], y_pos[5], z_pos[5]); 
-				//vertexTemp[5] = mesh->addPoint(elementType, ipoint, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]);
 
 					////Pillar 3
 					np = i + (nx + 1)*(j + 1);
@@ -399,9 +394,6 @@ namespace PAMELA
 					x_pos[2] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[2] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-					//vertexTemp[3] = new Point(i, x_pos[2], y_pos[2], z_pos[2]); 
-				//vertexTemp[3] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]);
-
 					//7
 					i0 = np * 6 - 1;
 					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
@@ -414,9 +406,6 @@ namespace PAMELA
 					}
 					x_pos[6] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[6] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
-
-					//vertexTemp[7] = new Point(i, x_pos[6], y_pos[6], z_pos[6]); 
-				//vertexTemp[7] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]);
 
 					////Pillar 4
 					np = i + (nx + 1)*(j + 1) + 1;
@@ -433,9 +422,6 @@ namespace PAMELA
 					x_pos[3] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[3] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-					//vertexTemp[2] = new Point(i, x_pos[3], y_pos[3], z_pos[3]); 
-				//vertexTemp[2] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]);
-
 					//8
 					i0 = np * 6 - 1;
 					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
@@ -448,9 +434,6 @@ namespace PAMELA
 					}
 					x_pos[7] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
 					y_pos[7] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
-
-					//vertexTemp[6] = new Point(i, x_pos[7], y_pos[7], z_pos[7]); 
-				//vertexTemp[6] = mesh->addPoint(elementType, i, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]);
 
 
 					if (m_ACTNUM[icellTotal]==1)
@@ -496,39 +479,53 @@ namespace PAMELA
 		m_Duplicate_Element.shrink_to_fit();
 
 		//Layers
-		m_Properties["Layer"] = layer;
-		m_Properties["ACTNUM"] = actnum;
-
-
+		m_CellProperties_integer["Layer"] = layer;
+		
 		//Remove non-active properties
 		auto iacthexas = icell;
-		std::vector<double> temp;
-		for (auto it = m_Properties.begin(); it != m_Properties.end(); ++it)
+		std::vector<double> temp_double;
+		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
 		{
-			if (it->first != "ACTNUM")
+			if ((it->second.size())==m_nTotalCells)	//Eliminate values on inactive blocks
 			{
-				temp.clear();
-				temp.reserve(iacthexas);
+				temp_double.clear();
+				temp_double.reserve(m_nActiveCells);
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
 					if ((actnum[i]) == 1)
 					{
-						temp.push_back(prop[i]);
+						temp_double.push_back(prop[i]);
 					}
 				}
-				prop = temp;
+				prop = temp_double;
+			}
+			
+		}
+
+		std::vector<int> temp_int;
+		for (auto it = m_CellProperties_integer.begin(); it != m_CellProperties_integer.end(); ++it)
+		{
+			if ((it->second.size()) == m_nTotalCells)	//Eliminate values on inactive blocks
+			{
+				temp_int.clear();
+				temp_int.reserve(m_nActiveCells);
+				auto& prop = it->second;
+				for (size_t i = 0; i != prop.size(); ++i)
+				{
+					if ((actnum[i]) == 1)
+					{
+						temp_int.push_back(prop[i]);
+					}
+				}
+				prop = temp_int;
 			}
 
 		}
 
-		m_Properties.erase("ACTNUM");
 
-		m_nActiveCells = iacthexas;
-		m_nTotalCells = icellTotal;
-
-		LOGINFO(std::to_string(icellTotal) + "  total hexas");
-		LOGINFO(std::to_string(icell) + "  active hexas");
+		LOGINFO(std::to_string(m_nTotalCells) + "  total hexas");
+		LOGINFO(std::to_string(m_nActiveCells) + "  active hexas");
 		LOGINFO(std::to_string(cpt) + "  duplicated hexas");
 
 		return mesh;
@@ -538,38 +535,44 @@ namespace PAMELA
 	void Eclipse_mesh::FillMeshWithProperties(Mesh* mesh)
 	{
 		//Temp var
-		auto props = mesh->get_PolyhedronProperty();
+		auto props_double = mesh->get_PolyhedronProperty_double();
+		auto props_int = mesh->get_PolyhedronProperty_int();
 
-		//Clean from duplicate elements
-		//auto dim_g = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
-		auto cpt = 0;
-		for (auto it = m_Properties.begin(); it != m_Properties.end(); ++it)
-		{
-			cpt = 0;
-			for (auto i = 0; i != m_nActiveCells; ++i)
-			{
-				if (m_Duplicate_Element[i] == 2)
-				{
-					(it->second)[i] = -987789;
-				}
-				else
-				{
-					cpt++;
-				}
-			}
-			it->second.erase(std::remove(it->second.begin(), it->second.end(), -987789), it->second.end());
-		}
+		////Clean from duplicate elements
+		////auto dim_g = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
+		//auto cpt = 0;
+		//for (auto it = m_Properties.begin(); it != m_Properties.end(); ++it)
+		//{
+		//	cpt = 0;
+		//	for (auto i = 0; i != m_nActiveCells; ++i)
+		//	{
+		//		if (m_Duplicate_Element[i] == 2)
+		//		{
+		//			(it->second)[i] = -987789;
+		//		}
+		//		else
+		//		{
+		//			cpt++;
+		//		}
+		//	}
+		//	it->second.erase(std::remove(it->second.begin(), it->second.end(), -987789), it->second.end());
+		//}
 
 		//Transfer property to mesh object
-		for (auto it = m_Properties.begin(); it != m_Properties.end(); ++it)
+		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
 		{
-			ASSERT(it->second.size() == props->get_Owner()->size_owned(), "Property set size is different from its owner");
-			props->ReferenceProperty(it->first);
-			props->SetProperty(it->first, it->second);
+			ASSERT(it->second.size() == props_double->get_Owner()->size_owned(), "Property set size is different from its owner");
+			props_double->ReferenceProperty(it->first);
+			props_double->SetProperty(it->first, it->second);
 		}
-
-		m_Properties["DUPLICATE"] = m_Duplicate_Element;
-		m_Properties["DUPLICATE"].erase(std::remove(m_Properties["DUPLICATE"].begin(), m_Properties["DUPLICATE"].end(), 2), m_Properties["DUPLICATE"].end());
+		m_CellProperties_double["DUPLICATE"] = m_Duplicate_Element;
+		m_CellProperties_double["DUPLICATE"].erase(std::remove(m_CellProperties_double["DUPLICATE"].begin(), m_CellProperties_double["DUPLICATE"].end(), 2), m_CellProperties_double["DUPLICATE"].end());
+		for (auto it = m_CellProperties_integer.begin(); it != m_CellProperties_integer.end(); ++it)
+		{
+			ASSERT(it->second.size() == props_int->get_Owner()->size_owned(), "Property set size is different from its owner");
+			props_int->ReferenceProperty(it->first);
+			props_int->SetProperty(it->first, it->second);
+		}
 	}
 
 	void Eclipse_mesh::ParseStringFromGRDECL(std::string& str)
@@ -593,11 +596,12 @@ namespace PAMELA
 				m_SPECGRID[0] = buf_int[0];
 				m_SPECGRID[1] = buf_int[1];
 				m_SPECGRID[2] = buf_int[2];
+				m_nTotalCells = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 				m_nCOORD = 6 * (m_SPECGRID[1] + 1) * 6 * (m_SPECGRID[0] + 1);
 				m_nZCORN = 8 * m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 				m_ZCORN.reserve(m_nZCORN);
 				m_COORD.reserve(m_nCOORD);
-				m_ACTNUM.reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				
 			}
 			else if (line == "COORD")
 			{
@@ -610,16 +614,17 @@ namespace PAMELA
 			{
 				LOGINFO("     o ZCORN Found");
 				buffer = extractDataBelowKeyword(mesh_file);
-				//StringUtils::ExpandStarExpression(buffer);
 				StringUtils::FromStringTo(buffer, m_ZCORN);
 			}
 			else if (line == "ACTNUM")
 			{
 				LOGINFO("     o ACTNUM Found");
-				m_Properties["ACTNUM"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
 				StringUtils::FromStringTo(buffer, m_ACTNUM);
+				std::replace(m_ACTNUM.begin(), m_ACTNUM.end(), 2, 0);
+				std::replace(m_ACTNUM.begin(), m_ACTNUM.end(), 3, 0);
+				m_nActiveCells = std::accumulate(m_ACTNUM.begin(), m_ACTNUM.end(), 0);
 			}
 			else if (line == "NNC")
 			{
@@ -629,46 +634,46 @@ namespace PAMELA
 			else if (line == "PORO")
 			{
 				LOGINFO("     o PORO Found");
-				m_Properties["PORO"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_CellProperties_double["PORO"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_Properties["PORO"]);
+				StringUtils::FromStringTo(buffer, m_CellProperties_double["PORO"]);
 			}
 			else if (line == "PERMX")
 			{
 				LOGINFO("     o PERMX Found");
-				m_Properties["PERMX"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_CellProperties_double["PERMX"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_Properties["PERMX"]);
+				StringUtils::FromStringTo(buffer, m_CellProperties_double["PERMX"]);
 			}
 			else if (line == "PERMY")
 			{
 				LOGINFO("     o PERMY Found");
-				m_Properties["PERMY"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_CellProperties_double["PERMY"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_Properties["PERMY"]);
+				StringUtils::FromStringTo(buffer, m_CellProperties_double["PERMY"]);
 			}
 			else if (line == "PERMZ")
 			{
 				LOGINFO("     o PERMZ Found");
-				m_Properties["PERMZ"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_CellProperties_double["PERMZ"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_Properties["PERMZ"]);
+				StringUtils::FromStringTo(buffer, m_CellProperties_double["PERMZ"]);
 			}
 			else if (line == "NTG")
 			{
 				LOGINFO("     o NTG Found");
-				m_Properties["NTG"].reserve(m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2]);
+				m_CellProperties_double["NTG"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_Properties["NTG"]);
+				StringUtils::FromStringTo(buffer, m_CellProperties_double["NTG"]);
 			}
 		}
 
-		ASSERT(m_SPECGRID[0] != 0, "Mandatory SPECGRID keywords missing");
+		ASSERT(m_nTotalCells != 0, "Grid dimension information missing");
 
 	}
 
@@ -696,8 +701,6 @@ namespace PAMELA
 			index = index + 4;
 
 			//Read type
-			//char ktype[4];
-			//strcpy_s(ktype, 4,str.substr(index, 4).c_str());
 			std::string ktype = str.substr(index, 4);
 			index = index + 4;
 
@@ -784,62 +787,24 @@ namespace PAMELA
 		if (keyword == "COORD")
 		{
 			LOGINFO("     o COORD processed");
-			m_COORD = std::vector<double>(data.begin(), data.end());		//TODO not efficient
+			m_COORD = data;		//TODO not efficient
 		}
 		else if (keyword == "ZCORN")
 		{
 			LOGINFO("     o ZCORN processed");
-			m_ZCORN = std::vector<double>(data.begin(), data.end());
+			m_ZCORN = data;
 		}
-		/*else if (keyword == "NNC")
-		{
-			LOGINFO("     o NNC processed");
-		}
-		else if (keyword == "PORO")
-		{
-			LOGINFO("     o PORO processed");
-			m_Properties["PORO"] = std::vector<double>(data.begin(), data.end());
-		}
-		else if (keyword == "PORV")
-		{
-			LOGINFO("     o PORV processed");
-			m_Properties["PORV"] = std::vector<double>(data.begin(), data.end());
-		}
-		else if (keyword == "PERMX")
-		{
-			LOGINFO("     o PERMX processed");
-			m_Properties["PERMX"] = std::vector<double>(data.begin(), data.end());
-		}
-		else if (keyword == "PERMY")
-		{
-			LOGINFO("     o PERMY processed");
-			m_Properties["PERMY"] = std::vector<double>(data.begin(), data.end());
-		}
-		else if (keyword == "PERMZ")
-		{
-			LOGINFO("     o PERMZ processed");
-			m_Properties["PERMZ"] = std::vector<double>(data.begin(), data.end());
-		}
-		else if (keyword == "DEPTH")
-		{
-			LOGINFO("     o DEPTH processed");
-			m_Properties["DEPTH"] = std::vector<double>(data.begin(), data.end());
-		}
-		else if (keyword == "NTG")
-		{
-			LOGINFO("     o NTG processed");
-			m_Properties["NTG"] = std::vector<double>(data.begin(), data.end());
-		}*/
 		else
 		{
-			if ((data.size() == m_nActiveCells))//|| (data.size() == m_nTotalCells))
+			if ((data.size() == m_nActiveCells)|| (data.size() == m_nTotalCells))//|| (data.size() == m_nNNCs))
 			{
-				LOGINFO("     o" + keyword + " processed");
-				m_Properties[keyword] = std::vector<double>(data.begin(), data.end());
+				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
+				m_CellProperties_double[keyword] = data;
 			}
 			else
 			{
-				LOGINFO("     o" + keyword + " ignored");
+				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
+				m_OtherProperties_double[keyword] = data;
 			}
 		}
 
@@ -854,12 +819,55 @@ namespace PAMELA
 			m_SPECGRID[1] = data[2];
 			m_SPECGRID[2] = data[3];
 			m_nTotalCells = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
+			LOGINFO( std::to_string(m_nTotalCells) + " numbers of cells");
+		}
+		else if (keyword == "NNCHEAD")
+		{
+			LOGINFO("     o NNCHEAD Found");
+			m_nNNCs = data[0];
+			LOGINFO(std::to_string(m_nNNCs) + " numbers of NNC connections");
 		}
 		else if (keyword == "ACTNUM")
 		{
-			LOGINFO("     o ACTNUM processed");
-			m_ACTNUM = data;
-			m_nActiveCells = std::accumulate(m_ACTNUM.begin(), m_ACTNUM.end(), 0);
+			if (!m_ACTNUM.empty()) //ACTNUM already processed, now its size will be m_nActiveCells
+			{
+				LOGINFO("     o ACTNUM updated");
+				auto i = 0;
+				for (auto it = m_ACTNUM.begin();it!=m_ACTNUM.end();++it)
+				{
+					if ((*it)==1)
+					{
+						*it = data[i];
+						++i;
+					}
+				}
+				m_nActiveCells = std::accumulate(m_ACTNUM.begin(), m_ACTNUM.end(), 0);
+				LOGINFO(std::to_string(m_nActiveCells) + " numbers of active cells");
+			}
+			else //First time
+			{
+				LOGINFO("     o ACTNUM processed");
+				m_ACTNUM = data;
+				std::replace(m_ACTNUM.begin(), m_ACTNUM.end(), 2, 0);
+				std::replace(m_ACTNUM.begin(), m_ACTNUM.end(), 3, 0);
+				m_nActiveCells = std::accumulate(m_ACTNUM.begin(), m_ACTNUM.end(), 0);
+				LOGINFO(std::to_string(m_nActiveCells) + " numbers of active cells");
+			}
+
+			
+		}
+		else
+		{
+			if ((data.size() == m_nActiveCells) || (data.size() == m_nTotalCells))//|| (data.size() == m_nNNCs))
+			{
+				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
+				m_CellProperties_integer[keyword] = data;//std::vector<double>(data.begin(), data.end());
+			}
+			else
+			{
+				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
+				m_OtherProperties_integer[keyword] = data;//std::vector<double>(data.begin(), data.end());
+			}
 		}
 
 

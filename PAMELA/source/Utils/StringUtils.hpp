@@ -73,7 +73,7 @@ namespace PAMELA
 			{
 				v.push_back(sub);
 			}
-		};
+		}
 
 		template<typename T>
 		void FromStringTo(std::string& data, T& v)

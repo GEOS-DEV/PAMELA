@@ -4,6 +4,7 @@
 #include "MeshDataWriters/Variable.hpp"
 #include "Parallel/Communicator.hpp"
 #include "Adjacency/Adjacency.hpp"
+#include "Adjacency/CSRGraph.hpp"
 #if defined( _WIN32)
 #include <direct.h>
 #else
@@ -35,55 +36,56 @@ namespace PAMELA
 		using PartMap = std::unordered_map<std::string, Part<T>*>;
 
 	public:
+		virtual ~MeshDataWriter() = default;
 
 		MeshDataWriter(Mesh * mesh, std::string name);
 
 		virtual void Init() = 0;
 
-		void DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name, std::string part);
+		void DeclareVariable(FAMILY family, VARIABLE_DIMENSION dim, VARIABLE_LOCATION dloc, std::string name, std::string part);
 
-		void DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name);
+		void DeclareVariable(FAMILY family, VARIABLE_DIMENSION dim, VARIABLE_LOCATION dloc, std::string name);
 
 		template<class T>
 		void SetVariableOnAllParts(std::string label, T univalue)
 		{
-                    for (auto const& part : m_PolyhedronParts)
-                    {
-                        if (m_Variable.find(VariableKey(label, part.first))!=m_Variable.end())
-                        {
-                            auto var = m_Variable.at(VariableKey(label, part.first));
-                            var->set_data(univalue);
-                        }
-                    }
+			for (auto const& part : m_PolyhedronParts)
+			{
+				if (m_Variable.find(VariableKey(label, part.first)) != m_Variable.end())
+				{
+					auto var = m_Variable.at(VariableKey(label, part.first));
+					var->set_data(univalue);
+				}
+			}
 
-                    for (auto const& part : m_PolygonParts)
-                    {
-                        if (m_Variable.find(VariableKey(label, part.first)) != m_Variable.end())
-                        {
-                            auto var = m_Variable.at(VariableKey(label, part.first));
-                            var->set_data(univalue);
-                        }
-                    }
+			for (auto const& part : m_PolygonParts)
+			{
+				if (m_Variable.find(VariableKey(label, part.first)) != m_Variable.end())
+				{
+					auto var = m_Variable.at(VariableKey(label, part.first));
+					var->set_data(univalue);
+				}
+			}
 
-                    for (auto const& part : m_LineParts)
-                    {
-                        if (m_Variable.find(VariableKey(label, part.first)) != m_Variable.end())
-                        {
-                            auto var = m_Variable.at(VariableKey(label, part.first));
-                            var->set_data(univalue);
-                        }
-                    }
+			for (auto const& part : m_LineParts)
+			{
+				if (m_Variable.find(VariableKey(label, part.first)) != m_Variable.end())
+				{
+					auto var = m_Variable.at(VariableKey(label, part.first));
+					var->set_data(univalue);
+				}
+			}
 
-                    for (auto const& part : m_PointParts)
-                    {
-                        if (m_Variable.find(VariableKey(label, part.first)) != m_Variable.end())
-                        {
-                            auto var = m_Variable.at(VariableKey(label, part.first));
-                            var->set_data(univalue);
-                        }
-                    }
+			for (auto const& part : m_PointParts)
+			{
+				if (m_Variable.find(VariableKey(label, part.first)) != m_Variable.end())
+				{
+					auto var = m_Variable.at(VariableKey(label, part.first));
+					var->set_data(univalue);
+				}
+			}
 
-                }
+		}
 
 		template<class T>
 		void SetVariable(std::string label, std::string part, T univalue)
@@ -92,80 +94,81 @@ namespace PAMELA
 			var->set_data(univalue);
 		}
 
-                template<class T>
-                void SetVariable(std::string label, std::string part, ParallelEnsemble<T>& values)
-                {
-                    auto var = m_Variable.at(VariableKey(label, part));
-		    var->set_data(values.begin_owned(), values.end_owned());
-                }
-
-                template<class T>
-		void SetVariableOnPolyhedron(std::string label, ParallelEnsemble<T>& values)
+		template<class T>
+		void SetVariable(std::string label, std::string part, ParallelEnsemble<T>& values)
 		{
-		    auto var = m_Variable.at(VariableKey(label, m_PolyhedronParts.begin()->first));
-		    var->set_data(values.begin_owned(), values.end_owned());
+			auto var = m_Variable.at(VariableKey(label, part));
+			var->set_data(values.begin_owned(), values.end_owned());
 		}
 
+		template<class T>
+		void SetVariableOnPolyhedron(std::string label, ParallelEnsemble<T>& values)
+		{
+			auto var = m_Variable.at(VariableKey(label, m_PolyhedronParts.begin()->first));
+			var->set_data(values.begin_owned(), values.end_owned());
+		}
 
+		void DeclareAndSetPartitionNumber()
+		{
+			DeclareVariable(
+				FAMILY::POLYHEDRON, VARIABLE_DIMENSION::SCALAR,
+				VARIABLE_LOCATION::PER_CELL, "Partition");
+			DeclareVariable(FAMILY::POLYGON, VARIABLE_DIMENSION::SCALAR,
+				VARIABLE_LOCATION::PER_CELL, "Partition");
+			DeclareVariable(FAMILY::LINE, VARIABLE_DIMENSION::SCALAR,
+				VARIABLE_LOCATION::PER_CELL, "Partition");
+			DeclareVariable(FAMILY::POINT, VARIABLE_DIMENSION::SCALAR,
+				VARIABLE_LOCATION::PER_CELL, "Partition");
+			SetVariableOnAllParts("Partition", Communicator::worldRank());
+		}
 
-
-                void DeclareAndSetPartitionNumber() {
-                    DeclareVariable(
-                            FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR,
-                            VARIABLE_LOCATION::PER_CELL, "Partition");
-                    DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR,
-                            VARIABLE_LOCATION::PER_CELL, "Partition");
-                    DeclareVariable(FAMILY::LINE, VARIABLE_TYPE::SCALAR,
-                            VARIABLE_LOCATION::PER_CELL, "Partition");
-                    DeclareVariable(FAMILY::POINT, VARIABLE_TYPE::SCALAR,
-                            VARIABLE_LOCATION::PER_CELL, "Partition");
-                    SetVariableOnAllParts("Partition", Communicator::worldRank());
-                }
-
-                void DeclareAndSetElementGlobalIndex() {
-                    DeclareVariable(
-                            FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR,
-                            VARIABLE_LOCATION::PER_CELL, "globalIndex");
-                    DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR,
-                            VARIABLE_LOCATION::PER_CELL, "globalIndex");
-                    DeclareVariable(FAMILY::LINE, VARIABLE_TYPE::SCALAR,
-                            VARIABLE_LOCATION::PER_CELL, "globalIndex");
-                    DeclareVariable(FAMILY::POINT, VARIABLE_TYPE::SCALAR,
-                            VARIABLE_LOCATION::PER_CELL, "globalIndex");
-                    DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR,
-                            VARIABLE_LOCATION::PER_CELL, "globalIndex");
-                    SetElementGlobalIndexOnPart(&m_PointParts);
-                    SetElementGlobalIndexOnPart(&m_LineParts);
-                    SetElementGlobalIndexOnPart(&m_PolyhedronParts);
-                    SetElementGlobalIndexOnPart(&m_PolygonParts);
-                }
+		void DeclareAndSetElementGlobalIndex() 
+		{
+			DeclareVariable(
+				FAMILY::POLYHEDRON, VARIABLE_DIMENSION::SCALAR,
+				VARIABLE_LOCATION::PER_CELL, "globalIndex");
+			DeclareVariable(FAMILY::POLYGON, VARIABLE_DIMENSION::SCALAR,
+				VARIABLE_LOCATION::PER_CELL, "globalIndex");
+			DeclareVariable(FAMILY::LINE, VARIABLE_DIMENSION::SCALAR,
+				VARIABLE_LOCATION::PER_CELL, "globalIndex");
+			DeclareVariable(FAMILY::POINT, VARIABLE_DIMENSION::SCALAR,
+				VARIABLE_LOCATION::PER_CELL, "globalIndex");
+			DeclareVariable(FAMILY::POLYGON, VARIABLE_DIMENSION::SCALAR,
+				VARIABLE_LOCATION::PER_CELL, "globalIndex");
+			SetElementGlobalIndexOnPart(&m_PointParts);
+			SetElementGlobalIndexOnPart(&m_LineParts);
+			SetElementGlobalIndexOnPart(&m_PolyhedronParts);
+			SetElementGlobalIndexOnPart(&m_PolygonParts);
+		}
 
 		void DeclareAndSetAdjacency(std::string label, Adjacency* adjacency);
 
 		virtual void Dump() = 0;
 
-	
-        private:
-                template<typename T>
-                void SetElementGlobalIndexOnPart(PartMap<T>* partMap) {
-                    for (auto it = partMap->begin();it != partMap->end();++it) 
-                    {
-                        ParallelEnsemble< double > globalIndex;
-                        auto partptr = it->second;
-                        int cell_index_local=0;
-                        for (auto it2 = partptr->SubParts.begin();it2 != partptr->SubParts.end(); ++it2)
-                        {
-                            if (it2->second->SubCollection.size_owned() > 0) 
-                            {
-                                auto subpart = it2->second;
-                                for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3) {
-                                    globalIndex.push_back_owned((*it3)->get_globalIndex());
-                                }
-                            }
-                        }
-                        SetVariable("globalIndex", it->first, globalIndex);
-                    }
-                }
+
+	private:
+
+		template<typename T>
+		void SetElementGlobalIndexOnPart(PartMap<T>* partMap) {
+			for (auto it = partMap->begin(); it != partMap->end(); ++it)
+			{
+				ParallelEnsemble< double > globalIndex;
+				auto partptr = it->second;
+				int cell_index_local = 0;
+				for (auto it2 = partptr->SubParts.begin(); it2 != partptr->SubParts.end(); ++it2)
+				{
+					if (it2->second->SubCollection.size_owned() > 0)
+					{
+						auto subpart = it2->second;
+						for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3) {
+							globalIndex.push_back_owned((*it3)->get_globalIndex());
+						}
+					}
+				}
+				SetVariable("globalIndex", it->first, globalIndex);
+			}
+		}
+
 	protected:
 
 		std::string PartitionNumberForExtension();
@@ -183,7 +186,7 @@ namespace PAMELA
 
 		int m_nDigitsExtensionPartition;
 		int m_nDigitsExtensionTime;
-		
+
 		//Parts
 		PartMap<Point*>   m_PointParts;
 		PartMap<Line*>  m_LineParts;
@@ -194,11 +197,11 @@ namespace PAMELA
 		void FillParts(std::string prefixLabel, PartMap<T>* parts);
 
 		//Property
-		std::unordered_map<VariableKey, Variable*, VariableKeyHash> m_Variable;
+		std::unordered_map<VariableKey, VariableDouble*, VariableKeyHash> m_Variable;
 
 		//Adjacency
 		std::vector<AdjacencyData> m_Adjacency;
-	
+
 	};
 
 	/**
@@ -232,7 +235,6 @@ namespace PAMELA
 			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
 			{
 				auto vtkType = (*it2)->get_vtkType();
-				//auto ensightGoldType = EnsightGold::VTKToEnsightGold.at(vtkType);
 				partptr->SubParts[vtkType]->SubCollection.push_back_owned_unique(*it2);
 			}
 
@@ -241,7 +243,6 @@ namespace PAMELA
 			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
 			{
 				auto vtkType = (*it2)->get_vtkType();
-				//auto ensightGoldType = EnsightGold::VTKToEnsightGold.at(vtkType);
 				auto subpart = partptr->SubParts[vtkType];
 				//Map local indexes
 				subpart->IndexMapping.push_back(id);

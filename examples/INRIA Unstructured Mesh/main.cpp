@@ -31,8 +31,6 @@ int main(int argc, char **argv) {
 
 	OutputWriter->Init();
 
-	OutputWriter->SetVariableOnAllParts("Partition", Communicator::worldRank());
-
 	//Dump variables
 	OutputWriter->Dump();
 

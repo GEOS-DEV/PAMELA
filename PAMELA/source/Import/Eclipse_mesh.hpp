@@ -45,12 +45,16 @@ namespace PAMELA
 		static int  m_nZCORN;
 		static int m_nActiveCells;
 		static int m_nTotalCells;
+		static int m_nNNCs;
 
 		//Duplicate
 		static std::vector<double> m_Duplicate_Element;
 
 		//Properties
-		static std::unordered_map<std::string, std::vector<double>> m_Properties;
+		static std::unordered_map<std::string, std::vector<double>> m_CellProperties_double;
+		static std::unordered_map<std::string, std::vector<int>> m_CellProperties_integer;
+		static std::unordered_map<std::string, std::vector<double>> m_OtherProperties_double;
+		static std::unordered_map<std::string, std::vector<int>> m_OtherProperties_integer;
 
 		static std::unordered_map<ECLIPSE_MESH_TYPE, ELEMENTS::TYPE> m_TypeMap;
 

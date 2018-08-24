@@ -15,45 +15,44 @@ namespace PAMELA
 {
 
 	//////VARIABLES
-	//Variable types
-	enum class VARIABLE_TYPE { UNKNOWN = -1, SCALAR = 1, VECTOR = 3, TENSOR_SYMM = 6 };
+	//Variable dimension
+	enum class VARIABLE_DIMENSION { UNKNOWN = -1, SCALAR = 1, VECTOR = 3, TENSOR_SYMM = 6 };
+	//Variable type
+	enum class VARIABLE_TYPE { UNKNOWN = -1, DOUBLE = 1, INTEGER = 2 };
 	//Variable locations
 	enum class VARIABLE_LOCATION { UNKNOWN = -1, PER_NODE = 1, PER_CELL = 2 };
 	//Variable size
-	const std::unordered_map<VARIABLE_TYPE, int> VariableTypeToSize =
+	const std::unordered_map<VARIABLE_DIMENSION, int> VariableDimensionToSize =
 	{
-		{ VARIABLE_TYPE::SCALAR,1 },
-		{ VARIABLE_TYPE::VECTOR,3 },
-		{ VARIABLE_TYPE::TENSOR_SYMM,6 },
+		{ VARIABLE_DIMENSION::SCALAR,1 },
+		{ VARIABLE_DIMENSION::VECTOR,3 },
+		{ VARIABLE_DIMENSION::TENSOR_SYMM,6 },
 	};
 
+
+
+	template<class T>
 	struct Variable
 	{
-		Variable(VARIABLE_TYPE dtype, std::string label, size_t size) : Label(label), dType(dtype)
+		Variable(VARIABLE_DIMENSION dim, VARIABLE_TYPE type, std::string label, size_t size) : Label(label), Dimension(dim), Type(type)
 		{
-			offset = VariableTypeToSize.at(dtype);
-			Data = std::vector<double>(size*offset);
+			offset = VariableDimensionToSize.at(dim);
+			Data = std::vector<T>(size*offset);
 		}
 
 		std::string Label;
 		size_t offset;
-		VARIABLE_TYPE dType;
+		VARIABLE_DIMENSION Dimension;
+		VARIABLE_TYPE Type;
 
 		size_t size() { return Data.size(); };
 
-		void set_data(double cst)
+		void set_data(T cst)
 		{
 			std::fill(Data.begin(), Data.end(), cst);
 		}
 
-		/*void set_data(std::vector<double> vec)
->>>>>>> master
-		{
-			ASSERT(vec.size() == Data.size(), "Mismatch sizes");
-			Data = vec;
-		}*/
-
-		void set_data(std::vector<double>::iterator it_begin_vec, std::vector<double>::iterator it_end_vec)
+		void set_data(typename std::vector<T>::iterator it_begin_vec, typename std::vector<T>::iterator it_end_vec)
 		{
 			auto vec_size = static_cast<size_t>(it_end_vec - it_begin_vec);
 			ASSERT(vec_size == Data.size(), "Mismatch sizes");
@@ -61,18 +60,33 @@ namespace PAMELA
 		}
 
 		
-		std::vector<double> get_data(int i)
+		std::vector<T> get_data(int i)
 		{
 			if (offset == 1)
 				return{ Data[i] };
-			std::vector<double> vec(&Data[i*offset], &Data[(i + 1)*offset - 1]);
+			std::vector<T> vec(&Data[i*offset], &Data[(i + 1)*offset - 1]);
 			return vec;
 		}
 
 	private:
-		std::vector<double> Data;
+		std::vector<T> Data;
 
 	};
+
+
+	struct VariableDouble : public Variable<double>
+	{
+		VariableDouble(VARIABLE_DIMENSION dim, std::string label, size_t size) :Variable<double>(dim, VARIABLE_TYPE::DOUBLE, label, size) {};
+	};
+
+
+	struct VariableInt : public Variable<int>
+	{
+		VariableInt(VARIABLE_DIMENSION dim, std::string label, size_t size) :Variable<int>(dim, VARIABLE_TYPE::INTEGER, label, size) {};
+	};
+
+
+
 
 
 	struct VariableKey

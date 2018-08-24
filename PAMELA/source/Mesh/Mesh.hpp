@@ -18,8 +18,7 @@ namespace PAMELA
 	class Mesh
 	{
 	public:
-		virtual ~Mesh() = default;
-
+		virtual ~Mesh();
 		Mesh();
 
 		//Getters
@@ -28,7 +27,8 @@ namespace PAMELA
 		PolygonCollection*  get_PolygonCollection() { return &m_PolygonCollection; }
 		PolyhedronCollection*  get_PolyhedronCollection() { return &m_PolyhedronCollection; }
 
-		Property<PolyhedronCollection, double>* get_PolyhedronProperty() const { return m_PolyhedronProperty; }
+		Property<PolyhedronCollection, double>* get_PolyhedronProperty_double() const { return m_PolyhedronProperty_double; }
+		Property<PolyhedronCollection, int>* get_PolyhedronProperty_int() const { return m_PolyhedronProperty_int; }
 
 		//Adjacency
 		MeshAdjacency* getMeshAdjacency() const;
@@ -63,12 +63,12 @@ namespace PAMELA
 		PolyhedronCollection m_PolyhedronCollection;
 
 		//Property
-		Property<PolyhedronCollection,double>* m_PolyhedronProperty;
+		Property<PolyhedronCollection,double>* m_PolyhedronProperty_double;
+		Property<PolyhedronCollection, int>* m_PolyhedronProperty_int;
 
 		//Adjacency
 		MeshAdjacency* m_Adjacency;
 
-		//void ShrinkMesh(const std::set<int>& Polyhedron_owned, const std::set<int>& vector);
 	};
 
 

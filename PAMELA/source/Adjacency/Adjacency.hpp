@@ -21,6 +21,7 @@ namespace PAMELA
 		friend class Mesh;
 
 	public:
+		~Adjacency();
 
 		CSRMatrix* get_adjacencySparseMatrix() { return m_adjacencySparseMatrix; }
 		
@@ -42,7 +43,7 @@ namespace PAMELA
 			m_adjacencySparseMatrix(new CSRMatrix(static_cast<int>(source->size_all()),
 			                                      static_cast<int>(target->size_all())))
 		{
-		};
+		}
 
 		//Components
 		ParallelEnsembleBase* m_sourceElementCollection;
@@ -66,7 +67,9 @@ namespace PAMELA
 	public:
 
 		typedef std::tuple<ELEMENTS::FAMILY, ELEMENTS::FAMILY, ELEMENTS::FAMILY> familyTriplet;
+
 		MeshAdjacency(Mesh* mesh) :m_mesh(mesh) {}
+		~MeshAdjacency();
 
 		//General getter
 		Adjacency* get_Adjacency(ELEMENTS::FAMILY source, ELEMENTS::FAMILY target, ELEMENTS::FAMILY base);

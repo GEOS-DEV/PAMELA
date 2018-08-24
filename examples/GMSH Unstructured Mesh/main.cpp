@@ -19,15 +19,16 @@ int main(int argc, char **argv) {
 	vtkMultiProcessController::SetGlobalController(controler.Get());
 #endif
 
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/gmsh/modelA1_volume_meshed.msh");
+	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/gmsh/modelA1_volume_meshed.msh");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/gmsh/mandaros.msh");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
-	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.case");
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.vtm");
 
-	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
-	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_TYPE::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_DIMENSION::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
+	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_DIMENSION::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->DeclareAndSetElementGlobalIndex();
 	OutputWriter->DeclareAndSetPartitionNumber();
 	OutputWriter->DeclareAndSetAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));

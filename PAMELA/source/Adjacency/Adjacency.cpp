@@ -4,6 +4,10 @@
 
 namespace PAMELA
 {
+	Adjacency::~Adjacency()
+	{
+		delete m_adjacencySparseMatrix;
+	}
 
 	std::pair<std::vector<int>, std::vector<int>> Adjacency::get_SingleElementAdjacency(int i) const
 	{
@@ -14,6 +18,14 @@ namespace PAMELA
 		std::vector<int> columnIndexVec(firstColumnIndex, lastColumnIndex);
 		std::vector<int> valuesVec(firstValues, lastValues);
 		return std::make_pair(columnIndexVec, valuesVec);
+	}
+
+	MeshAdjacency::~MeshAdjacency()
+	{
+		for (auto it= adjacencyMap.begin();it!= adjacencyMap.end();++it)
+		{
+			delete it->second;
+		}
 	}
 
 	Adjacency* MeshAdjacency::get_Adjacency(ELEMENTS::FAMILY source, ELEMENTS::FAMILY target, ELEMENTS::FAMILY base)

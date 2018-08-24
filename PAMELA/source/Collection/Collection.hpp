@@ -26,7 +26,7 @@ namespace PAMELA
 			auto length = static_cast<int>(vect_ver.size());
 			for (int i = 0; i < length; i++)
 			{
-				hc += vect_ver[i]->get_localIndex() + i*100;
+				hc += vect_ver[i]->get_localIndex() + i*100000;
 			}
 			return hc;
 		}

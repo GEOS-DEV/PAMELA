@@ -11,12 +11,20 @@
 
 namespace PAMELA
 {
+	Mesh::~Mesh()
+	{
+		delete m_PolyhedronProperty_double;
+		delete m_PolyhedronProperty_int;
+		delete m_Adjacency;
+
+	}
 
 	Mesh::Mesh() : m_PointCollection(PointCollection(ELEMENTS::FAMILY::POINT)),
 	               m_LineCollection(LineCollection(ELEMENTS::FAMILY::LINE)),
 	               m_PolygonCollection(PolygonCollection(ELEMENTS::FAMILY::POLYGON)),
 	               m_PolyhedronCollection(PolyhedronCollection(ELEMENTS::FAMILY::POLYHEDRON)),
-				   m_PolyhedronProperty(new Property<PolyhedronCollection,double>(&m_PolyhedronCollection)),
+				   m_PolyhedronProperty_double(new Property<PolyhedronCollection,double>(&m_PolyhedronCollection)),
+				   m_PolyhedronProperty_int(new Property<PolyhedronCollection, int>(&m_PolyhedronCollection)),
 	               m_Adjacency(new MeshAdjacency(this))
 	{
 	}
@@ -138,173 +146,173 @@ namespace PAMELA
 
 	void Mesh::PerformPolyhedronPartitioning(ELEMENTS::FAMILY edgeElement, ELEMENTS::FAMILY ghostBaseElement)
 	{
-
-		LOGINFO("*** Perform partitioning...");
-
-		//This is a cell partitioning
-		ELEMENTS::FAMILY nodeElement = ELEMENTS::FAMILY::POLYHEDRON;
-
-		//Elements affiliation - GLOBAL
-		std::vector<int> PolyhedronAffiliation(m_PolyhedronCollection.size_all());
-
-		//PARTITION WISE
-		std::set<int> PolyhedronOwned;
-		std::set<int> PolygonOwned;
-		std::set<int> LineOwned;
-		std::set<int> PointOwned;
-
-		std::set<int> PolyhedronGhost;
-		std::set<int> PolygonGhost;
-		std::set<int> LineGhost;
-		std::set<int> PointGhost;
-
-
-
-
-		//Get adjacencies
-		auto adjacencyForPartitioning = getMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, edgeElement);
-		auto adjacencyForGhosts = getMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, ghostBaseElement);
-
 		//MPI data
 		auto CommRankSize = Communicator::worldSize();
 		bool MPIRUN = Communicator::isMPIrun();
 		int ipartition = Communicator::worldRank();
 		int npartition = Communicator::worldSize();
 
-		//Partitioning
-		if ((CommRankSize > 1) && (MPIRUN))
+		if ((CommRankSize > 1) && (MPIRUN))	//TO be removed for debugging
 		{
-			//Compute Partionioning vector from METIS
-			LOGINFO("METIS partioning...");
-			PolyhedronAffiliation = METISPartitioning(adjacencyForPartitioning, CommRankSize);
-		}
-		else
-		{
-			//Compute TRIVIAL Partionioning for one partition
-			LOGINFO("TRIVIAL partioning...");
-			PolyhedronAffiliation = TRIVIALPartitioning();
-		}
 
-		//PolyhedronAffiliation = METISPartitioning(adjacencyForPartitioning, 2);
+			LOGINFO("*** Perform partitioning...");
 
-		int nbPolyhedronInPartition = static_cast<int>(std::count(PolyhedronAffiliation.begin(), PolyhedronAffiliation.end(), ipartition));
+			//This is a cell partitioning
+			ELEMENTS::FAMILY nodeElement = ELEMENTS::FAMILY::POLYHEDRON;
 
-		//POLYHEDRON
-		//--OWNED POLYHEDRA
-		int ind = 0;
-		for (size_t i = 0; i != PolyhedronAffiliation.size(); ++i)
-		{
-			if (PolyhedronAffiliation[i] == ipartition)
+			//Elements affiliation - GLOBAL
+			std::vector<int> PolyhedronAffiliation(m_PolyhedronCollection.size_all());
+
+			//PARTITION WISE
+			std::set<int> PolyhedronOwned;
+			std::set<int> PolygonOwned;
+			std::set<int> LineOwned;
+			std::set<int> PointOwned;
+
+			std::set<int> PolyhedronGhost;
+			std::set<int> PolygonGhost;
+			std::set<int> LineGhost;
+			std::set<int> PointGhost;
+
+			//Get adjacencies
+			auto adjacencyForPartitioning = getMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, edgeElement);
+			auto adjacencyForGhosts = getMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, ghostBaseElement);
+
+			//Partitioning
+			if ((CommRankSize > 1) && (MPIRUN))
 			{
-				PolyhedronOwned.insert(static_cast<int>(i));
-				ind++;
+				//Compute Partionioning vector from METIS
+				LOGINFO("METIS partioning...");
+				PolyhedronAffiliation = METISPartitioning(adjacencyForPartitioning, CommRankSize);
 			}
-		}
-
-		//--GHOST POLYHEDRA
-		for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
-		{
-			auto ele_adj = adjacencyForGhosts->get_SingleElementAdjacency(*it);
-			for (auto it2 = ele_adj.first.begin(); it2 < ele_adj.first.end(); ++it2)
+			else
 			{
-				if (PolyhedronAffiliation[*it2] != ipartition)
+				//Compute TRIVIAL Partionioning for one partition
+				LOGINFO("TRIVIAL partioning...");
+				PolyhedronAffiliation = TRIVIALPartitioning();
+			}
+
+			//PolyhedronAffiliation = METISPartitioning(adjacencyForPartitioning, 2);
+
+			int nbPolyhedronInPartition = static_cast<int>(std::count(PolyhedronAffiliation.begin(), PolyhedronAffiliation.end(), ipartition));
+
+			//POLYHEDRON
+			//--OWNED POLYHEDRA
+			int ind = 0;
+			for (size_t i = 0; i != PolyhedronAffiliation.size(); ++i)
+			{
+				if (PolyhedronAffiliation[i] == ipartition)
 				{
-					PolyhedronGhost.insert(*it2);
+					PolyhedronOwned.insert(static_cast<int>(i));
+					ind++;
 				}
 			}
-		}
 
-		LOGINFO("Ghost elements...");
-
-		////OWNED AND GHOST POLYGONS   //TODO Can be much more efficient as it goes multiple times to the same point right now
-		auto PolygonPolyhedronAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
-		auto PolyhedronPolygonAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON);
-		for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
-		{
-			auto adj_Polyhedron2Polygon = PolyhedronPolygonAdj->get_SingleElementAdjacency(*it);
-			auto adj_Polyhedron2PolygonSize = adj_Polyhedron2Polygon.first.size();
-			for (size_t i = 0; i < adj_Polyhedron2PolygonSize; ++i)
+			//--GHOST POLYHEDRA
+			for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
 			{
-				auto adj_Polygon2Polyhedron = PolygonPolyhedronAdj->get_SingleElementAdjacency(adj_Polyhedron2Polygon.first[i]);
-				auto adj_Polygon2PolyhedronSize = adj_Polygon2Polyhedron.first.size();
-				auto PolyToPart = vectorUtils::Vector2VectorMapping(adj_Polygon2Polyhedron.first, PolyhedronAffiliation);
-				if ((std::equal(PolyToPart.begin() + 1, PolyToPart.end(), PolyToPart.begin())) || PolyToPart.size() == 1)
+				auto ele_adj = adjacencyForGhosts->get_SingleElementAdjacency(*it);
+				for (auto it2 = ele_adj.first.begin(); it2 < ele_adj.first.end(); ++it2)
 				{
-					//All points connect to polyhedra of the current partition
-					PolygonOwned.insert(adj_Polyhedron2Polygon.first[i]);
-				}
-				else
-				{
-
-					int ival = CoinToss(PolyToPart[0], PolyToPart[1]);
-
-					if (ival == ipartition)
+					if (PolyhedronAffiliation[*it2] != ipartition)
 					{
+						PolyhedronGhost.insert(*it2);
+					}
+				}
+			}
+
+			LOGINFO("Ghost elements...");
+
+			////OWNED AND GHOST POLYGONS   //TODO Can be much more efficient as it goes multiple times to the same point right now
+			auto PolygonPolyhedronAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PolyhedronPolygonAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON);
+			for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
+			{
+				auto adj_Polyhedron2Polygon = PolyhedronPolygonAdj->get_SingleElementAdjacency(*it);
+				auto adj_Polyhedron2PolygonSize = adj_Polyhedron2Polygon.first.size();
+				for (size_t i = 0; i < adj_Polyhedron2PolygonSize; ++i)
+				{
+					auto adj_Polygon2Polyhedron = PolygonPolyhedronAdj->get_SingleElementAdjacency(adj_Polyhedron2Polygon.first[i]);
+					auto adj_Polygon2PolyhedronSize = adj_Polygon2Polyhedron.first.size();
+					auto PolyToPart = vectorUtils::Vector2VectorMapping(adj_Polygon2Polyhedron.first, PolyhedronAffiliation);
+					if ((std::equal(PolyToPart.begin() + 1, PolyToPart.end(), PolyToPart.begin())) || PolyToPart.size() == 1)
+					{
+						//All points connect to polyhedra of the current partition
 						PolygonOwned.insert(adj_Polyhedron2Polygon.first[i]);
 					}
 					else
 					{
-						PolygonGhost.insert(adj_Polyhedron2Polygon.first[i]);
-					}
 
+						int ival = CoinToss(PolyToPart[0], PolyToPart[1]);
+
+						if (ival == ipartition)
+						{
+							PolygonOwned.insert(adj_Polyhedron2Polygon.first[i]);
+						}
+						else
+						{
+							PolygonGhost.insert(adj_Polyhedron2Polygon.first[i]);
+						}
+
+					}
 				}
 			}
-		}
 
-		////OWNED AND GHOST POINTS   //TODO Can be much more efficient as it goes multiple times to the same point right now
-		auto PointPolyhedronAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
-		auto PolyhedronPointAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON);
-		for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
-		{
-			auto adj_Poly2Point = PolyhedronPointAdj->get_SingleElementAdjacency(*it);
-			int adj_Poly2PointSize = static_cast<int>(adj_Poly2Point.first.size());
-			for (auto i = 0; i < adj_Poly2PointSize; ++i)
+			////OWNED AND GHOST POINTS   //TODO Can be much more efficient as it goes multiple times to the same point right now
+			auto PointPolyhedronAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PolyhedronPointAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON);
+			for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
 			{
-				auto adj_Point2Poly = PointPolyhedronAdj->get_SingleElementAdjacency(adj_Poly2Point.first[i]);
-				int adj_Point2PolySize = static_cast<int>(adj_Point2Poly.first.size());
-				auto PolyToPart = vectorUtils::Vector2VectorMapping(adj_Point2Poly.first, PolyhedronAffiliation);
-				if ((std::equal(PolyToPart.begin() + 1, PolyToPart.end(), PolyToPart.begin())) || PolyToPart.size() == 1)
+				auto adj_Poly2Point = PolyhedronPointAdj->get_SingleElementAdjacency(*it);
+				int adj_Poly2PointSize = static_cast<int>(adj_Poly2Point.first.size());
+				for (auto i = 0; i < adj_Poly2PointSize; ++i)
 				{
-					//All points connect to polyhedra of the current partition
-					PointOwned.insert(adj_Poly2Point.first[i]);
-				}
-				else
-				{
-					int ival = vectorUtils::MostOccuringValue(PolyToPart);
-
-
-					if (ival == ipartition)
+					auto adj_Point2Poly = PointPolyhedronAdj->get_SingleElementAdjacency(adj_Poly2Point.first[i]);
+					int adj_Point2PolySize = static_cast<int>(adj_Point2Poly.first.size());
+					auto PolyToPart = vectorUtils::Vector2VectorMapping(adj_Point2Poly.first, PolyhedronAffiliation);
+					if ((std::equal(PolyToPart.begin() + 1, PolyToPart.end(), PolyToPart.begin())) || PolyToPart.size() == 1)
 					{
-						//The majority of points connect to polyhedra that belongs to the current partition
+						//All points connect to polyhedra of the current partition
 						PointOwned.insert(adj_Poly2Point.first[i]);
 					}
 					else
 					{
-						PointGhost.insert(adj_Poly2Point.first[i]);
-					}
+						int ival = vectorUtils::MostOccuringValue(PolyToPart);
 
+
+						if (ival == ipartition)
+						{
+							//The majority of points connect to polyhedra that belongs to the current partition
+							PointOwned.insert(adj_Poly2Point.first[i]);
+						}
+						else
+						{
+							PointGhost.insert(adj_Poly2Point.first[i]);
+						}
+
+					}
 				}
 			}
+
+
+			//ClearAfterPartitioning
+			LOGINFO("Clean mesh...");
+			m_PolyhedronCollection.ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
+			m_PolygonCollection.ClearAfterPartitioning(PolygonOwned, PolygonGhost);
+			m_PointCollection.ClearAfterPartitioning(PointOwned, PointGhost);
+			m_PolyhedronProperty_double->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
+			m_PolyhedronProperty_int->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
+			LOGINFO("*** Done...");
+			LOGINFO("Clean Adjacency...");
+			m_Adjacency->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost, PolygonOwned, PolygonGhost);
+			LOGINFO("*** Done...");
+
+			////Recreate Polyhedron to Polyhedron connectivity
+			//LOGINFO("Recreate Polyhedron to Polyhedron connectivity...");
+			//CreateFacesFromCells();
+			LOGINFO("*** Done...");
+
 		}
-
-
-		//ClearAfterPartitioning
-		LOGINFO("Clean mesh...");
-		m_PolyhedronCollection.ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
-		m_PolygonCollection.ClearAfterPartitioning(PolygonOwned, PolygonGhost);
-		m_PointCollection.ClearAfterPartitioning(PointOwned, PointGhost);
-		m_PolyhedronProperty->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
-		LOGINFO("*** Done...");
-		LOGINFO("Clean Adjacency...");
-		m_Adjacency->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost, PolygonOwned, PolygonGhost);
-		LOGINFO("*** Done...");
-
-		////Recreate Polyhedron to Polyhedron connectivity
-		//LOGINFO("Recreate Polyhedron to Polyhedron connectivity...");
-		//CreateFacesFromCells();
-		LOGINFO("*** Done...");
-
-
 	}
 
 

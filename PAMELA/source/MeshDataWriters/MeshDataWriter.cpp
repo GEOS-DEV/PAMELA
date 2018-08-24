@@ -77,29 +77,29 @@ namespace PAMELA
 			}
 
 
-	void MeshDataWriter::DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name, std::string part)
+	void MeshDataWriter::DeclareVariable(FAMILY family, VARIABLE_DIMENSION dim, VARIABLE_LOCATION dloc, std::string name, std::string part)
 	{
 
 		switch (family)
 		{
 		case FAMILY::POINT:
-			m_Variable[VariableKey(name, part)] = m_PointParts[part]->AddVariable(dtype, dloc, name);
+			m_Variable[VariableKey(name, part)] = m_PointParts[part]->AddVariable(dim, dloc, name);
 			break;
 		case FAMILY::LINE:
-			m_Variable[VariableKey(name, part)] = m_LineParts[part]->AddVariable(dtype, dloc, name);
+			m_Variable[VariableKey(name, part)] = m_LineParts[part]->AddVariable(dim, dloc, name);
 			break;
 		case FAMILY::POLYGON:
-			m_Variable[VariableKey(name, part)] = m_PolygonParts[part]->AddVariable(dtype, dloc, name);
+			m_Variable[VariableKey(name, part)] = m_PolygonParts[part]->AddVariable(dim, dloc, name);
 			break;
 		case FAMILY::POLYHEDRON:
-			m_Variable[VariableKey(name, part)] = m_PolyhedronParts[part]->AddVariable(dtype, dloc, name);
+			m_Variable[VariableKey(name, part)] = m_PolyhedronParts[part]->AddVariable(dim, dloc, name);
 			break;
 		default:;
 		}
 
 	}
 
-	void MeshDataWriter::DeclareVariable(FAMILY family, VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string name)
+	void MeshDataWriter::DeclareVariable(FAMILY family, VARIABLE_DIMENSION dim, VARIABLE_LOCATION dloc, std::string name)
 	{
 
 		switch (family)
@@ -107,25 +107,25 @@ namespace PAMELA
 		case FAMILY::POINT:
 			for (auto const& part : m_PointParts)
 			{
-				DeclareVariable(family, dtype, dloc, name, part.first);
+				DeclareVariable(family, dim, dloc, name, part.first);
 			}
 			break;
 		case FAMILY::LINE:
 			for (auto const& part : m_LineParts)
 			{
-				DeclareVariable(family, dtype, dloc, name, part.first);
+				DeclareVariable(family, dim, dloc, name, part.first);
 			}
 			break;
 		case FAMILY::POLYGON:
 			for (auto const& part : m_PolygonParts)
 			{
-				DeclareVariable(family, dtype, dloc, name, part.first);
+				DeclareVariable(family, dim, dloc, name, part.first);
 			}
 			break;
 		case FAMILY::POLYHEDRON:
 			for (auto const& part : m_PolyhedronParts)
 			{
-				DeclareVariable(family, dtype, dloc, name, part.first);
+				DeclareVariable(family, dim, dloc, name, part.first);
 			}
 			break;
 		default:;

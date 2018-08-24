@@ -28,8 +28,23 @@ namespace PAMELA
 	template <class T>
 	struct Part
 	{
-		Part(std::string label, int index, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* collection) { Label = label; Collection = collection; Index = index; };
-		Variable* AddVariable(VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string label);
+		Part(std::string label, int index, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* collection) { Label = label; Collection = collection; Index = index; }
+		VariableDouble* AddVariable(VARIABLE_DIMENSION dim, VARIABLE_LOCATION dloc, std::string label)
+		{
+			if (dloc == VARIABLE_LOCATION::PER_CELL)
+			{
+				PerElementVariable.push_back(new VariableDouble(dim, label, Collection->size_owned()));
+				return PerElementVariable.back();
+			}
+			if (dloc == VARIABLE_LOCATION::PER_NODE)
+			{
+				PerNodeVariable.push_back(new VariableDouble(dim, label, static_cast<int>(Points.size())));
+				return PerNodeVariable.back();
+			}
+
+			return nullptr;
+
+		}
 
 		int Index;   // global including all families
 		std::string Label;
@@ -50,27 +65,10 @@ namespace PAMELA
 			{ ELEMENTS::TYPE::VTK_PYRAMID,0 }
 		};
 
-		std::vector<Variable*> PerElementVariable;
-		std::vector<Variable*> PerNodeVariable;
+		std::vector<VariableDouble*> PerElementVariable;
+		std::vector<VariableDouble*> PerNodeVariable;
 
 	}; //TODO: specialize init of numberOfElementsPerSubPart
 
-	template <class T>
-	Variable* Part<T>::AddVariable(VARIABLE_TYPE dtype, VARIABLE_LOCATION dloc, std::string label)
-	{
-		if (dloc == VARIABLE_LOCATION::PER_CELL)
-		{
-			PerElementVariable.push_back(new Variable(dtype, label, Collection->size_owned()));
-			return PerElementVariable.back();
-		}
-		if (dloc == VARIABLE_LOCATION::PER_NODE)
-		{
-			PerNodeVariable.push_back(new Variable(dtype, label, static_cast<int>(Points.size())));
-			return PerNodeVariable.back();
-		}
-
-		return nullptr;
-
-	}
 
 }

@@ -121,16 +121,16 @@ namespace PAMELA
 				}
 
 				vtkSmartPointer<vtkDataArray> data_array;
-				if (variableptr->dType == VARIABLE_TYPE::SCALAR) {
+				if (variableptr->Dimension == VARIABLE_DIMENSION::SCALAR) {
 				}
-				else if (variableptr->dType == VARIABLE_TYPE::VECTOR) {
+				else if (variableptr->Dimension == VARIABLE_DIMENSION::VECTOR) {
 				}
-				else if (variableptr->dType == VARIABLE_TYPE::TENSOR_SYMM) {
+				else if (variableptr->Dimension == VARIABLE_DIMENSION::TENSOR_SYMM) {
 				}
 				else {
 					continue;
 				}
-				auto type = variableptr->dType;
+				auto type = variableptr->Dimension;
 
 			}
 		}

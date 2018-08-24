@@ -76,16 +76,18 @@ namespace PAMELA
 		{
 			LOGINFO("     o Skipping " + keyword);
 		}
-
-		static void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data);
-		static void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<int>& data);
-
 	};
 
 
 
-	template <class T>
-	void Eclipse_mesh::EGRID_ExtractData(std::string& str, int& index, int dim, int type_size, std::vector<T>& output)
+        template<>
+            void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data);
+        template<>
+            void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<int>& data);
+
+
+        template <class T>
+            void Eclipse_mesh::EGRID_ExtractData(std::string& str, int& index, int dim, int type_size, std::vector<T>& output)
 	{
 		output.reserve(dim);
 

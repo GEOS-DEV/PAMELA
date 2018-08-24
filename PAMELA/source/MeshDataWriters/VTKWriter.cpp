@@ -24,13 +24,13 @@
 namespace PAMELA
 {
     /// -------------- PUBLIC METHODS
-    void VTKWriter::Init() {
+    void VTKWriter::Dump() {
         DeclareAllVariables();
         MakeChildFiles();
         MakeParentFile();
     }
 
-    void VTKWriter::Dump() {
+    void VTKWriter::Init() {
     }
     
     /// -------------- PRIVATE METHODS

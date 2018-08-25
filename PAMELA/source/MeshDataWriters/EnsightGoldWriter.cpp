@@ -151,6 +151,9 @@ namespace PAMELA
 		//Header
 		MakeGeoFile_Header();
 
+		//-- Point
+		MakeGeoFile_AddParts(&m_PointParts);
+
 		//-- Line
 		MakeGeoFile_AddParts(&m_LineParts);
 
@@ -159,9 +162,6 @@ namespace PAMELA
 
 		//-- Polyhedron
 		MakeGeoFile_AddParts(&m_PolyhedronParts);
-
-		//Adjacency
-		MakeGeoFile_AddAdjacency();
 
 		LOGINFO("*** Done");
 	}
@@ -183,78 +183,6 @@ namespace PAMELA
 
 	}
 
-	void EnsightGoldWriter::MakeGeoFile_AddAdjacency()
-	{
-		int ipart = 100;
-
-		for (auto it = m_Adjacency.begin(); it != m_Adjacency.end(); ++it)			//Loop over Parts that are defined from the mesh input
-		{
-
-			auto label = it->label;
-
-			m_geoFile << "part" << std::endl;
-			m_geoFile << std::setw(10);
-			m_geoFile << ipart << std::endl;
-			m_geoFile << label << std::endl;
-
-			//Coordinates
-			m_geoFile << "coordinates" << std::endl;
-			m_geoFile << std::setw(10);
-			m_geoFile << it->NodesVector.size() << std::endl;
-
-
-			//--Id
-			for (auto it2 = it->NodesVector.begin(); it2 != it->NodesVector.end(); ++it2)
-			{
-				m_geoFile << std::setw(10);
-				m_geoFile << static_cast<int>(it2 - it->NodesVector.begin()) << std::endl;
-			}
-
-			//--x
-			for (auto it2 = it->NodesVector.begin(); it2 != it->NodesVector.end(); ++it2)		//Loop over Points 
-			{
-				m_geoFile << std::setw(12);
-				m_geoFile << it2->get_coordinates().x << std::endl;
-			}
-
-			//--y
-			for (auto it2 = it->NodesVector.begin(); it2 != it->NodesVector.end(); ++it2)		//Loop over Points 
-			{
-				m_geoFile << std::setw(12);
-				m_geoFile << it2->get_coordinates().y << std::endl;
-			}
-
-			//--z
-			for (auto it2 = it->NodesVector.begin(); it2 != it->NodesVector.end(); ++it2)		//Loop over Points 
-			{
-				m_geoFile << std::setw(12);
-				m_geoFile << it2->get_coordinates().z << std::endl;
-			}
-
-			//Elements
-
-			m_geoFile << "bar2" << std::endl;
-			m_geoFile << std::setw(10);
-			//----dimension
-			m_geoFile << it->iTarget.size() << std::endl;
-			//----Id
-			for (auto it3 = it->iTarget.begin(); it3 != it->iTarget.end(); ++it3)
-			{
-				m_geoFile << std::setw(10) << static_cast<int>(it3 - it->iTarget.begin()) << std::endl;
-			}
-			//----Connectivity
-			for (size_t iv = 0; iv != it->iTarget.size(); ++iv)
-			{
-				m_geoFile << std::setw(10) << it->iSource[iv] + 1 << std::setw(10) << it->iTarget[iv] + 1 << std::endl;
-			}
-
-		}
-	}
-
-	void EnsightGoldWriter::DumpAdjacency()
-	{
-
-	}
 
 	void EnsightGoldWriter::Init()
 	{
@@ -269,14 +197,17 @@ namespace PAMELA
 	void EnsightGoldWriter::Dump()
 	{
 
+		//Point
+		DumpVariables_Parts(&m_PointParts);
+
+		//Line
+		DumpVariables_Parts(&m_LineParts);
+
 		//Polygon
 		DumpVariables_Parts(&m_PolygonParts);
 
 		//Polyhedron
 		DumpVariables_Parts(&m_PolyhedronParts);
-
-		//Adjacency
-		DumpAdjacency();
 
 	}
 }

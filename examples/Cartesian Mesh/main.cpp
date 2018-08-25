@@ -35,6 +35,7 @@ int main(int argc, char **argv)
 	
 	//Partitioning
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
+	MainMesh->CreateLineGroupWithAdjacency("TopologicalC2C", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
 
 	//Output
@@ -48,7 +49,6 @@ int main(int argc, char **argv)
 	//
 	OutputWriter->DeclareAndSetElementGlobalIndex();
 	OutputWriter->DeclareAndSetPartitionNumber();
-	OutputWriter->DeclareAndSetAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
 	//--Make files
 	OutputWriter->Init();

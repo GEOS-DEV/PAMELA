@@ -1,7 +1,6 @@
 #include "PAMELA.hpp"
 #include "Mesh/MeshFactory.hpp"
 #include "Mesh/Mesh.hpp"
-#include "Adjacency/Adjacency.hpp"
 #include "Parallel/Communicator.hpp"
 #include <thread>
 #include "MeshDataWriters/MeshDataWriterFactory.hpp"
@@ -36,6 +35,7 @@ int main(int argc, char **argv) {
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
+	MainMesh->CreateLineGroupWithAdjacency("TopologicalC2C", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
 	////-------------------------Output
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.vtm");
@@ -49,16 +49,15 @@ int main(int argc, char **argv) {
 	//
 	OutputWriter->DeclareAndSetElementGlobalIndex();
 	OutputWriter->DeclareAndSetPartitionNumber();
-	OutputWriter->DeclareAndSetAdjacency("Volume to Volume", MainMesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
+
+	//Init
+	OutputWriter->Init();
 
 	//Set
 	for (auto& mesh_prop : mesh_props)
 	{
 		OutputWriter->SetVariableOnPolyhedron(mesh_prop.first, mesh_prop.second);
 	}
-
-	//Init
-	OutputWriter->Init();
 
 	//Dump
 	OutputWriter->Dump();

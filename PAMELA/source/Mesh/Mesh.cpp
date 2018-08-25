@@ -15,7 +15,7 @@ namespace PAMELA
 	{
 		delete m_PolyhedronProperty_double;
 		delete m_PolyhedronProperty_int;
-		delete m_Adjacency;
+		delete m_TopologicalAdjacency;
 
 	}
 
@@ -25,14 +25,8 @@ namespace PAMELA
 	               m_PolyhedronCollection(PolyhedronCollection(ELEMENTS::FAMILY::POLYHEDRON)),
 				   m_PolyhedronProperty_double(new Property<PolyhedronCollection,double>(&m_PolyhedronCollection)),
 				   m_PolyhedronProperty_int(new Property<PolyhedronCollection, int>(&m_PolyhedronCollection)),
-	               m_Adjacency(new MeshAdjacency(this))
+		m_TopologicalAdjacency(new TopologicalAdjacency(this))
 	{
-	}
-
-
-	MeshAdjacency* Mesh::getMeshAdjacency() const
-	{
-		return m_Adjacency;
 	}
 
 	void Mesh::CreateFacesFromCells()
@@ -78,7 +72,7 @@ namespace PAMELA
 		adj->m_adjacencySparseMatrix->checkMatrix();
 
 		//Add to map
-		m_Adjacency->adjacencyMap[std::make_tuple(source->get_family(), target->get_family(), base->get_family())] = adj;
+		m_TopologicalAdjacency->adjacencyMap[std::make_tuple(source->get_family(), target->get_family(), base->get_family())] = adj;
 
 		//
 		LOGINFO(std::to_string(target->size_all() - InitPolyhedronCollectionSize) + " polygons have been created");
@@ -304,7 +298,7 @@ namespace PAMELA
 			m_PolyhedronProperty_int->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
 			LOGINFO("*** Done...");
 			LOGINFO("Clean Adjacency...");
-			m_Adjacency->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost, PolygonOwned, PolygonGhost);
+			m_TopologicalAdjacency->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost, PolygonOwned, PolygonGhost);
 			LOGINFO("*** Done...");
 
 			////Recreate Polyhedron to Polyhedron connectivity
@@ -359,4 +353,61 @@ namespace PAMELA
 		return val;
 	}
 
+	void Mesh::CreateLineGroupWithAdjacency(std::string Label, Adjacency* adjacency)
+	{
+
+		auto& line_collection = m_LineCollection;
+		auto& point_collection = m_PointCollection;
+
+		//CSR Matrix
+		auto csr_matrix = adjacency->get_adjacencySparseMatrix();
+		auto dimRow = csr_matrix->dimRow;
+		auto nnz = csr_matrix->nnz;
+		auto columIndex = csr_matrix->columnIndex;
+		auto rowPtr = csr_matrix->rowPtr;
+
+
+		if ((adjacency->get_sourceFamily() == ELEMENTS::FAMILY::POLYHEDRON) && (adjacency->get_targetFamily() == ELEMENTS::FAMILY::POLYHEDRON))
+		{
+			auto sourcetarget = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
+
+			//Compute Node coordinates
+			int isource = 0, itarget = 0, ipoint = m_PointCollection.size_owned() , iline = m_LineCollection.size_owned();
+			int cpt = 0;
+			for (auto irow = 0; irow != dimRow; ++irow)
+			{
+				auto it = get_PolyhedronCollection()->begin_owned() + irow;
+				auto xyz1 = (*it)->get_centroidCoordinates();
+				auto source_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz1[0], xyz1[1], xyz1[2]);
+				auto source_rpoint = point_collection.AddElement(Label, source_point);
+				++ipoint;
+				itarget = isource;
+				for (auto icol = rowPtr[irow]; icol != rowPtr[irow + 1]; ++icol)
+				{
+					if (icol!= columIndex[icol])
+					{
+						itarget = itarget + 1;
+						auto it = get_PolyhedronCollection()->begin_owned() + columIndex[icol];
+						auto xyz2 = (*it)->get_centroidCoordinates();
+						auto target_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz2[0], xyz2[1], xyz2[2]);
+						auto target_rpoint = point_collection.AddElement(Label, target_point);
+						++ipoint;
+						auto edgev = { source_rpoint , target_rpoint };
+						auto edge = ElementFactory::makeLine(ELEMENTS::TYPE::VTK_LINE, iline, edgev);
+						++iline;
+						auto redge = line_collection.AddElement(Label, edge);
+					}
+					
+				}
+				isource = itarget + 1;
+				cpt++;
+			}
+
+		}
+
+		m_LineCollection.activeGroup(Label);
+		m_PointCollection.activeGroup(Label);
+
+
+	}
 }

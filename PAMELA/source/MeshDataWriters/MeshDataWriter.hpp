@@ -32,10 +32,10 @@ namespace PAMELA
 
 	class MeshDataWriter
 	{
+	public:
+
 		template <typename T>
 		using PartMap = std::unordered_map<std::string, Part<T>*>;
-
-	public:
 		virtual ~MeshDataWriter() = default;
 
 		MeshDataWriter(Mesh * mesh, std::string name);
@@ -124,24 +124,18 @@ namespace PAMELA
 
 		void DeclareAndSetElementGlobalIndex() 
 		{
-			DeclareVariable(
-				FAMILY::POLYHEDRON, VARIABLE_DIMENSION::SCALAR,
-				VARIABLE_LOCATION::PER_CELL, "globalIndex");
-			DeclareVariable(FAMILY::POLYGON, VARIABLE_DIMENSION::SCALAR,
-				VARIABLE_LOCATION::PER_CELL, "globalIndex");
-			DeclareVariable(FAMILY::LINE, VARIABLE_DIMENSION::SCALAR,
-				VARIABLE_LOCATION::PER_CELL, "globalIndex");
-			DeclareVariable(FAMILY::POINT, VARIABLE_DIMENSION::SCALAR,
-				VARIABLE_LOCATION::PER_CELL, "globalIndex");
-			DeclareVariable(FAMILY::POLYGON, VARIABLE_DIMENSION::SCALAR,
-				VARIABLE_LOCATION::PER_CELL, "globalIndex");
-			SetElementGlobalIndexOnPart(&m_PointParts);
-			SetElementGlobalIndexOnPart(&m_LineParts);
-			SetElementGlobalIndexOnPart(&m_PolyhedronParts);
-			SetElementGlobalIndexOnPart(&m_PolygonParts);
-		}
+			//DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_DIMENSION::SCALAR,VARIABLE_LOCATION::PER_CELL, "globalIndex_Polyhedron");
+			//DeclareVariable(FAMILY::POLYGON, VARIABLE_DIMENSION::SCALAR,VARIABLE_LOCATION::PER_CELL, "globalIndex_Polygon");
+			//DeclareVariable(FAMILY::LINE, VARIABLE_DIMENSION::SCALAR,VARIABLE_LOCATION::PER_CELL, "globalIndex_Line");
+			//DeclareVariable(FAMILY::POINT, VARIABLE_DIMENSION::SCALAR,VARIABLE_LOCATION::PER_CELL, "globalIndex_Point");
+			//SetElementGlobalIndexOnPart(&m_PointParts);
+			//SetElementGlobalIndexOnPart(&m_LineParts);
+			//SetElementGlobalIndexOnPart(&m_PolyhedronParts);
+			//SetElementGlobalIndexOnPart(&m_PolygonParts);
 
-		void DeclareAndSetAdjacency(std::string label, Adjacency* adjacency);
+
+			//TODO: Need to be fixed as globalIndex cannot be defined on all types of elements
+		}
 
 		virtual void Dump() = 0;
 
@@ -160,7 +154,8 @@ namespace PAMELA
 					if (it2->second->SubCollection.size_owned() > 0)
 					{
 						auto subpart = it2->second;
-						for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3) {
+						for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3) 
+						{
 							globalIndex.push_back_owned((*it3)->get_globalIndex());
 						}
 					}
@@ -212,7 +207,7 @@ namespace PAMELA
 	template<typename T>
 	void MeshDataWriter::FillParts(std::string prefixLabel, PartMap<T>* parts)
 	{
-		//--Iterate over polygon parts
+		//--Iterate over parts
 		for (auto it = parts->begin(); it != parts->end(); ++it)	//Loop over group and act on active groups
 		{
 			auto partptr = it->second;

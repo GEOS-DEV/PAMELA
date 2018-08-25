@@ -18,21 +18,6 @@ namespace PAMELA
 
 	enum class ENSIGHT_GOLD_TYPE { UNKNOWN = -1, ESG_POINT = 1, ESG_BAR2 = 2, ESG_TRIA3 = 4, ENS_QUAD4 = 6, ENS_TETRA4 = 8, ENS_PYRAMID5 = 10, ENS_PENTA6 = 12, ENS_HEXA8 = 14 };
 
-	////Maps
-	//const std::unordered_map<ELEMENTS::TYPE, ENSIGHT_GOLD_TYPE> VTKToEnsightGold
-	//	=
-	//{
-	//	{ ELEMENTS::TYPE::VTK_VERTEX ,ENSIGHT_GOLD_TYPE::ESG_POINT },
-	//	{ ELEMENTS::TYPE::VTK_LINE ,ENSIGHT_GOLD_TYPE::ESG_BAR2 },
-	//	{ ELEMENTS::TYPE::VTK_TRIANGLE ,ENSIGHT_GOLD_TYPE::ESG_TRIA3 },
-	//	{ ELEMENTS::TYPE::VTK_QUAD ,ENSIGHT_GOLD_TYPE::ENS_QUAD4 },
-	//	{ ELEMENTS::TYPE::VTK_TETRA ,ENSIGHT_GOLD_TYPE::ENS_TETRA4 },
-	//	{ ELEMENTS::TYPE::VTK_HEXAHEDRON ,ENSIGHT_GOLD_TYPE::ENS_HEXA8 },
-	//	{ ELEMENTS::TYPE::VTK_WEDGE ,ENSIGHT_GOLD_TYPE::ENS_PENTA6 },
-	//	{ ELEMENTS::TYPE::VTK_PYRAMID ,ENSIGHT_GOLD_TYPE::ENS_PYRAMID5 }
-	//};
-
-
 	class EnsightGoldWriter : public MeshDataWriter
 	{
 
@@ -54,13 +39,8 @@ namespace PAMELA
 		template<typename T>
 		void MakeGeoFile_AddParts(const PartMap<T>* parts);
 
-		void MakeGeoFile_AddAdjacency();
-
 		template<typename T>
 		void DumpVariables_Parts(const PartMap<T>* parts);
-
-		void DumpAdjacency();
-
 
 		const std::unordered_map<ELEMENTS::TYPE, std::string> ElementToLabel
 			=

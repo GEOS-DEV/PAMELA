@@ -5,15 +5,14 @@
 #include "Elements/Polygon.hpp"
 #include "Elements/Polyhedron.hpp"
 #include "Collection/Collection.hpp"
-#include "Utils/Types.hpp"
-#include "Elements/Line.hpp"
 #include "Property/Property.hpp"
+#include "Adjacency/TopologicalAdjacency.hpp"
 
 namespace PAMELA
 {
 
 	class Adjacency;
-	class MeshAdjacency;
+	class TopologicalAdjacency;
 
 	class Mesh
 	{
@@ -31,7 +30,11 @@ namespace PAMELA
 		Property<PolyhedronCollection, int>* get_PolyhedronProperty_int() const { return m_PolyhedronProperty_int; }
 
 		//Adjacency
-		MeshAdjacency* getMeshAdjacency() const;
+		TopologicalAdjacency* getMeshAdjacency() const
+		{
+			return m_TopologicalAdjacency;
+		}
+
 
 		virtual void Distort(double alpha) {};
 
@@ -52,6 +55,9 @@ namespace PAMELA
 		std::vector<int> METISPartitioning(Adjacency* adjacency, int npartition);
 		std::vector<int> TRIVIALPartitioning();
 
+		//Adjacency
+		void CreateLineGroupWithAdjacency(std::string Label, Adjacency* adjacency);
+
 	
 
 	protected:
@@ -67,7 +73,8 @@ namespace PAMELA
 		Property<PolyhedronCollection, int>* m_PolyhedronProperty_int;
 
 		//Adjacency
-		MeshAdjacency* m_Adjacency;
+		TopologicalAdjacency* m_TopologicalAdjacency;
+		std::unordered_map<std::string, Adjacency*> m_OtherAdjacency;
 
 	};
 

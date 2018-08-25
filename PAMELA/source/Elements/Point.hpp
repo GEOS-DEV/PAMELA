@@ -9,7 +9,6 @@ namespace PAMELA
 	template <typename T>
 	class Collection;
 
-
 	template <>
 	class Element<ELEMENTS::FAMILY::POINT> : public ElementBase
 	{
@@ -18,6 +17,7 @@ namespace PAMELA
 		Element(int index, double x, double y, double z) :ElementBase(), m_coordinates(Coordinates(x, y, z))
 		{
 			m_family = ELEMENTS::FAMILY::POINT;
+			m_vertexList = { this };
 		}
 
 		//virtual ~Element() = 0;// {}
@@ -26,10 +26,14 @@ namespace PAMELA
 		const Coordinates& get_coordinates() const { return m_coordinates; }
 		Coordinates& get_coordinates() { return m_coordinates; }
 
+		//Getter
+		const std::vector<Element<ELEMENTS::FAMILY::POINT>*>& get_vertexList() const { return m_vertexList; };
 
 	protected:
 
 		Coordinates m_coordinates;
+
+		std::vector<Element<ELEMENTS::FAMILY::POINT>*> m_vertexList;
 
 	};
 	typedef Element<ELEMENTS::FAMILY::POINT> Point;

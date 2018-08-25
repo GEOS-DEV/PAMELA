@@ -1,5 +1,6 @@
 #include "MeshDataWriters/MeshDataWriter.hpp"
 #include "Mesh/Mesh.hpp"
+#include "Elements/ElementFactory.hpp"
 
 namespace PAMELA
 {
@@ -20,6 +21,25 @@ namespace PAMELA
 
 		//Part Index
 		int partIndex = 1;
+
+		//------------------------------------------------------------- PointCollection -------------------------------------------------------------
+		auto PointCollection = m_mesh->get_PointCollection();
+		auto ActiveGroupMapPoint = PointCollection->get_ActiveGroupsMap();
+
+		//--Add active parts
+		for (auto it = ActiveGroupMapPoint.begin(); it != ActiveGroupMapPoint.end(); ++it)	//Loop over group and act on active groups
+		{
+			if (it->second)
+			{
+				std::string grplabel = it->first;
+				auto groupEnsemble = PointCollection->get_Group(grplabel);
+				m_PointParts[grplabel] = new Part<Point*>(grplabel, partIndex, groupEnsemble);
+				partIndex++;
+			}
+		}
+		FillParts("PART" + PartitionNumberForExtension() + "_" + "POINT", &m_PointParts);
+
+
 
 		//------------------------------------------------------------- LineCollection -------------------------------------------------------------
 		auto LineCollection = m_mesh->get_LineCollection();
@@ -63,7 +83,7 @@ namespace PAMELA
 		//--Add active parts
 		for (auto it = ActiveGroupMapPolyhedron.begin(); it != ActiveGroupMapPolyhedron.end(); ++it)	//Loop over group and act on active groups
 		{
-			if (it->second )
+			if (it->second)
 			{
 				std::string grplabel = it->first;
 				auto groupEnsemble = PolyhedronCollection->get_Group(grplabel);
@@ -74,7 +94,7 @@ namespace PAMELA
 		FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYHEDRON", &m_PolyhedronParts);
 
 		LOGINFO("*** Done");
-			}
+	}
 
 
 	void MeshDataWriter::DeclareVariable(FAMILY family, VARIABLE_DIMENSION dim, VARIABLE_LOCATION dloc, std::string name, std::string part)
@@ -155,52 +175,52 @@ namespace PAMELA
 	}
 
 
-	void MeshDataWriter::DeclareAndSetAdjacency(std::string label, Adjacency* adjacency)
-	{
+	//void MeshDataWriter::DeclareAndSetAdjacency(std::string label, Adjacency* adjacency)
+	//{
 
-		//Reference
-		m_Adjacency.emplace_back(label);
-		auto& adj_data = m_Adjacency.back();
+	//	//Reference
+	//	m_Adjacency.emplace_back(label);
+	//	auto& adj_data = m_Adjacency.back();
 
-		//CSR Matrix
-		auto csr_matrix = adjacency->get_adjacencySparseMatrix();
-		auto dimRow = csr_matrix->dimRow;
-		auto nnz = csr_matrix->nnz;
-		auto columIndex = csr_matrix->columnIndex;
-		auto rowPtr = csr_matrix->rowPtr;
+	//	//CSR Matrix
+	//	auto csr_matrix = adjacency->get_adjacencySparseMatrix();
+	//	auto dimRow = csr_matrix->dimRow;
+	//	auto nnz = csr_matrix->nnz;
+	//	auto columIndex = csr_matrix->columnIndex;
+	//	auto rowPtr = csr_matrix->rowPtr;
 
 
-		if ((adjacency->get_sourceFamily() == ELEMENTS::FAMILY::POLYHEDRON) && (adjacency->get_targetFamily() == ELEMENTS::FAMILY::POLYHEDRON))
-		{
-			auto sourcetarget = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
+	//	if ((adjacency->get_sourceFamily() == ELEMENTS::FAMILY::POLYHEDRON) && (adjacency->get_targetFamily() == ELEMENTS::FAMILY::POLYHEDRON))
+	//	{
+	//		auto sourcetarget = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
 
-			//Compute Node coordinates
-			int isource=0, itarget=0;
-			int cpt = 0;
-			for (auto irow = 0; irow != dimRow; ++irow)
-			{
-				auto it = m_mesh->get_PolyhedronCollection()->begin_owned() + irow;
-				auto xyz = (*it)->get_centroidCoordinates();
-				Point source_point = Point(isource,xyz[0], xyz[1], xyz[2]);
-				adj_data.NodesVector.push_back(source_point);
-				itarget = isource;
-				for (auto icol = rowPtr[irow]; icol != rowPtr[irow + 1]; ++icol)
-				{
-					itarget=itarget+1;
-					auto it = m_mesh->get_PolyhedronCollection()->begin_owned() + columIndex[icol];
-					auto xyz = (*it)->get_centroidCoordinates();
-					Point target_point = Point(itarget, xyz[0], xyz[1], xyz[2]);
-					adj_data.NodesVector.push_back(target_point);
-					adj_data.iSource.push_back(isource);
-					adj_data.iTarget.push_back(itarget);
-				}
-				isource = itarget + 1;
-				cpt++;
-			}
+	//		//Compute Node coordinates
+	//		int isource = 0, itarget = 0;
+	//		int cpt = 0;
+	//		for (auto irow = 0; irow != dimRow; ++irow)
+	//		{
+	//			auto it = m_mesh->get_PolyhedronCollection()->begin_owned() + irow;
+	//			auto xyz = (*it)->get_centroidCoordinates();
+	//			Point source_point = Point(isource, xyz[0], xyz[1], xyz[2]);
+	//			adj_data.NodesVector.push_back(source_point);
+	//			itarget = isource;
+	//			for (auto icol = rowPtr[irow]; icol != rowPtr[irow + 1]; ++icol)
+	//			{
+	//				itarget = itarget + 1;
+	//				auto it = m_mesh->get_PolyhedronCollection()->begin_owned() + columIndex[icol];
+	//				auto xyz = (*it)->get_centroidCoordinates();
+	//				Point target_point = Point(itarget, xyz[0], xyz[1], xyz[2]);
+	//				adj_data.NodesVector.push_back(target_point);
+	//				adj_data.iSource.push_back(isource);
+	//				adj_data.iTarget.push_back(itarget);
+	//			}
+	//			isource = itarget + 1;
+	//			cpt++;
+	//		}
 
-		}
+	//	}
 
-	}
+	//}
 
 	/**
 	* \brief

@@ -12,7 +12,7 @@ namespace PAMELA
 
 	Line* ElementFactory::makeLine(ELEMENTS::TYPE elementType, int index, const std::vector<Point*>& vertexList)
 	{
-		ASSERT(elementType == ELEMENTS::TYPE::VTK_LINE, "Cannot make a point with this type");
+		ASSERT(elementType == ELEMENTS::TYPE::VTK_LINE, "Cannot make a line with this type");
 		return new ElementSpe<ELEMENTS::FAMILY::LINE, ELEMENTS::TYPE::VTK_LINE>(index, vertexList);
 	}
 

@@ -1,10 +1,16 @@
 #pragma once
-#include "Mesh/Mesh.hpp"
+
+#include <cstddef>
+#include <tuple>
+#include "Elements/Element.hpp"
+#include "Collection/Collection.hpp"
+
 
 namespace PAMELA
 {
 
 	class Adjacency;
+        class Mesh;
 
 	struct TripletHash
 	{
@@ -14,17 +20,17 @@ namespace PAMELA
 		}
 	};
 
+		typedef std::tuple<ELEMENTS::FAMILY, ELEMENTS::FAMILY, ELEMENTS::FAMILY> familyTriplet;
 
 	class TopologicalAdjacency
 	{
-
 		friend class Mesh;
+
 
 	public:
 
-		typedef std::tuple<ELEMENTS::FAMILY, ELEMENTS::FAMILY, ELEMENTS::FAMILY> familyTriplet;
 
-		TopologicalAdjacency(Mesh* mesh) :m_mesh(mesh) {}
+		TopologicalAdjacency(Mesh * mesh) : m_mesh(mesh) {}
 		~TopologicalAdjacency();
 
 		//General getter

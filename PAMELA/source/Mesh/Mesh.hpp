@@ -12,7 +12,6 @@ namespace PAMELA
 {
 
 	class Adjacency;
-	class TopologicalAdjacency;
 
 	class Mesh
 	{

@@ -73,7 +73,6 @@ int main(int argc, char **argv) {
 
 		output_mesh->DeclareAndSetElementGlobalIndex();
 		output_mesh->DeclareAndSetPartitionNumber();
-		output_mesh->DeclareAndSetAdjacency("Volume to Volume", input_mesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 		output_mesh->Init();
 
 

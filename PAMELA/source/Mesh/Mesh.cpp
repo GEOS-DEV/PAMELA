@@ -372,7 +372,7 @@ namespace PAMELA
 			auto sourcetarget = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
 
 			//Compute Node coordinates
-			int isource = 0, itarget = 0, ipoint = m_PointCollection.size_owned() , iline = m_LineCollection.size_owned();
+			int isource = 0, itarget = 0, ipoint = static_cast<int>(m_PointCollection.size_owned()) , iline = static_cast<int>(m_LineCollection.size_owned());
 			int cpt = 0;
 			for (auto irow = 0; irow != dimRow; ++irow)
 			{

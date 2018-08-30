@@ -193,7 +193,7 @@ namespace PAMELA
 
 		T AddElement_ghost(std::string label, T Element)
 		{
-			if (!groupExist)
+			if (!groupExist(label))
 			{
 				addAndCreateGroup(label);
 			}

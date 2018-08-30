@@ -1,5 +1,4 @@
 #include "Import/Eclipse_mesh.hpp"
-#include <experimental/filesystem>
 #include "Utils/StringUtils.hpp"
 #include "Elements/ElementFactory.hpp"
 #include "Elements/Element.hpp"

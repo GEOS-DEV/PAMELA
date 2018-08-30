@@ -169,8 +169,8 @@ namespace PAMELA
 			std::set<int> PointGhost;
 
 			//Get adjacencies
-			auto adjacencyForPartitioning = getMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, edgeElement);
-			auto adjacencyForGhosts = getMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, ghostBaseElement);
+			auto adjacencyForPartitioning = getTopologicalMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, edgeElement);
+			auto adjacencyForGhosts = getTopologicalMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, ghostBaseElement);
 
 			//Partitioning
 			if ((CommRankSize > 1) && (MPIRUN))
@@ -218,8 +218,8 @@ namespace PAMELA
 			LOGINFO("Ghost elements...");
 
 			////OWNED AND GHOST POLYGONS   //TODO Can be much more efficient as it goes multiple times to the same point right now
-			auto PolygonPolyhedronAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
-			auto PolyhedronPolygonAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PolygonPolyhedronAdj = getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PolyhedronPolygonAdj = getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON);
 			for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
 			{
 				auto adj_Polyhedron2Polygon = PolyhedronPolygonAdj->get_SingleElementAdjacency(*it);
@@ -253,8 +253,8 @@ namespace PAMELA
 			}
 
 			////OWNED AND GHOST POINTS   //TODO Can be much more efficient as it goes multiple times to the same point right now
-			auto PointPolyhedronAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
-			auto PolyhedronPointAdj = getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PointPolyhedronAdj = getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PolyhedronPointAdj = getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON);
 			for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
 			{
 				auto adj_Poly2Point = PolyhedronPointAdj->get_SingleElementAdjacency(*it);

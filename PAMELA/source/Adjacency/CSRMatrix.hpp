@@ -24,6 +24,8 @@ namespace PAMELA
 		void sortRowIndexAndMoveValues();
 		void sortRowIndexAndMoveValues(int i);
 		void shrink();
+		void fillEmpty(int dim_row, int dim_col);
+
 
 		int nnz;
 		int dimRow, dimColumn;

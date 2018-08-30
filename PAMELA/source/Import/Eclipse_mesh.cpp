@@ -6,7 +6,8 @@
 #include <map>
 #include "Parallel/Communicator.hpp"
 #include "Utils/File.hpp"
-#include <iostream>
+#include "Adjacency/Adjacency.hpp"
+#include <algorithm>    // std::sort
 
 namespace PAMELA
 {
@@ -25,8 +26,11 @@ namespace PAMELA
 	std::vector<double>  Eclipse_mesh::m_COORD = {};
 	std::vector<double>  Eclipse_mesh::m_ZCORN = {};
 	std::vector<int>  Eclipse_mesh::m_ACTNUM = {};
+	std::vector<Eclipse_mesh::TPFANNC>  Eclipse_mesh::m_NNCs = {};
 	std::vector<double> Eclipse_mesh::m_Duplicate_Element;
-
+	std::unordered_map<Eclipse_mesh::IJK, int, Eclipse_mesh::IJKHash> Eclipse_mesh::m_IJK2Index;
+	std::unordered_map<int, Eclipse_mesh::IJK> Eclipse_mesh::m_Index2IJK;
+	std::unordered_map<int, int> Eclipse_mesh::m_IndexTotal2Active;
 	std::unordered_map<ECLIPSE_MESH_TYPE, ELEMENTS::TYPE> Eclipse_mesh::m_TypeMap;
 
 
@@ -256,10 +260,12 @@ namespace PAMELA
 		FillMeshWithProperties(mesh);
 
 
+		//Create NNC adjacency
+		CreateNNCAdjacency(mesh);
+
 		return mesh;
 
 	}
-
 
 	Mesh* Eclipse_mesh::ConvertMesh()
 	{
@@ -444,9 +450,10 @@ namespace PAMELA
 
 
 
-					if (m_ACTNUM[icellTotal]==1)
+					if (m_ACTNUM[icellTotal] == 1)
 					{
-						icell++;
+
+						m_IndexTotal2Active[icellTotal] = icell;
 
 						//Points
 						vertexTemp[0] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]);
@@ -473,6 +480,9 @@ namespace PAMELA
 							m_Duplicate_Element.push_back(0);
 						}
 
+						m_IJK2Index[IJK(i,j,k)] = icell;
+						m_Index2IJK[icell] = IJK(i, j, k);
+						icell++;
 					}
 
 					layer.push_back(k);
@@ -488,7 +498,7 @@ namespace PAMELA
 
 		//Layers
 		m_CellProperties_integer["Layer"] = layer;
-		
+
 		//Remove non-active properties
 		auto iacthexas = icell;
 
@@ -496,7 +506,7 @@ namespace PAMELA
 		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
 		{
 
-			if ((it->second.size())==m_nTotalCells)	//Eliminate values on inactive blocks
+			if ((it->second.size()) == m_nTotalCells)	//Eliminate values on inactive blocks
 			{
 
 				temp_double.clear();
@@ -513,10 +523,11 @@ namespace PAMELA
 
 				prop = temp_double;
 			}
-			
+
 		}
 
-
+		//Inactive blocks
+		//--Delete properties on inactive blocks
 		std::vector<int> temp_int;
 		for (auto it = m_CellProperties_integer.begin(); it != m_CellProperties_integer.end(); ++it)
 		{
@@ -534,6 +545,32 @@ namespace PAMELA
 				}
 				prop = temp_int;
 			}
+		}
+
+		//--Delete NNC on inactive blocks
+		temp_int.clear();
+		
+		for(auto i=0;i!=m_NNCs.size();++i)
+		{
+			if (m_ACTNUM[m_NNCs[i].downstream_index]==1&& m_ACTNUM[m_NNCs[i].upstream_index]==1)
+			{
+				temp_int.push_back(i);
+			}
+		}
+		std::vector < TPFANNC> temp_NNC; temp_NNC.reserve(temp_int.size());
+		for (auto i = 0; i != temp_int.size(); ++i)
+		{
+			temp_NNC.push_back(m_NNCs[temp_int[i]]);
+		}
+		m_NNCs.clear();
+		m_NNCs = temp_NNC;
+		for (auto it = m_NNCs.begin(); it != m_NNCs.end(); ++it)
+		{
+			it->downstream_index = m_IndexTotal2Active.at(it->downstream_index);
+			it->upstream_index = m_IndexTotal2Active.at(it->upstream_index);
+
+			
+
 		}
 
 		LOGINFO(std::to_string(m_nTotalCells) + "  total hexas");
@@ -613,7 +650,7 @@ namespace PAMELA
 				m_nZCORN = 8 * m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
 				m_ZCORN.reserve(m_nZCORN);
 				m_COORD.reserve(m_nCOORD);
-				
+
 			}
 			else if (line == "COORD")
 			{
@@ -773,7 +810,6 @@ namespace PAMELA
 
 	}
 
-
 	std::string Eclipse_mesh::extractDataBelowKeyword(std::istringstream& string_block)
 	{
 		char KeywordEnd = '/';
@@ -793,9 +829,8 @@ namespace PAMELA
 		return res[0];
 	}
 
-
-        template<>
-            void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data)
+	template<>
+	void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data)
 	{
 		if (keyword == "COORD")
 		{
@@ -807,9 +842,17 @@ namespace PAMELA
 			LOGINFO("     o ZCORN processed");
 			m_ZCORN = data;
 		}
+		else if (keyword == "TRANNNC")
+		{
+			LOGINFO("     o TRANNNC processed");
+			for (auto i = 0; i < m_nNNCs; ++i)
+			{
+				m_NNCs[i].transmissibility = data[i];
+			}
+		}
 		else
 		{
-			if ((data.size() == m_nActiveCells)|| (data.size() == m_nTotalCells))//|| (data.size() == m_nNNCs))
+			if ((data.size() == m_nActiveCells) || (data.size() == m_nTotalCells))//|| (data.size() == m_nNNCs))
 			{
 				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
 				m_CellProperties_double[keyword] = data;
@@ -823,7 +866,7 @@ namespace PAMELA
 
 	}
 
-        template<>
+	template<>
 	void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<int>& data)
 	{
 		if (keyword == "GRIDHEAD")
@@ -833,12 +876,13 @@ namespace PAMELA
 			m_SPECGRID[1] = data[2];
 			m_SPECGRID[2] = data[3];
 			m_nTotalCells = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
-			LOGINFO( std::to_string(m_nTotalCells) + " numbers of cells");
+			LOGINFO(std::to_string(m_nTotalCells) + " numbers of cells");
 		}
 		else if (keyword == "NNCHEAD")
 		{
 			LOGINFO("     o NNCHEAD Found");
 			m_nNNCs = data[0];
+			m_NNCs = std::vector<TPFANNC>(m_nNNCs);
 			LOGINFO(std::to_string(m_nNNCs) + " numbers of NNC connections");
 		}
 		else if (keyword == "ACTNUM")
@@ -847,9 +891,9 @@ namespace PAMELA
 			{
 				LOGINFO("     o ACTNUM updated");
 				auto i = 0;
-				for (auto it = m_ACTNUM.begin();it!=m_ACTNUM.end();++it)
+				for (auto it = m_ACTNUM.begin(); it != m_ACTNUM.end(); ++it)
 				{
-					if ((*it)==1)
+					if ((*it) == 1)
 					{
 						*it = data[i];
 						++i;
@@ -868,7 +912,23 @@ namespace PAMELA
 				LOGINFO(std::to_string(m_nActiveCells) + " numbers of active cells");
 			}
 
-			
+
+		}
+		else if (keyword == "NNC1")
+		{
+			LOGINFO("     o NNC1 processed");
+			for (auto i=0;i<m_nNNCs;++i)
+			{
+				m_NNCs[i].downstream_index = data[i]-1;
+			}
+		}
+		else if (keyword == "NNC2")
+		{
+			LOGINFO("     o NNC2 processed");
+			for (auto i = 0; i < m_nNNCs; ++i)
+			{
+				m_NNCs[i].upstream_index = data[i]-1;
+			}
 		}
 		else
 		{
@@ -887,8 +947,52 @@ namespace PAMELA
 
 	}
 
+	void Eclipse_mesh::CreateNNCAdjacency(Mesh* mesh)
+	{
+
+	
+		if (m_nNNCs > 0)
+		{
+			auto new_adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::UNKNOWN, mesh->get_PolyhedronCollection(), mesh->get_PolyhedronCollection(), nullptr);
+			auto csr_mat = new_adj->get_adjacencySparseMatrix();
+
+			auto nb_polyhedron = mesh->get_PolyhedronCollection()->size_all();
+			csr_mat->fillEmpty(static_cast<int>(nb_polyhedron), static_cast<int>(nb_polyhedron));
+
+			//---NNCs
+			//Sort TPFANNC
+			std::sort(m_NNCs.begin(), m_NNCs.end());
+
+			int last_irow = 0, last_rowptr = 0;
+			int cpt=1;
+ 			for (auto i=0;i != m_NNCs.size();++i)
+			{
+				int irow = m_NNCs[i].downstream_index;
+				int icol = m_NNCs[i].upstream_index;
+
+				if (irow != last_irow)
+				{
+					std::fill(csr_mat->rowPtr.begin()+last_irow+1, csr_mat->rowPtr.begin()+irow, last_rowptr);
+					csr_mat->rowPtr[irow] = static_cast<int>(csr_mat->columnIndex.size());
+					csr_mat->rowPtr[irow + 1] = static_cast<int>(csr_mat->columnIndex.size() + 1);
+					last_irow = irow;
+				}
+				else
+				{
+					csr_mat->rowPtr[irow + 1]++;
+				}
+				last_rowptr = csr_mat->rowPtr[irow + 1];
+				csr_mat->columnIndex.push_back(icol);
+				csr_mat->nnz++;
+			}
+			std::fill(csr_mat->rowPtr.begin() + last_irow + 1, csr_mat->rowPtr.end(), last_rowptr);
+			csr_mat->checkMatrix();
+			mesh->get_OtherAdjacency()["NNCs"] = new_adj;
+
+		}
 
 
 
 
+	}
 }

@@ -29,10 +29,12 @@ namespace PAMELA
 		Property<PolyhedronCollection, int>* get_PolyhedronProperty_int() const { return m_PolyhedronProperty_int; }
 
 		//Adjacency
-		TopologicalAdjacency* getMeshAdjacency() const
+		TopologicalAdjacency* getTopologicalMeshAdjacency() const
 		{
 			return m_TopologicalAdjacency;
 		}
+
+		std::unordered_map<std::string, Adjacency*>& get_OtherAdjacency() {return m_OtherAdjacency; }
 
 
 		virtual void Distort(double alpha) {};

@@ -25,7 +25,7 @@ namespace PAMELA
 
 			if (rowPtr[row] == rowPtr[row + 1])
 			{
-				LOGWARNING("The CSR matrix has an empty row");
+				//LOGWARNING("The CSR matrix has an empty row");
 				//return false;
 			}
 
@@ -34,7 +34,7 @@ namespace PAMELA
 			{
 				if (columnIndex[nnz_index] >= columnIndex[nnz_index + 1])
 				{
-					//LOGWARNING("The CSR matrix has a column index vector not sorted");  //TODO:check this. Seems ok.
+					LOGWARNING("The CSR matrix has a column index vector not sorted");  //TODO:check this. Seems ok.
 					//return false;
 				}
 			}
@@ -100,6 +100,12 @@ namespace PAMELA
 		columnIndex.shrink_to_fit();
 	}
 
+	void CSRMatrix::fillEmpty(int dim_row, int dim_col)
+	{
+		values.resize(0);
+		rowPtr.resize(dim_row + 1);
+		columnIndex.resize(0);
+	}
 
 	CSRMatrix* CSRMatrix::product(CSRMatrix* matrix_lhs, CSRMatrix* matrix_rhs)
 	{

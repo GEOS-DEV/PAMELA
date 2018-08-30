@@ -36,11 +36,62 @@ namespace PAMELA
 		static int m_nhexahedra;
 
 		///Eclipse file data
+
+
+		struct IJK
+		{
+			IJK() { I = -1; J = -1; K = -1; }
+			IJK(int i, int j, int k) { I = i; J = j; K = k; }
+			bool operator==(IJK const& other) const { return ((*this).I == other.I)&((*this).I == other.I)&((*this).I == other.I); }
+			int I;
+			int J;
+			int K;
+
+		};
+
+		
+		struct IJKHash
+		{
+			std::size_t operator()(const IJK& ele) const
+			{
+				return ele.I+ ele.J*100000+ ele.K*1000000;
+			}
+		};
+
+
+		struct TPFANNC
+		{
+			bool operator<(TPFANNC const& other) const
+			{
+				if ((*this).downstream_index != other.downstream_index)
+				{
+					return (*this).downstream_index < other.downstream_index;
+				}
+
+				return (*this).upstream_index < other.upstream_index;
+
+			}
+			int downstream_index;
+			int upstream_index;
+			double transmissibility;
+
+		};
+
+		bool compareTPFANNC(const TPFANNC& a, const TPFANNC& b)
+		{
+			return a.downstream_index > b.downstream_index;
+		}
+
 		//Grid
 		static std::vector<int> m_SPECGRID;
 		static std::vector<double>  m_COORD;
 		static std::vector<double>  m_ZCORN;
 		static std::vector<int>  m_ACTNUM;
+		static std::vector<TPFANNC>  m_NNCs;
+		static std::unordered_map<IJK,int, IJKHash> m_IJK2Index ;
+		static std::unordered_map<int,IJK> m_Index2IJK;
+		static std::unordered_map<int, int> m_IndexTotal2Active;
+
 		static int  m_nCOORD;
 		static int  m_nZCORN;
 		static int m_nActiveCells;
@@ -69,6 +120,7 @@ namespace PAMELA
 
 		};
 
+		
 
 		//Egrid
 
@@ -80,6 +132,8 @@ namespace PAMELA
 		{
 			LOGINFO("     o Skipping " + keyword);
 		}
+
+		static void CreateNNCAdjacency(Mesh* mesh);
 	};
 
 
@@ -152,5 +206,6 @@ namespace PAMELA
 
 	}
 
+	
 
 }

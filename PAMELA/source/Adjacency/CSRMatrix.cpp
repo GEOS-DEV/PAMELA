@@ -32,9 +32,14 @@ namespace PAMELA
 			int row_stop = rowPtr[row + 1];
 			for (int nnz_index = row_start; nnz_index < row_stop - 1; ++nnz_index)
 			{
-				if (columnIndex[nnz_index] >= columnIndex[nnz_index + 1])
+				if (columnIndex[nnz_index] > columnIndex[nnz_index + 1])
 				{
-					LOGWARNING("The CSR matrix has a column index vector not sorted");  //TODO:check this. Seems ok.
+ 					LOGWARNING("The CSR matrix has a column index vector not sorted");  
+					//return false;
+				}
+				if (columnIndex[nnz_index] == columnIndex[nnz_index + 1])
+				{
+					//LOGWARNING("The CSR matrix has a column values equals in same row");  //TODO:check this. Seems ok.
 					//return false;
 				}
 			}

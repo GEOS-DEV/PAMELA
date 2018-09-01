@@ -25,7 +25,8 @@ namespace PAMELA
 	std::vector<double>  Eclipse_mesh::m_COORD = {};
 	std::vector<double>  Eclipse_mesh::m_ZCORN = {};
 	std::vector<int>  Eclipse_mesh::m_ACTNUM = {};
-	std::vector<Eclipse_mesh::TPFANNC>  Eclipse_mesh::m_NNCs = {};
+	std::vector<Eclipse_mesh::TPFA>  Eclipse_mesh::m_NNCs = {};
+	std::vector<Eclipse_mesh::TPFA>  Eclipse_mesh::m_EclipseGeneratedTrans = {};
 	std::vector<double> Eclipse_mesh::m_Duplicate_Element;
 	std::unordered_map<Eclipse_mesh::IJK, int, Eclipse_mesh::IJKHash> Eclipse_mesh::m_IJK2Index;
 	std::unordered_map<int, Eclipse_mesh::IJK> Eclipse_mesh::m_Index2IJK;
@@ -254,13 +255,19 @@ namespace PAMELA
 		LOGINFO("*** Converting into internal mesh format");
 		auto mesh = ConvertMesh();
 
+		//Create transmissibility from egrid/init
+		CreateEclipseGeneratedTrans();
+
 		//Fill mesh with imported properties
 		LOGINFO("*** Filling mesh with imported properties");
 		FillMeshWithProperties(mesh);
 
+		CreateAdjacencyFromTPFAdata("PreProc", m_EclipseGeneratedTrans, mesh);
 
 		//Create NNC adjacency
-		CreateNNCAdjacency(mesh);
+		CreateAdjacencyFromTPFAdata("NNCs", m_NNCs, mesh);
+
+		//CreateNNCAdjacency(mesh);
 
 		return mesh;
 
@@ -556,7 +563,7 @@ namespace PAMELA
 				temp_int.push_back(i);
 			}
 		}
-		std::vector < TPFANNC> temp_NNC; temp_NNC.reserve(temp_int.size());
+		std::vector <TPFA> temp_NNC; temp_NNC.reserve(temp_int.size());
 		for (auto i = 0; i != temp_int.size(); ++i)
 		{
 			temp_NNC.push_back(m_NNCs[temp_int[i]]);
@@ -586,26 +593,6 @@ namespace PAMELA
 		auto props_double = mesh->get_PolyhedronProperty_double();
 		auto props_int = mesh->get_PolyhedronProperty_int();
 
-		////Clean from duplicate elements
-		////auto dim_g = m_SPECGRID[0] * m_SPECGRID[1] * m_SPECGRID[2];
-		//auto cpt = 0;
-		//for (auto it = m_Properties.begin(); it != m_Properties.end(); ++it)
-		//{
-		//	cpt = 0;
-		//	for (auto i = 0; i != m_nActiveCells; ++i)
-		//	{
-		//		if (m_Duplicate_Element[i] == 2)
-		//		{
-		//			(it->second)[i] = -987789;
-		//		}
-		//		else
-		//		{
-		//			cpt++;
-		//		}
-		//	}
-		//	it->second.erase(std::remove(it->second.begin(), it->second.end(), -987789), it->second.end());
-		//}
-
 		//Transfer property to mesh object
 		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
 		{
@@ -613,8 +600,7 @@ namespace PAMELA
 			props_double->ReferenceProperty(it->first);
 			props_double->SetProperty(it->first, it->second);
 		}
-		m_CellProperties_double["DUPLICATE"] = m_Duplicate_Element;
-		m_CellProperties_double["DUPLICATE"].erase(std::remove(m_CellProperties_double["DUPLICATE"].begin(), m_CellProperties_double["DUPLICATE"].end(), 2), m_CellProperties_double["DUPLICATE"].end());
+
 		for (auto it = m_CellProperties_integer.begin(); it != m_CellProperties_integer.end(); ++it)
 		{
 			ASSERT(it->second.size() == props_int->get_Owner()->size_owned(), "Property set size is different from its owner");
@@ -844,6 +830,7 @@ namespace PAMELA
 		else if (keyword == "TRANNNC")
 		{
 			LOGINFO("     o TRANNNC processed");
+			//m_CellProperties_double[keyword] = data;
 			for (auto i = 0; i < m_nNNCs; ++i)
 			{
 				m_NNCs[i].transmissibility = data[i];
@@ -881,7 +868,7 @@ namespace PAMELA
 		{
 			LOGINFO("     o NNCHEAD Found");
 			m_nNNCs = data[0];
-			m_NNCs = std::vector<TPFANNC>(m_nNNCs);
+			m_NNCs = std::vector<TPFA>(m_nNNCs);
 			LOGINFO(std::to_string(m_nNNCs) + " numbers of NNC connections");
 		}
 		else if (keyword == "ACTNUM")
@@ -946,11 +933,11 @@ namespace PAMELA
 
 	}
 
-	void Eclipse_mesh::CreateNNCAdjacency(Mesh* mesh)
+
+	void Eclipse_mesh::CreateAdjacencyFromTPFAdata(std::string label, std::vector<TPFA>& data, Mesh* mesh)
 	{
 
-	
-		if (m_nNNCs > 0)
+		if (data.size() > 0)
 		{
 			auto new_adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::UNKNOWN, mesh->get_PolyhedronCollection(), mesh->get_PolyhedronCollection(), nullptr);
 			auto csr_mat = new_adj->get_adjacencySparseMatrix();
@@ -960,18 +947,18 @@ namespace PAMELA
 
 			//---NNCs
 			//Sort TPFANNC
-			std::sort(m_NNCs.begin(), m_NNCs.end());
+			std::sort(data.begin(), data.end());
 
 			int last_irow = 0, last_rowptr = 0;
-			int cpt=1;
- 			for (auto i=0;i != m_NNCs.size();++i)
+			int cpt = 1;
+			for (auto i = 0; i != data.size(); ++i)
 			{
-				int irow = m_NNCs[i].downstream_index;
-				int icol = m_NNCs[i].upstream_index;
+				int irow = data[i].downstream_index;
+				int icol = data[i].upstream_index;
 
 				if (irow != last_irow)
 				{
-					std::fill(csr_mat->rowPtr.begin()+last_irow+1, csr_mat->rowPtr.begin()+irow, last_rowptr);
+					std::fill(csr_mat->rowPtr.begin() + last_irow + 1, csr_mat->rowPtr.begin() + irow, last_rowptr);
 					csr_mat->rowPtr[irow] = static_cast<int>(csr_mat->columnIndex.size());
 					csr_mat->rowPtr[irow + 1] = static_cast<int>(csr_mat->columnIndex.size() + 1);
 					last_irow = irow;
@@ -986,12 +973,75 @@ namespace PAMELA
 			}
 			std::fill(csr_mat->rowPtr.begin() + last_irow + 1, csr_mat->rowPtr.end(), last_rowptr);
 			csr_mat->checkMatrix();
-			mesh->get_OtherAdjacency()["NNCs"] = new_adj;
+			mesh->getAdjacencySet()->Add_NonTopologicalAdjacency(label, new_adj);
+		}
+
+	}
+
+	
+
+	void Eclipse_mesh::CreateEclipseGeneratedTrans()
+	{
+
+		if (!m_CellProperties_double.at("TRANX").empty())
+		{
+			ASSERT(m_CellProperties_double.at("TRANX").size() == m_CellProperties_double.at("TRANY").size() && m_CellProperties_double.at("TRANY").size() == m_CellProperties_double.at("TRANZ").size(), "Size mismatch");
+
+			auto ntran = m_CellProperties_double.at("TRANX").size();
+			auto& tranx = m_CellProperties_double.at("TRANX");
+			auto& trany = m_CellProperties_double.at("TRANY");
+			auto& tranz = m_CellProperties_double.at("TRANZ");
+
+			TPFA temp_TPFA;
+			for (size_t i = 0; i != ntran; ++i)
+			{
+				auto ijk = m_Index2IJK.at(i);
+
+				//X
+				if (tranx[i]>0)
+				{
+					ijk.I = ijk.I + 1;
+					if (m_IJK2Index.find(ijk) != m_IJK2Index.end())
+					{
+						temp_TPFA.downstream_index = i;
+						temp_TPFA.upstream_index = m_IJK2Index.at(ijk);
+						temp_TPFA.transmissibility = tranx[i];
+						m_EclipseGeneratedTrans.push_back(temp_TPFA);
+					}
+					ijk.I = ijk.I - 1;
+				}
+				
+				//Y
+				if (tranx[i] > 0)
+				{
+					ijk.J = ijk.J + 1;
+					if (m_IJK2Index.find(ijk) != m_IJK2Index.end())
+					{
+						temp_TPFA.downstream_index = i;
+						temp_TPFA.upstream_index = m_IJK2Index.at(ijk);
+						temp_TPFA.transmissibility = trany[i];
+						m_EclipseGeneratedTrans.push_back(temp_TPFA);
+					}
+					ijk.J = ijk.J - 1;
+				}
+
+				//Z
+				if (tranx[i] > 0)
+				{
+					ijk.K = ijk.K + 1;
+					if (m_IJK2Index.find(ijk) != m_IJK2Index.end())
+					{
+						temp_TPFA.downstream_index = i;
+						temp_TPFA.upstream_index = m_IJK2Index.at(ijk);
+						temp_TPFA.transmissibility = tranz[i];
+						m_EclipseGeneratedTrans.push_back(temp_TPFA);
+					}
+					ijk.K = ijk.K - 1;
+				}
+			}
 
 		}
 
-
-
-
+		
 	}
 }

@@ -6,7 +6,7 @@
 #include "Elements/Polyhedron.hpp"
 #include "Collection/Collection.hpp"
 #include "Property/Property.hpp"
-#include "Adjacency/TopologicalAdjacency.hpp"
+#include "Adjacency/AdjacencySet.hpp"
 
 namespace PAMELA
 {
@@ -29,13 +29,10 @@ namespace PAMELA
 		Property<PolyhedronCollection, int>* get_PolyhedronProperty_int() const { return m_PolyhedronProperty_int; }
 
 		//Adjacency
-		TopologicalAdjacency* getTopologicalMeshAdjacency() const
+		AdjacencySet* getAdjacencySet() const
 		{
-			return m_TopologicalAdjacency;
+			return m_AdjacencySet;
 		}
-
-		std::unordered_map<std::string, Adjacency*>& get_OtherAdjacency() {return m_OtherAdjacency; }
-
 
 		virtual void Distort(double alpha) {};
 
@@ -74,8 +71,7 @@ namespace PAMELA
 		Property<PolyhedronCollection, int>* m_PolyhedronProperty_int;
 
 		//Adjacency
-		TopologicalAdjacency* m_TopologicalAdjacency;
-		std::unordered_map<std::string, Adjacency*> m_OtherAdjacency;
+		AdjacencySet* m_AdjacencySet;
 
 	};
 

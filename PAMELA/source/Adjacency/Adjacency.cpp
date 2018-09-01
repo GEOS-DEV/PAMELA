@@ -20,5 +20,19 @@ namespace PAMELA
 		return std::make_pair(columnIndexVec, valuesVec);
 	}
 
+	Adjacency* Adjacency::transposed(Adjacency* input)
+	{
+		Adjacency* adj = new Adjacency(input->get_targetFamily(), input->get_sourceFamily(), input->get_baseFamily(), input->m_targetElementCollection, input->m_sourceElementCollection, input->m_baseElementCollection);
+		adj->m_adjacencySparseMatrix = CSRMatrix::transpose(input->m_adjacencySparseMatrix);
+		return  adj;
+	}
+
+
+	Adjacency* Adjacency::multiply(Adjacency* input_lhs, Adjacency* input_rhs)
+	{
+		Adjacency* adj = new Adjacency(input_rhs->get_targetFamily(), input_lhs->get_sourceFamily(), input_lhs->get_targetFamily(), input_rhs->m_targetElementCollection, input_lhs->m_sourceElementCollection, input_lhs->m_targetElementCollection);
+		adj->m_adjacencySparseMatrix = CSRMatrix::product(input_lhs->m_adjacencySparseMatrix, input_rhs->m_adjacencySparseMatrix);
+		return adj;
+	}
 	
 }

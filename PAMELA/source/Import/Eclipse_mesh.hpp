@@ -42,7 +42,7 @@ namespace PAMELA
 		{
 			IJK() { I = -1; J = -1; K = -1; }
 			IJK(int i, int j, int k) { I = i; J = j; K = k; }
-			bool operator==(IJK const& other) const { return ((*this).I == other.I)&((*this).I == other.I)&((*this).I == other.I); }
+			bool operator==(IJK const& other) const { return ((*this).I == other.I)&((*this).J == other.J)&((*this).K == other.K); }
 			int I;
 			int J;
 			int K;
@@ -59,9 +59,9 @@ namespace PAMELA
 		};
 
 
-		struct TPFANNC
+		struct TPFA
 		{
-			bool operator<(TPFANNC const& other) const
+			bool operator<(TPFA const& other) const
 			{
 				if ((*this).downstream_index != other.downstream_index)
 				{
@@ -77,7 +77,7 @@ namespace PAMELA
 
 		};
 
-		bool compareTPFANNC(const TPFANNC& a, const TPFANNC& b)
+		bool compareTPFANNC(const TPFA& a, const TPFA& b)
 		{
 			return a.downstream_index > b.downstream_index;
 		}
@@ -87,7 +87,8 @@ namespace PAMELA
 		static std::vector<double>  m_COORD;
 		static std::vector<double>  m_ZCORN;
 		static std::vector<int>  m_ACTNUM;
-		static std::vector<TPFANNC>  m_NNCs;
+		static std::vector<TPFA>  m_NNCs;
+		static std::vector<TPFA>  m_EclipseGeneratedTrans;
 		static std::unordered_map<IJK,int, IJKHash> m_IJK2Index ;
 		static std::unordered_map<int,IJK> m_Index2IJK;
 		static std::unordered_map<int, int> m_IndexTotal2Active;
@@ -133,10 +134,9 @@ namespace PAMELA
 			LOGINFO("     o Skipping " + keyword);
 		}
 
-		static void CreateNNCAdjacency(Mesh* mesh);
+		static void CreateAdjacencyFromTPFAdata(std::string label, std::vector<TPFA>& data, Mesh* mesh);
+		static void CreateEclipseGeneratedTrans();
 	};
-
-
 
         template<>
             void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data);

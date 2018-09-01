@@ -15,7 +15,7 @@ namespace PAMELA
 	{
 		delete m_PolyhedronProperty_double;
 		delete m_PolyhedronProperty_int;
-		delete m_TopologicalAdjacency;
+		delete m_AdjacencySet;
 
 	}
 
@@ -25,7 +25,7 @@ namespace PAMELA
 	               m_PolyhedronCollection(PolyhedronCollection(ELEMENTS::FAMILY::POLYHEDRON)),
 				   m_PolyhedronProperty_double(new Property<PolyhedronCollection,double>(&m_PolyhedronCollection)),
 				   m_PolyhedronProperty_int(new Property<PolyhedronCollection, int>(&m_PolyhedronCollection)),
-		m_TopologicalAdjacency(new TopologicalAdjacency(this))
+		m_AdjacencySet(new AdjacencySet(this))
 	{
 	}
 
@@ -72,7 +72,7 @@ namespace PAMELA
 		adj->m_adjacencySparseMatrix->checkMatrix();
 
 		//Add to map
-		m_TopologicalAdjacency->adjacencyMap[std::make_tuple(source->get_family(), target->get_family(), base->get_family())] = adj;
+		m_AdjacencySet->TopologicalAdjacencyMap[std::make_tuple(source->get_family(), target->get_family(), base->get_family())] = adj;
 
 		//
 		LOGINFO(std::to_string(target->size_all() - InitPolyhedronCollectionSize) + " polygons have been created");
@@ -146,8 +146,8 @@ namespace PAMELA
 		int ipartition = Communicator::worldRank();
 		int npartition = Communicator::worldSize();
 
-		if ((CommRankSize > 1) && (MPIRUN))	//TO be removed for debugging
-		{
+		//if ((CommRankSize > 1) && (MPIRUN))	//TO be removed for debugging
+		//{
 
 			LOGINFO("*** Perform partitioning...");
 
@@ -169,8 +169,8 @@ namespace PAMELA
 			std::set<int> PointGhost;
 
 			//Get adjacencies
-			auto adjacencyForPartitioning = getTopologicalMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, edgeElement);
-			auto adjacencyForGhosts = getTopologicalMeshAdjacency()->get_Adjacency(nodeElement, nodeElement, ghostBaseElement);
+			auto adjacencyForPartitioning = getAdjacencySet()->get_TopologicalAdjacency(nodeElement, nodeElement, edgeElement);
+			auto adjacencyForGhosts = getAdjacencySet()->get_TopologicalAdjacency(nodeElement, nodeElement, ghostBaseElement);
 
 			//Partitioning
 			if ((CommRankSize > 1) && (MPIRUN))
@@ -218,8 +218,8 @@ namespace PAMELA
 			LOGINFO("Ghost elements...");
 
 			////OWNED AND GHOST POLYGONS   //TODO Can be much more efficient as it goes multiple times to the same point right now
-			auto PolygonPolyhedronAdj = getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
-			auto PolyhedronPolygonAdj = getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PolygonPolyhedronAdj = getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PolyhedronPolygonAdj = getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON);
 			for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
 			{
 				auto adj_Polyhedron2Polygon = PolyhedronPolygonAdj->get_SingleElementAdjacency(*it);
@@ -253,8 +253,8 @@ namespace PAMELA
 			}
 
 			////OWNED AND GHOST POINTS   //TODO Can be much more efficient as it goes multiple times to the same point right now
-			auto PointPolyhedronAdj = getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
-			auto PolyhedronPointAdj = getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PointPolyhedronAdj = getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);
+			auto PolyhedronPointAdj = getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON);
 			for (auto it = PolyhedronOwned.begin(); it != PolyhedronOwned.end(); ++it)
 			{
 				auto adj_Poly2Point = PolyhedronPointAdj->get_SingleElementAdjacency(*it);
@@ -298,15 +298,10 @@ namespace PAMELA
 			m_PolyhedronProperty_int->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost);
 			LOGINFO("*** Done...");
 			LOGINFO("Clean Adjacency...");
-			m_TopologicalAdjacency->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost, PolygonOwned, PolygonGhost);
+			m_AdjacencySet->ClearAfterPartitioning(PolyhedronOwned, PolyhedronGhost,PolygonOwned, PolygonGhost);
 			LOGINFO("*** Done...");
 
-			////Recreate Polyhedron to Polyhedron connectivity
-			//LOGINFO("Recreate Polyhedron to Polyhedron connectivity...");
-			//CreateFacesFromCells();
-			LOGINFO("*** Done...");
-
-		}
+		//}
 	}
 
 

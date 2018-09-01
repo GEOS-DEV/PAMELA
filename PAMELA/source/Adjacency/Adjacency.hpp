@@ -9,21 +9,28 @@ namespace PAMELA
 	{
 
 		friend class Mesh;
-		friend class TopologicalAdjacency;
 
 	public:
 
-		Adjacency(ELEMENTS::FAMILY sourceFamily, ELEMENTS::FAMILY targetFamily, ELEMENTS::FAMILY baseFamily, ParallelEnsembleBase* source, ParallelEnsembleBase* target, ParallelEnsembleBase* base) :
+		Adjacency(ELEMENTS::FAMILY sourceFamily, ELEMENTS::FAMILY targetFamily, ELEMENTS::FAMILY baseFamily, ParallelEnsembleBase* source, ParallelEnsembleBase* target, ParallelEnsembleBase* base, CSRMatrix* csr_mat) :
 			m_sourceElementCollection(source), m_targetElementCollection(target), m_baseElementCollection(base),
 			m_sourceFamily(sourceFamily), m_targetFamily(targetFamily), m_baseFamily(baseFamily),
-			m_adjacencySparseMatrix(new CSRMatrix(static_cast<int>(source->size_all()),
-				static_cast<int>(target->size_all())))
+			m_adjacencySparseMatrix(csr_mat)
 		{
 		}
-		
+
+		Adjacency(ELEMENTS::FAMILY sourceFamily, ELEMENTS::FAMILY targetFamily, ELEMENTS::FAMILY baseFamily, ParallelEnsembleBase* source, ParallelEnsembleBase* target, ParallelEnsembleBase* base) 
+		: Adjacency(sourceFamily, targetFamily, baseFamily, source, target, base, new CSRMatrix(static_cast<int>(source->size_all()), static_cast<int>(target->size_all())))
+		{
+		}
+
 		~Adjacency();
 
 		CSRMatrix* get_adjacencySparseMatrix() { return m_adjacencySparseMatrix; }
+
+		//Utils
+		static Adjacency* transposed(Adjacency* input);
+		static Adjacency* multiply(Adjacency* input_lhs, Adjacency* input_rhs);
 		
 		ParallelEnsembleBase* get_sourceElementCollection() const { return m_sourceElementCollection; }
 		ParallelEnsembleBase* get_targetElementCollection() const { return m_targetElementCollection; }

@@ -23,9 +23,10 @@ namespace PAMELA
 	               m_LineCollection(LineCollection(ELEMENTS::FAMILY::LINE)),
 	               m_PolygonCollection(PolygonCollection(ELEMENTS::FAMILY::POLYGON)),
 	               m_PolyhedronCollection(PolyhedronCollection(ELEMENTS::FAMILY::POLYHEDRON)),
-				   m_PolyhedronProperty_double(new Property<PolyhedronCollection,double>(&m_PolyhedronCollection)),
-				   m_PolyhedronProperty_int(new Property<PolyhedronCollection, int>(&m_PolyhedronCollection)),
-		m_AdjacencySet(new AdjacencySet(this))
+	               m_ImplicitPointCollection(PointCollection(ELEMENTS::FAMILY::POINT)), m_ImplicitLineCollection(LineCollection(ELEMENTS::FAMILY::LINE)),
+	               m_PolyhedronProperty_double(new Property<PolyhedronCollection, double>(&m_PolyhedronCollection)),
+	               m_PolyhedronProperty_int(new Property<PolyhedronCollection, int>(&m_PolyhedronCollection)),
+	               m_AdjacencySet(new AdjacencySet(this))
 	{
 	}
 
@@ -135,6 +136,17 @@ namespace PAMELA
 		return nullptr;
 		
 
+	}
+
+	void Mesh::AddImplicitLine(ELEMENTS::TYPE elementType, std::string groupLabel, std::vector<Point*>& pointList)
+	{
+		m_ImplicitPointCollection.AddElement(groupLabel, pointList[0]);
+		for (size_t i=1;i!= pointList.size();++i)
+		{
+			m_ImplicitPointCollection.AddElement(groupLabel, pointList[i]);
+			Line* element = ElementFactory::makeLine(ELEMENTS::TYPE::VTK_LINE, -1, { pointList[i-1],pointList[i] });
+			m_ImplicitLineCollection.AddElement(groupLabel, element);
+		}
 	}
 
 
@@ -405,4 +417,5 @@ namespace PAMELA
 
 
 	}
+
 }

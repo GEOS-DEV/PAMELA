@@ -213,6 +213,118 @@ namespace PAMELA
 
 	}
 
+	CSRMatrix* CSRMatrix::sum(CSRMatrix* matrix_lhs, CSRMatrix* matrix_rhs)
+	{
+
+		ASSERT(matrix_lhs->checkMatrix(), "Problem with CSR matrix data structure");
+		ASSERT(matrix_rhs->checkMatrix(), "Problem with CSR matrix data structure");
+		ASSERT(matrix_lhs->dimColumn == matrix_rhs->dimRow, "Matrix dimensions are not compatible for sum operation");
+
+		//Dimensions
+		int nnz_lhs = matrix_lhs->nnz;
+		int Nc_lhs = matrix_lhs->dimColumn;
+		int Nr_lhs = matrix_lhs->dimRow;
+		int nnz_rhs = matrix_rhs->nnz;
+		int Nc_rhs = matrix_rhs->dimColumn;
+		int Nr_rhs = matrix_rhs->dimRow;
+
+		//Dynamic allocation of trans_mat
+		int nnz_guess = (nnz_lhs + nnz_rhs) * 10;
+		CSRMatrix* sum_mat = new CSRMatrix(Nr_lhs, Nr_lhs, nnz_guess);
+
+		int Mnnz = sum_mat->nnz;
+		int MNc = sum_mat->dimColumn;
+		int MNr = sum_mat->dimRow;
+
+		//Work data
+		auto& rowPtr_lhs = matrix_lhs->rowPtr;
+		auto& columnIndex_lhs = matrix_lhs->columnIndex;
+		auto& values_lhs = matrix_lhs->values;
+		auto& rowPtr_rhs = matrix_rhs->rowPtr;
+		auto& columnIndex_rhs = matrix_rhs->columnIndex;
+		auto& values_rhs = matrix_rhs->values;
+		auto& MrowPtr = sum_mat->rowPtr;
+		auto& McolumnIndex = sum_mat->columnIndex;
+		auto& Mvalues = sum_mat->values;
+
+
+		int ka, kb;
+		int j1, j2;
+		int kc = 0;
+		int nelea_left, neleb_left;
+		MrowPtr[1] = kc;
+		for (int ii = 0; ii < Nr_lhs; ++ii)
+		{
+			ka = rowPtr_lhs[ii];
+			kb = rowPtr_rhs[ii];
+			nelea_left = rowPtr_lhs[ii + 1] - rowPtr_lhs[ii];
+			neleb_left = rowPtr_rhs[ii + 1] - rowPtr_rhs[ii];
+
+
+			if ((nelea_left > 0) || (neleb_left > 0))
+			{
+
+				do
+				{
+
+					if (nelea_left > 0)
+					{
+						j1 = columnIndex_lhs[ka];
+					}
+					else
+					{
+						j1 = MNc;
+					}
+					if (neleb_left > 0)
+					{
+						j2 = columnIndex_rhs[kb];
+					}
+					else
+					{
+						j2 = MNc;
+					}
+
+
+					if (j1 == j2)
+					{
+						Mvalues[kc] = 1;//values_lhs[ka] + values_rhs[kb];
+						McolumnIndex[kc] = j1;
+						ka = ka + 1;
+						kb = kb + 1;
+						kc = kc + 1;
+					}
+					else if (j1 < j2)
+					{
+						McolumnIndex[kc] = j1;
+						Mvalues[kc] = 1;//values_lhs[ka];
+						ka = ka + 1;
+						kc = kc + 1;
+					}
+					else if (j2 < j1)
+					{
+						McolumnIndex[kc] = j2;
+						Mvalues[kc] = 1;//values_lhs[kb];
+						kb = kb + 1;
+						kc = kc + 1;
+					}
+
+					nelea_left = rowPtr_lhs[ii + 1] - ka;
+					neleb_left = rowPtr_rhs[ii + 1] - kb;
+
+				} while ((nelea_left > 0) || (neleb_left > 0));
+
+			}
+			MrowPtr[ii + 1] = kc;
+		}
+
+		sum_mat->shrink();
+		sum_mat->sortRowIndexAndMoveValues();
+		ASSERT(sum_mat->checkMatrix(), "Something wrong with the resulting transposed matrix");
+
+		return sum_mat;
+
+	}
+
 	CSRMatrix* CSRMatrix::transpose(CSRMatrix* matrix)
 	{
 		ASSERT(matrix->checkMatrix(), "Problem with CSR matrix data structure");

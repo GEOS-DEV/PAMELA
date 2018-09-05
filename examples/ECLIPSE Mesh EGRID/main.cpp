@@ -34,10 +34,14 @@ int main(int argc, char **argv) {
 
 
 	MainMesh->CreateFacesFromCells();
+
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
+
+	MainMesh->getAdjacencySet()->Add_NonTopologicalAdjacencySum("NNCs+PreProc", { MainMesh->getAdjacencySet()->get_NonTopologicalAdjacency("NNCs") ,MainMesh->getAdjacencySet()->get_NonTopologicalAdjacency("PreProc") });
 	MainMesh->CreateLineGroupWithAdjacency("TopologicalC2C", MainMesh->getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 	MainMesh->CreateLineGroupWithAdjacency("NNCs", MainMesh->getAdjacencySet()->get_NonTopologicalAdjacency("NNCs"));
 	MainMesh->CreateLineGroupWithAdjacency("PreProc", MainMesh->getAdjacencySet()->get_NonTopologicalAdjacency("PreProc"));
+	MainMesh->CreateLineGroupWithAdjacency("NNCs+PreProc", MainMesh->getAdjacencySet()->get_NonTopologicalAdjacency("NNCs+PreProc"));
 
 	////-------------------------Output
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.vtm");

@@ -19,6 +19,7 @@ namespace PAMELA
 
 		static CSRMatrix* transpose(CSRMatrix* matrix);
 		static CSRMatrix* product(CSRMatrix* matrix_lhs, CSRMatrix* matrix_rhs);
+		static CSRMatrix* sum(CSRMatrix* matrix_lhs, CSRMatrix* matrix_rhs);
 		bool checkMatrix();
 
 		void sortRowIndexAndMoveValues();

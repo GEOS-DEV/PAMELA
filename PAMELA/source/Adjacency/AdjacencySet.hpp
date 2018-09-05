@@ -42,6 +42,8 @@ namespace PAMELA
 		                                                 std::set<int>& Polyhedron_ghost);
 
 		void Add_NonTopologicalAdjacency(std::string label, Adjacency* adj) { NonTopologicalAdjacencyMap[label] = adj; }
+		void Add_NonTopologicalAdjacencySum(std::string label, std::vector<Adjacency*> sumAdj);
+
 		Adjacency* get_NonTopologicalAdjacency(std::string label) { return NonTopologicalAdjacencyMap.at(label); }
 
 	private:

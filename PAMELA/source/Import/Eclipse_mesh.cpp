@@ -969,6 +969,7 @@ namespace PAMELA
 				}
 				last_rowptr = csr_mat->rowPtr[irow + 1];
 				csr_mat->columnIndex.push_back(icol);
+				csr_mat->values.push_back(1);
 				csr_mat->nnz++;
 			}
 			std::fill(csr_mat->rowPtr.begin() + last_irow + 1, csr_mat->rowPtr.end(), last_rowptr);
@@ -979,7 +980,6 @@ namespace PAMELA
 	}
 
 	
-
 	void Eclipse_mesh::CreateEclipseGeneratedTrans()
 	{
 
@@ -987,13 +987,13 @@ namespace PAMELA
 		{
 			ASSERT(m_CellProperties_double.at("TRANX").size() == m_CellProperties_double.at("TRANY").size() && m_CellProperties_double.at("TRANY").size() == m_CellProperties_double.at("TRANZ").size(), "Size mismatch");
 
-			auto ntran = m_CellProperties_double.at("TRANX").size();
+			auto ntran = static_cast<int>(m_CellProperties_double.at("TRANX").size());
 			auto& tranx = m_CellProperties_double.at("TRANX");
 			auto& trany = m_CellProperties_double.at("TRANY");
 			auto& tranz = m_CellProperties_double.at("TRANZ");
 
 			TPFA temp_TPFA;
-			for (size_t i = 0; i != ntran; ++i)
+			for (auto i = 0; i != ntran; ++i)
 			{
 				auto ijk = m_Index2IJK.at(i);
 

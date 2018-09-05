@@ -47,6 +47,11 @@ namespace PAMELA
 		Polygon* addPolygon(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
 		Polyhedron* addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
 
+		//Add Implicit Elements
+		void AddImplicitLine(ELEMENTS::TYPE elementType, std::string groupLabel, std::vector<Point*>& pointList);
+
+
+
 		///Partitioning 
 		// This is a graph-based partitioning followed by the add of ghost elements according to ghostBaseElement parameter.
 		void PerformPolyhedronPartitioning(ELEMENTS::FAMILY edgeElement, ELEMENTS::FAMILY ghostBaseElement);
@@ -60,11 +65,15 @@ namespace PAMELA
 
 	protected:
 
-		//Element Collections - First owned then ghosts
+		//Explicit Element Collections - First owned then ghosts
 		PointCollection m_PointCollection;
 		LineCollection m_LineCollection;
 		PolygonCollection m_PolygonCollection;
 		PolyhedronCollection m_PolyhedronCollection;
+
+		//Implicit Element Collections
+		PointCollection m_ImplicitPointCollection;
+		LineCollection m_ImplicitLineCollection;
 
 		//Property
 		Property<PolyhedronCollection,double>* m_PolyhedronProperty_double;

@@ -9,23 +9,23 @@ namespace PAMELA
 {
 
 	enum class ECLIPSE_MESH_TYPE { VERTEX, EDGE, QUADRILATERAL, HEXAHEDRON };
+	enum class UNITS {FIELD,LAB,METRIC, UNKNOWN};
 
 	class Eclipse_mesh
 	{
 
 	public:
-		static Mesh* CreateMeshFromGRDECL(const File file);
-		static Mesh* CreateMeshFromEGRID(const File file);
+		static Mesh* CreateMeshFromGRDECL(File file);
+		static Mesh* CreateMeshFromEclipseBinaryFiles(File file);
 
 	private:
 
-		virtual ~Eclipse_mesh() = 0;//{ };
+		virtual ~Eclipse_mesh() = delete;
 
 		static void ParseStringFromGRDECL(std::string& str);
-		static void ParseStringFromEGRID(std::string& str);
+		static std::string ConvertFiletoString(File file);
+		static void ParseStringFromBinaryFile(std::string& str);
 		static std::string extractDataBelowKeyword(std::istringstream& string_block);
-		//static void get_slb_header(std::istringstream& content);
-		//static void get_slb_header(std::istringstream& content, char* keyword, int& n_item, char* keyword_type);
 		static Mesh* ConvertMesh();
 		static void FillMeshWithProperties(Mesh* mesh);
 
@@ -34,6 +34,9 @@ namespace PAMELA
 		static int m_nvertices;
 		static int m_nquadrilaterals;
 		static int m_nhexahedra;
+
+
+
 
 		///Eclipse file data
 
@@ -49,7 +52,6 @@ namespace PAMELA
 
 		};
 
-		
 		struct IJKHash
 		{
 			std::size_t operator()(const IJK& ele) const
@@ -57,7 +59,6 @@ namespace PAMELA
 				return ele.I+ ele.J*100000+ ele.K*1000000;
 			}
 		};
-
 
 		struct TPFA
 		{
@@ -74,6 +75,32 @@ namespace PAMELA
 			int downstream_index;
 			int upstream_index;
 			double transmissibility;
+
+		};
+
+		struct COMPLETION
+		{
+			COMPLETION(int h_index, double cf, double kh)
+			{
+				hosting_cell_index = h_index;
+				connection_factor = cf;
+				Kh = kh;
+			}
+			int hosting_cell_index;
+			double connection_factor;
+			double Kh;
+		};
+
+		struct WELL
+		{
+			WELL(int h_index, int nb_comp)
+			{
+				head_cell_index = h_index;
+				nb_completions = nb_comp;
+			}
+			int head_cell_index;
+			int nb_completions;
+			std::vector<COMPLETION> completions;
 
 		};
 
@@ -107,6 +134,11 @@ namespace PAMELA
 		static std::unordered_map<std::string, std::vector<int>> m_CellProperties_integer;
 		static std::unordered_map<std::string, std::vector<double>> m_OtherProperties_double;
 		static std::unordered_map<std::string, std::vector<int>> m_OtherProperties_integer;
+		static std::unordered_map<std::string, std::vector<char>> m_OtherProperties_char;
+
+		//Wells
+		static int m_nWells;
+		static std::unordered_map<std::string, WELL*> m_Wells;
 
 		static std::unordered_map<ECLIPSE_MESH_TYPE, ELEMENTS::TYPE> m_TypeMap;
 
@@ -121,31 +153,39 @@ namespace PAMELA
 
 		};
 
-		
+		static bool m_INIT_file;
+		static bool m_UNRST_file;
+		static int m_firstSEQ;
+
+		static UNITS m_UnitSystem;
 
 		//Egrid
 
 		template<class T>
-		static void EGRID_ExtractData(std::string& str, int& index, int dim, int type_size, std::vector<T>& output);
+		static void ExtractBinaryBlock(std::string& str, int& index, int dim, int type_size, std::vector<T>& output);
 
 		template<class T>
-		static void EGRID_ConvertData(std::string keyword, std::vector<T>& data)
+		static void ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<T>& data)
 		{
 			LOGINFO("     o Skipping " + keyword);
 		}
 
 		static void CreateAdjacencyFromTPFAdata(std::string label, std::vector<TPFA>& data, Mesh* mesh);
 		static void CreateEclipseGeneratedTrans();
+
+		static void CreateWellAndCompletion(Mesh* mesh);
 	};
 
         template<>
-            void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data);
+            void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<double>& data);
         template<>
-            void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<int>& data);
+            void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<int>& data);
+		template<>
+			void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<char>& data);
 
 
         template <class T>
-            void Eclipse_mesh::EGRID_ExtractData(std::string& str, int& index, int dim, int type_size, std::vector<T>& output)
+            void Eclipse_mesh::ExtractBinaryBlock(std::string& str, int& index, int dim, int type_size, std::vector<T>& output)
 	{
 		output.reserve(dim);
 

@@ -187,7 +187,7 @@ namespace PAMELA
 						}
 
 						mesh->addPolygon(elementType, nPolygon, grplabel, vertexTemp3);
-						mesh->get_PolygonCollection()->activeGroup(grplabel);
+						mesh->get_PolygonCollection()->MakeActiveGroup(grplabel);
 						nPolygon++;
 						m_ntriangles++;
 						break;
@@ -211,7 +211,7 @@ namespace PAMELA
 						}
 
 						mesh->addPolygon(elementType, nPolygon, grplabel, vertexTemp4);
-						mesh->get_PolygonCollection()->activeGroup(grplabel);
+						mesh->get_PolygonCollection()->MakeActiveGroup(grplabel);
 						nPolygon++;
 						m_nquadrangles++;
 						break;
@@ -235,7 +235,7 @@ namespace PAMELA
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp4);
-						mesh->get_PolyhedronCollection()->activeGroup(grplabel);
+						mesh->get_PolyhedronCollection()->MakeActiveGroup(grplabel);
 						nPolyhedron++;
 						m_ntetrahedra++;
 						break;
@@ -263,7 +263,7 @@ namespace PAMELA
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp8);
-						mesh->get_PolyhedronCollection()->activeGroup(grplabel);
+						mesh->get_PolyhedronCollection()->MakeActiveGroup(grplabel);
 						nPolyhedron++;
 						m_nhexahedra++;
 						break;
@@ -289,7 +289,7 @@ namespace PAMELA
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp6);
-						mesh->get_PolyhedronCollection()->activeGroup(grplabel);
+						mesh->get_PolyhedronCollection()->MakeActiveGroup(grplabel);
 						nPolyhedron++;
 						m_nprisms++;
 						break;
@@ -314,7 +314,7 @@ namespace PAMELA
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp5);
-						mesh->get_PolyhedronCollection()->activeGroup(grplabel);
+						mesh->get_PolyhedronCollection()->MakeActiveGroup(grplabel);
 						nPolyhedron++;
 						m_npyramids++;
 						break;

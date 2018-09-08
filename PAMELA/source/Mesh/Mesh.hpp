@@ -25,6 +25,8 @@ namespace PAMELA
 		PolygonCollection*  get_PolygonCollection() { return &m_PolygonCollection; }
 		PolyhedronCollection*  get_PolyhedronCollection() { return &m_PolyhedronCollection; }
 
+		LineCollection*  get_ImplicitLineCollection() { return &m_ImplicitLineCollection; }
+
 		Property<PolyhedronCollection, double>* get_PolyhedronProperty_double() const { return m_PolyhedronProperty_double; }
 		Property<PolyhedronCollection, int>* get_PolyhedronProperty_int() const { return m_PolyhedronProperty_int; }
 

@@ -59,6 +59,24 @@ namespace PAMELA
 		FillParts("PART" + PartitionNumberForExtension() + "_" + "LINE", &m_LineParts);
 
 
+		//------------------------------------------------------------- ImplicitLineCollection -------------------------------------------------------------
+		auto ImplicitLineCollection = m_mesh->get_ImplicitLineCollection();
+		auto ActiveGroupMapImplicitLine = ImplicitLineCollection->get_ActiveGroupsMap();
+
+		//--Add active parts
+		for (auto it = ActiveGroupMapImplicitLine.begin(); it != ActiveGroupMapImplicitLine.end(); ++it)	//Loop over group and act on active groups
+		{
+			if (it->second)
+			{
+				std::string grplabel = it->first;
+				auto groupEnsemble = ImplicitLineCollection->get_Group(grplabel);
+				m_LineParts[grplabel] = new Part<Line*>(grplabel, partIndex, groupEnsemble);
+				partIndex++;
+			}
+		}
+		FillParts("PART" + PartitionNumberForExtension() + "_" + "LINE", &m_LineParts);
+
+
 		//------------------------------------------------------------- PolygonCollection -------------------------------------------------------------
 		auto PolygonCollection = m_mesh->get_PolygonCollection();
 		auto ActiveGroupMapPolygon = PolygonCollection->get_ActiveGroupsMap();

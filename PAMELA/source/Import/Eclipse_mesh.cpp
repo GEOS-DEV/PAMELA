@@ -33,11 +33,21 @@ namespace PAMELA
 	std::unordered_map<int, int> Eclipse_mesh::m_IndexTotal2Active;
 	std::unordered_map<ECLIPSE_MESH_TYPE, ELEMENTS::TYPE> Eclipse_mesh::m_TypeMap;
 
+	bool Eclipse_mesh::m_INIT_file=false;
+	bool Eclipse_mesh::m_UNRST_file=false;
+
+	int Eclipse_mesh::m_firstSEQ=-1;
+
+	UNITS  Eclipse_mesh::m_UnitSystem = UNITS::UNKNOWN;
 
 	std::unordered_map<std::string, std::vector<double>> Eclipse_mesh::m_CellProperties_double;
 	std::unordered_map<std::string, std::vector<int>> Eclipse_mesh::m_CellProperties_integer;
 	std::unordered_map<std::string, std::vector<double>> Eclipse_mesh::m_OtherProperties_double;
 	std::unordered_map<std::string, std::vector<int>> Eclipse_mesh::m_OtherProperties_integer;
+	std::unordered_map<std::string, std::vector<char>> Eclipse_mesh::m_OtherProperties_char;
+
+	int Eclipse_mesh::m_nWells=0;
+	std::unordered_map<std::string, Eclipse_mesh::WELL*> Eclipse_mesh::m_Wells;
 
 	void Eclipse_mesh::InitElementsMapping()
 	{
@@ -159,15 +169,50 @@ namespace PAMELA
 
 	}
 
-
-	/**
-	 * \brief
-	 * \param file
-	 * \return
-	 */
-	Mesh* Eclipse_mesh::CreateMeshFromEGRID(File egrid_file)
+	std::string Eclipse_mesh::ConvertFiletoString(File file)
 	{
+		std::string file_content("A");
+		std::string file_name("N/A");
+		int file_length = 0;
 
+		if (Communicator::worldRank() == 0)
+		{
+			file_name = file.getFullName();
+			file_length = static_cast<int>(file_name.size());
+			std::ifstream file_stream(file_name, std::ios::binary);
+			std::istreambuf_iterator<char> b(file_stream), e;
+			file_content = std::string(b, e);
+			file_stream.close();
+		}
+
+#ifdef WITH_MPI
+		//Broadcast the file name (String)
+		MPI_Bcast(&file_length, 1, MPI_INT, 0, MPI_COMM_WORLD);
+		file_name.resize(file_length);
+		MPI_Bcast(&file_name[0], file_length, MPI_CHARACTER, 0, MPI_COMM_WORLD);
+		MPI_Barrier(MPI_COMM_WORLD);
+#endif
+
+		if (Communicator::worldRank() == 0)
+		{
+			//Parse File content
+			LOGINFO("---- Parsing " + file_name);
+			file_length = static_cast<int>(file_content.size());
+		}
+
+#ifdef WITH_MPI
+		//Broadcast the file content (String)
+		MPI_Bcast(&file_length, 1, MPI_INT, 0, MPI_COMM_WORLD);
+		file_content.resize(file_length);
+		MPI_Bcast(&file_content[0], file_length, MPI_CHARACTER, 0, MPI_COMM_WORLD);
+		MPI_Barrier(MPI_COMM_WORLD);
+#endif
+
+		return file_content;
+	}
+
+	Mesh* Eclipse_mesh::CreateMeshFromEclipseBinaryFiles(File egrid_file)
+	{
 
 		//Init map
 		InitElementsMapping();
@@ -182,11 +227,23 @@ namespace PAMELA
 		int nfiles = 1;
 
 
+		//EGRID file
+
+
 		////Search for INIT file
 		File init_file = File(egrid_file.getDirectory() + "/" + egrid_file.getNameWithoutExtension() + ".INIT");
 		if (init_file.exists())
 		{
-			file_list.push_back(init_file.getFullName());
+			m_INIT_file = true;
+			nfiles++;
+		}
+
+
+		////Search for UNRST file
+		File restart_file = File(egrid_file.getDirectory() + "/" + egrid_file.getNameWithoutExtension() + ".UNRST");
+		if (restart_file.exists())
+		{
+			m_UNRST_file = true;
 			nfiles++;
 		}
 
@@ -208,66 +265,62 @@ namespace PAMELA
 		MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
-		for (auto ifile = 0; ifile != nfiles; ++ifile)
+		//EGRID
+		LOGINFO("*** Parsing EGRID file");
+		std::string file_content = ConvertFiletoString(egrid_file);
+		ParseStringFromBinaryFile(file_content);
+
+		//INIT
+		if (m_INIT_file)
 		{
-			std::string file_content("A");
-			std::string file_name("N/A");
-			int file_length = 0;
+			LOGINFO("*** Parsing INIT file");
+			file_content.clear();
+			file_content = ConvertFiletoString(init_file);
+			ParseStringFromBinaryFile(file_content);
+		}
+		else
+		{
+			LOGINFO("*** INIT file not found");
+		}
+		
 
-			if (irank == 0)
-			{
-				file_name = file_list[ifile];
-				file_length = static_cast<int>(file_name.size());
-				std::ifstream file_stream(file_name, std::ios::binary);
-				std::istreambuf_iterator<char> b(file_stream), e;
-				file_content = std::string(b, e);
-				file_stream.close();
-			}
-
-#ifdef WITH_MPI
-			//Broadcast the file name (String)
-			MPI_Bcast(&file_length, 1, MPI_INT, 0, MPI_COMM_WORLD);
-			file_name.resize(file_length);
-			MPI_Bcast(&file_name[0], file_length, MPI_CHARACTER, 0, MPI_COMM_WORLD);
-			MPI_Barrier(MPI_COMM_WORLD);
-#endif
-
-			if (irank == 0)
-			{
-
-				//Parse File content
-				LOGINFO("---- Parsing " + file_name);
-				file_length = static_cast<int>(file_content.size());
-			}
-
-#ifdef WITH_MPI
-			//Broadcast the file content (String)
-			MPI_Bcast(&file_length, 1, MPI_INT, 0, MPI_COMM_WORLD);
-			file_content.resize(file_length);
-			MPI_Bcast(&file_content[0], file_length, MPI_CHARACTER, 0, MPI_COMM_WORLD);
-			MPI_Barrier(MPI_COMM_WORLD);
-#endif
-
-			ParseStringFromEGRID(file_content);
+		//UNRST
+		if (m_UNRST_file)
+		{
+			LOGINFO("*** Parsing RESTART file");
+			file_content.clear();
+			file_content = ConvertFiletoString(restart_file);
+			ParseStringFromBinaryFile(file_content);
+		}
+		else
+		{
+			LOGINFO("*** RESTART file not found");
 		}
 
+		
 		//Convert mesh into internal format
-		LOGINFO("*** Converting into internal mesh format");
+		LOGINFO("*** Converting content into internal mesh format");
 		auto mesh = ConvertMesh();
 
 		//Create transmissibility from egrid/init
+		LOGINFO("*** Generating TPFA data structure from imported content");
 		CreateEclipseGeneratedTrans();
 
 		//Fill mesh with imported properties
 		LOGINFO("*** Filling mesh with imported properties");
 		FillMeshWithProperties(mesh);
 
+		//Create adjacency from TPFA data
+		LOGINFO("*** Generating TPFA adjacency graph");
 		CreateAdjacencyFromTPFAdata("PreProc", m_EclipseGeneratedTrans, mesh);
 
 		//Create NNC adjacency
+		LOGINFO("*** Generating NNCs adjacency graph");
 		CreateAdjacencyFromTPFAdata("NNCs", m_NNCs, mesh);
 
-		//CreateNNCAdjacency(mesh);
+		//Wells
+		LOGINFO("*** Generating Well & Completion data");
+		CreateWellAndCompletion(mesh);
 
 		return mesh;
 
@@ -472,7 +525,7 @@ namespace PAMELA
 						vertexTemp[6] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]);
 
 						//Hexa
-						mesh->get_PolyhedronCollection()->activeGroup("POLYHEDRON_GROUP");
+						mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP");
 						auto returned_element = mesh->addPolyhedron(m_TypeMap[ECLIPSE_MESH_TYPE::HEXAHEDRON], icell, "POLYHEDRON_GROUP", vertexTemp);
 
 						if (returned_element != nullptr)
@@ -711,9 +764,9 @@ namespace PAMELA
 
 	}
 
-	void Eclipse_mesh::ParseStringFromEGRID(std::string& str)
+	void Eclipse_mesh::ParseStringFromBinaryFile(std::string& str)
 	{
-
+		std::string prefix;
 		int index = 0;
 		do
 		{
@@ -746,49 +799,61 @@ namespace PAMELA
 			StringUtils::RemoveTab(keyword);
 			StringUtils::Trim(keyword);
 
-
 			if (ktype == "INTE")
 			{
 				int kdim = 4;
 				std::vector<int> data;
-				EGRID_ExtractData(str, index, ksize, kdim, data);
-				EGRID_ConvertData(keyword, data);
+				ExtractBinaryBlock(str, index, ksize, kdim, data);
+
+				if (keyword == "SEQNUM")		//for UNRST file
+				{
+					prefix = "_SEQNUM_" + std::to_string(data[0]);
+					if (m_firstSEQ==-1)
+					{
+						m_firstSEQ = data[0];
+					}
+				}
+				else
+				{
+					ConvertBinaryBlock(keyword, prefix, data);
+				}
+				
 			}
 			else if (ktype == "REAL")
 			{
 				int kdim = 4;
 				std::vector<float> data;
-				EGRID_ExtractData(str, index, ksize, kdim, data);
+				ExtractBinaryBlock(str, index, ksize, kdim, data);
 				std::vector<double> temp(data.begin(), data.end());
-				EGRID_ConvertData(keyword, temp);
+				ConvertBinaryBlock(keyword, prefix, temp);
 			}
 			else if (ktype == "CHAR")
 			{
 				int kdim = 8;
 				std::vector <char> data;
-				EGRID_ExtractData(str, index, ksize, kdim, data);
-				EGRID_ConvertData(keyword, data);
+				ExtractBinaryBlock(str, index, ksize, kdim, data);
+				ConvertBinaryBlock(keyword, prefix, data);
 			}
 			else if (ktype == "LOGI")
 			{
 				int kdim = 4;
 				std::vector <bool> data;
-				EGRID_ExtractData(str, index, ksize, kdim, data);
-				EGRID_ConvertData(keyword, data);
+				ExtractBinaryBlock(str, index, ksize, kdim, data);
+				ConvertBinaryBlock(keyword, prefix, data);
 			}
 			else if (ktype == "DOUB")
 			{
 				int kdim = 8;
 				std::vector <double> data;
-				EGRID_ExtractData(str, index, ksize, kdim, data);
-				EGRID_ConvertData(keyword, data);
+				ExtractBinaryBlock(str, index, ksize, kdim, data);
+				ConvertBinaryBlock(keyword, prefix, data);
 			}
 			else
 			{
 				LOGWARNING(ktype + " EGRID type not supported");
 			}
 
-		} while (index < str.size());
+		} while (index < static_cast<int>(str.size()));
 
 		auto jj = 4;
 
@@ -815,7 +880,7 @@ namespace PAMELA
 	}
 
 	template<>
-	void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<double>& data)
+	void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<double>& data)
 	{
 		if (keyword == "COORD")
 		{
@@ -841,19 +906,19 @@ namespace PAMELA
 			if ((data.size() == m_nActiveCells) || (data.size() == m_nTotalCells))//|| (data.size() == m_nNNCs))
 			{
 				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
-				m_CellProperties_double[keyword] = data;
+				m_CellProperties_double[keyword + label_prefix] = data;
 			}
 			else
 			{
 				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
-				m_OtherProperties_double[keyword] = data;
+				m_OtherProperties_double[keyword  + label_prefix] = data;
 			}
 		}
 
 	}
 
 	template<>
-	void Eclipse_mesh::EGRID_ConvertData(std::string keyword, std::vector<int>& data)
+	void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<int>& data)
 	{
 		if (keyword == "GRIDHEAD")
 		{
@@ -921,27 +986,36 @@ namespace PAMELA
 			if ((data.size() == m_nActiveCells) || (data.size() == m_nTotalCells))//|| (data.size() == m_nNNCs))
 			{
 				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
-				m_CellProperties_integer[keyword] = data;//std::vector<double>(data.begin(), data.end());
+				m_CellProperties_integer[keyword + label_prefix] = data;
 			}
 			else
 			{
 				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
-				m_OtherProperties_integer[keyword] = data;//std::vector<double>(data.begin(), data.end());
+				m_OtherProperties_integer[keyword  + label_prefix] = data;
 			}
 		}
 
 
 	}
 
+	template<>
+	void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<char>& data)
+	{
+
+		LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
+		m_OtherProperties_char[keyword + label_prefix] = data;
+
+
+	}
 
 	void Eclipse_mesh::CreateAdjacencyFromTPFAdata(std::string label, std::vector<TPFA>& data, Mesh* mesh)
 	{
+		auto new_adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::UNKNOWN, mesh->get_PolyhedronCollection(), mesh->get_PolyhedronCollection(), nullptr);
 
-		if (data.size() > 0)
+		if (!data.empty())
 		{
-			auto new_adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::UNKNOWN, mesh->get_PolyhedronCollection(), mesh->get_PolyhedronCollection(), nullptr);
+			
 			auto csr_mat = new_adj->get_adjacencySparseMatrix();
-
 			auto nb_polyhedron = mesh->get_PolyhedronCollection()->size_all();
 			csr_mat->fillEmpty(static_cast<int>(nb_polyhedron), static_cast<int>(nb_polyhedron));
 
@@ -974,12 +1048,11 @@ namespace PAMELA
 			}
 			std::fill(csr_mat->rowPtr.begin() + last_irow + 1, csr_mat->rowPtr.end(), last_rowptr);
 			csr_mat->checkMatrix();
-			mesh->getAdjacencySet()->Add_NonTopologicalAdjacency(label, new_adj);
 		}
+		mesh->getAdjacencySet()->Add_NonTopologicalAdjacency(label, new_adj);
 
 	}
 
-	
 	void Eclipse_mesh::CreateEclipseGeneratedTrans()
 	{
 
@@ -1043,5 +1116,87 @@ namespace PAMELA
 		}
 
 		
+	}
+
+	void Eclipse_mesh::CreateWellAndCompletion(Mesh* mesh)
+	{
+		//Import well data
+		if (m_OtherProperties_integer.find("INTEHEAD")!= m_OtherProperties_integer.end())
+		{
+
+			std::string seq_prefix = "_SEQNUM_" + std::to_string(m_firstSEQ);
+
+			auto intehead = m_OtherProperties_integer.at("INTEHEAD"+ seq_prefix);
+			m_nWells = intehead[16];
+			auto niwelz = intehead[24];
+			auto iwel = m_OtherProperties_integer.at("IWEL" + seq_prefix);
+			auto scon = m_OtherProperties_double.at("SCON" + seq_prefix);
+			auto icon = m_OtherProperties_integer.at("ICON" + seq_prefix);
+			auto nsconz= intehead[33];
+			auto niconz = intehead[32];
+			auto ncwmax= intehead[17];
+			for (size_t iw=0;iw!= m_nWells;++iw)
+			{
+				std::vector<int> sub_iwel(&iwel[0 + iw*niwelz], &iwel[(iw+1)*(niwelz - 1)]);
+				auto well_type = sub_iwel[6];
+				std::string label;
+				if (well_type==1)
+				{
+					label = "PRODUCER";
+				}
+				else if (well_type == 2)
+				{
+					label = "OIL_INJECTOR";
+				}
+				else if (well_type == 3)
+				{
+					label = "WATER_INJECTOR";
+				}
+				else if (well_type == 4)
+				{
+					label = "GAS_INJECTOR";
+				}
+				label = label + "_" + std::to_string(iw);
+
+				auto icell = m_IJK2Index.at(IJK(sub_iwel[0]-1, sub_iwel[1]-1, sub_iwel[2]-1));
+				auto nb_comp = sub_iwel[4];
+				auto well = m_Wells[label] = new WELL(icell,nb_comp);
+				std::vector<double> sub_scon(&scon[0 + iw * ncwmax * nsconz], &scon[(iw + 1)*(ncwmax * nsconz - 1)]);
+				std::vector<int> sub_icon(&icon[0 + iw * ncwmax * niconz], &icon[(iw + 1)*(ncwmax * niconz - 1)]);
+				for (size_t ic = 0; ic != nb_comp; ++ic)
+				{
+					std::vector<double> sub_sub_scon(&sub_scon[0 + ic*nsconz], &sub_scon[(ic + 1)*(nsconz - 1)]);
+					std::vector<int> sub_sub_icon(&sub_icon[0 + ic * niconz], &sub_icon[(ic + 1)*(niconz - 1)]);
+					auto cf = sub_sub_scon[0];
+					auto kh = sub_sub_scon[3];
+					auto icell_comp = m_IJK2Index.at(IJK(sub_sub_icon[1] - 1, sub_sub_icon[2] - 1, sub_sub_icon[3] - 1));
+					well->completions.push_back(COMPLETION(icell_comp, cf, kh));
+				}
+
+			}
+
+		}
+
+		//Create line and point groups
+		auto polyhedron_collection = mesh->get_PolyhedronCollection();
+		for (auto itw=m_Wells.begin(); itw != m_Wells.end();++itw)
+		{
+			std::vector<Point*> vecpoint;
+			auto well = itw->second;
+			auto hcindex = well->head_cell_index;
+			auto itpol = polyhedron_collection->begin_owned() + hcindex;
+			auto xyz = (*itpol)->get_centroidCoordinates();
+			vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz[0], xyz[1], 0));
+			auto comps = well->completions;
+			for (size_t ic = 0; ic != well->nb_completions; ++ic)
+			{
+				auto cell_index = comps[ic].hosting_cell_index;
+				auto itpol2 = polyhedron_collection->begin_owned() + cell_index;
+				auto xyz2 = (*itpol2)->get_centroidCoordinates();
+				vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz2[0], xyz2[1], xyz2[2]));
+			}
+			mesh->AddImplicitLine(ELEMENTS::TYPE::VTK_LINE, itw->first, vecpoint);
+			mesh->get_ImplicitLineCollection()->MakeActiveGroup(itw->first);
+		}
 	}
 }

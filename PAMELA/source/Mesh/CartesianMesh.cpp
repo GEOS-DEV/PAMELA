@@ -246,14 +246,14 @@ namespace PAMELA
 		}
 
 		//By default all polyhedron groups are active, only polygon boundary groups are active
-		m_PolygonCollection.activeGroup("North");
-		m_PolygonCollection.activeGroup("South");
-		m_PolygonCollection.activeGroup("East");
-		m_PolygonCollection.activeGroup("West");
-		m_PolygonCollection.activeGroup("Top");
-		m_PolygonCollection.activeGroup("Bottom");
+		m_PolygonCollection.MakeActiveGroup("North");
+		m_PolygonCollection.MakeActiveGroup("South");
+		m_PolygonCollection.MakeActiveGroup("East");
+		m_PolygonCollection.MakeActiveGroup("West");
+		m_PolygonCollection.MakeActiveGroup("Top");
+		m_PolygonCollection.MakeActiveGroup("Bottom");
 
-		m_PolyhedronCollection.activeGroup("DEFAULT");
+		m_PolyhedronCollection.MakeActiveGroup("DEFAULT");
 
 
 	}

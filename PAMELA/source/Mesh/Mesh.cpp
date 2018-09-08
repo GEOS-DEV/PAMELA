@@ -373,6 +373,8 @@ namespace PAMELA
 		auto columIndex = csr_matrix->columnIndex;
 		auto rowPtr = csr_matrix->rowPtr;
 
+		int nb_lines = 0;
+		int nb_points = 0;
 
 		if ((adjacency->get_sourceFamily() == ELEMENTS::FAMILY::POLYHEDRON) && (adjacency->get_targetFamily() == ELEMENTS::FAMILY::POLYHEDRON))
 		{
@@ -380,41 +382,48 @@ namespace PAMELA
 
 			//Compute Node coordinates
 			int isource = 0, itarget = 0, ipoint = static_cast<int>(m_PointCollection.size_owned()) , iline = static_cast<int>(m_LineCollection.size_owned());
-			int cpt = 0;
+			
 			for (auto irow = 0; irow != dimRow; ++irow)
 			{
-				auto it = get_PolyhedronCollection()->begin_owned() + irow;
-				auto xyz1 = (*it)->get_centroidCoordinates();
-				auto source_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz1[0], xyz1[1], xyz1[2]);
-				auto source_rpoint = point_collection.AddElement(Label, source_point);
-				++ipoint;
-				itarget = isource;
-				for (auto icol = rowPtr[irow]; icol != rowPtr[irow + 1]; ++icol)
+				if (rowPtr[irow + 1]- rowPtr[irow]>0)
 				{
-					if (icol!= columIndex[icol])
+					auto it = get_PolyhedronCollection()->begin_owned() + irow;
+					auto xyz1 = (*it)->get_centroidCoordinates();
+					auto source_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz1[0], xyz1[1], xyz1[2]);
+					auto source_rpoint = point_collection.AddElement(Label, source_point);
+					++ipoint; ++nb_points;
+					itarget = isource;
+					for (auto icol = rowPtr[irow]; icol != rowPtr[irow + 1]; ++icol)
 					{
-						itarget = itarget + 1;
-						auto it = get_PolyhedronCollection()->begin_owned() + columIndex[icol];
-						auto xyz2 = (*it)->get_centroidCoordinates();
-						auto target_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz2[0], xyz2[1], xyz2[2]);
-						auto target_rpoint = point_collection.AddElement(Label, target_point);
-						++ipoint;
-						auto edgev = { source_rpoint , target_rpoint };
-						auto edge = ElementFactory::makeLine(ELEMENTS::TYPE::VTK_LINE, iline, edgev);
-						++iline;
-						auto redge = line_collection.AddElement(Label, edge);
+						if (icol != columIndex[icol])
+						{
+							itarget = itarget + 1;
+							auto it = get_PolyhedronCollection()->begin_owned() + columIndex[icol];
+							auto xyz2 = (*it)->get_centroidCoordinates();
+							auto target_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz2[0], xyz2[1], xyz2[2]);
+							auto target_rpoint = point_collection.AddElement(Label, target_point);
+							++ipoint;
+							auto edgev = { source_rpoint , target_rpoint };
+							auto edge = ElementFactory::makeLine(ELEMENTS::TYPE::VTK_LINE, iline, edgev);
+							++iline;
+							auto redge = line_collection.AddElement(Label, edge);
+						}
+
 					}
-					
+					isource = itarget + 1;
+					nb_lines++;
 				}
-				isource = itarget + 1;
-				cpt++;
 			}
 
 		}
-
-		m_LineCollection.activeGroup(Label);
-		m_PointCollection.activeGroup(Label);
-
+		if (nb_lines >0)
+		{
+			m_LineCollection.MakeActiveGroup(Label);
+		}
+		if (nb_points > 0)
+		{
+			m_PointCollection.MakeActiveGroup(Label);
+		}
 
 	}
 

@@ -7,6 +7,7 @@
 #include <vtkMultiProcessController.h>
 #include <vtkMPIController.h>
 #include <ctime>
+#include "Elements/ElementFactory.hpp"
 
 int main(int argc, char **argv) {
 
@@ -24,14 +25,8 @@ int main(int argc, char **argv) {
 	tstart = time(0);
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
-	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/ReducedNorne/IRAP_1005.GRDECL");
-	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/SPE9/SPE9_CP.EGRID");
-	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Sector/SECTOR.EGRID");
-	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Brugge/BRUGGE_0000.EGRID");
-	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Sector/SECTOR.EGRID");
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Norne/GRID/NORNE_ATW2013.EGRID");
-	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Skew_MPFAO/SKEWO.EGRID");
-
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/spe9/SPE9.EGRID");
+	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Norne/NORNE_ATW2013.EGRID");
 
 	MainMesh->CreateFacesFromCells();
 

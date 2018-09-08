@@ -128,7 +128,7 @@ namespace PAMELA
 					vertexTemp[1] = vertexcollection[v1 - 1];
 					vertexTemp[2] = vertexcollection[v2 - 1];
 					mesh->addPolygon(elementType, i, "POLYGON_GROUP_" + std::to_string(attribute), vertexTemp);
-					mesh->get_PolygonCollection()->activeGroup("POLYGON_GROUP_" + std::to_string(attribute));
+					mesh->get_PolygonCollection()->MakeActiveGroup("POLYGON_GROUP_" + std::to_string(attribute));
 				}
 				LOGINFO("Done");
 			}
@@ -155,7 +155,7 @@ namespace PAMELA
 					vertexTemp[2] = vertexcollection[v3 - 1];
 					vertexTemp[3] = vertexcollection[v2 - 1];
 					mesh->addPolygon(elementType, i, "POLYHEDRON_GROUP_" + std::to_string(attribute), vertexTemp);
-					mesh->get_PolyhedronCollection()->activeGroup("POLYHEDRON_GROUP_" + std::to_string(attribute));
+					mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP_" + std::to_string(attribute));
 				}
 				LOGINFO("Done");
 			}
@@ -183,7 +183,7 @@ namespace PAMELA
 					vertexTemp[2] = vertexcollection[v2 - 1];
 					vertexTemp[3] = vertexcollection[v3 - 1];
 					mesh->addPolyhedron(elementType, i, "POLYHEDRON_GROUP_" + std::to_string(attribute), vertexTemp);
-					mesh->get_PolyhedronCollection()->activeGroup("POLYHEDRON_GROUP_" + std::to_string(attribute));
+					mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP_" + std::to_string(attribute));
 				}
 				LOGINFO("Done");
 
@@ -215,7 +215,7 @@ namespace PAMELA
 					vertexTemp[6] = vertexcollection[v7 - 1];
 					vertexTemp[7] = vertexcollection[v6 - 1];
 					mesh->addPolyhedron(elementType, i, "POLYHEDRON_GROUP_" + std::to_string(attribute), vertexTemp);
-					mesh->get_PolyhedronCollection()->activeGroup("POLYHEDRON_GROUP_" + std::to_string(attribute));
+					mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP_" + std::to_string(attribute));
 				}
 				LOGINFO("Done");
 			}

@@ -35,7 +35,6 @@ int main(int argc, char **argv)
 	
 	//Partitioning
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
-	MainMesh->CreateLineGroupWithAdjacency("TopologicalC2C", MainMesh->getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
 
 	//Output

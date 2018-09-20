@@ -58,14 +58,14 @@ namespace PAMELA
 		//Iterators
 		typedef typename std::vector<T>::iterator collection_iterator;
 
-		collection_iterator begin() { return m_data.begin(); }
-		collection_iterator end() { return m_data.end(); }
+		collection_iterator begin() const { return m_data.begin(); }
+		collection_iterator end() const { return m_data.end(); }
 
-		collection_iterator begin_owned() { return m_data.begin(); }
-		collection_iterator end_owned() { return m_data.begin() + size_owned(); }
+		collection_iterator begin_owned() const { return m_data.begin(); }
+		collection_iterator end_owned() const { return m_data.begin() + size_owned(); }
 
-		collection_iterator begin_ghost() { return m_data.begin() + size_owned(); }
-		collection_iterator end_ghost() { return m_data.end(); }
+		collection_iterator begin_ghost() const { return m_data.begin() + size_owned(); }
+		collection_iterator end_ghost() const { return m_data.end(); }
 
 		//Operators
 		T &operator[](size_t i) { return m_data[i]; }

@@ -1,5 +1,6 @@
 #include "Adjacency/AdjacencySet.hpp"
 #include "Utils/Logger.hpp"
+#include "Utils/Range.hpp"
 #include "Elements/Polyhedron.hpp"
 #include "Adjacency/Adjacency.hpp"
 
@@ -57,9 +58,8 @@ namespace PAMELA
 		//Topological
 		auto adjacency = get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON);
 		auto new_adjacency = ClearAfterPartitioning_Topological(adjacency, PolygonOwned, PolygonGhost);
-		delete adjacency;
 		TopologicalAdjacencyMap.clear();
-		TopologicalAdjacencyMap[std::make_tuple(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON)] = new_adjacency;
+		TopologicalAdjacencyMap[std::make_tuple(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON)] = std::move(new_adjacency);
 
 		//Others
 
@@ -78,32 +78,32 @@ namespace PAMELA
 
 
 
-	Adjacency* AdjacencySet::ClearAfterPartitioning_Topological(Adjacency* adjacency, std::set<int>& PolygonOwned, std::set<int>& PolygonGhost)
+	Adjacency AdjacencySet::ClearAfterPartitioning_Topological(Adjacency* adjacency, std::set<int>& PolygonOwned, std::set<int>& PolygonGhost)
 	{
-		auto polyhedra = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
-		auto polygons = static_cast<PolygonCollection*>(adjacency->get_targetElementCollection());
-		auto csr_matrix = adjacency->get_adjacencySparseMatrix();
+		const auto& polyhedra = static_cast<const PolyhedronCollection&>(adjacency->get_sourceElementCollection());
+		const auto& polygons = static_cast<const PolygonCollection&>(adjacency->get_targetElementCollection());
+		const auto& csr_matrix = adjacency->get_adjacencySparseMatrix();
 
-		auto dimRow = csr_matrix->dimRow;
-		auto nnz = csr_matrix->nnz;
-		auto& columIndex = csr_matrix->columnIndex;
-		auto& rowPtr = csr_matrix->rowPtr;
-		auto& val = csr_matrix->values;
-		auto dimColumn = csr_matrix->dimColumn;
+		auto dimRow = csr_matrix.dimRow;
+		auto nnz = csr_matrix.nnz;
+		auto& columIndex = csr_matrix.columnIndex;
+		auto& rowPtr = csr_matrix.rowPtr;
+		auto& val = csr_matrix.values;
+		auto dimColumn = csr_matrix.dimColumn;
 
-		auto new_csr_matrix = new CSRMatrix;
-		auto& new_dimRow_ghost = new_csr_matrix->dimRow_ghost = static_cast<int>(polyhedra->size_ghost());
-		auto& new_dimRow_owned = new_csr_matrix->dimRow_owned = static_cast<int>(polyhedra->size_owned());
-		auto& new_dimRow = new_csr_matrix->dimRow = static_cast<int>(polyhedra->size_all());
-		auto& new_dimColumn_ghost = new_csr_matrix->dimColumn_ghost = static_cast<int>(polygons->size_ghost());
-		auto& new_dimColumn_owned = new_csr_matrix->dimColumn_owned = static_cast<int>(polygons->size_owned());
-		auto& new_dimColumn = new_csr_matrix->dimColumn = static_cast<int>(polygons->size_all());
-		auto& new_nnz = new_csr_matrix->nnz = 0;
-		auto& new_columIndex = new_csr_matrix->columnIndex;
-		auto& new_rowPtr = new_csr_matrix->rowPtr;
-		auto& new_val = new_csr_matrix->values;
+		CSRMatrix new_csr_matrix;
+		auto& new_dimRow_ghost = new_csr_matrix.dimRow_ghost = static_cast<int>(polyhedra.size_ghost());
+		auto& new_dimRow_owned = new_csr_matrix.dimRow_owned = static_cast<int>(polyhedra.size_owned());
+		auto& new_dimRow = new_csr_matrix.dimRow = static_cast<int>(polyhedra.size_all());
+		auto& new_dimColumn_ghost = new_csr_matrix.dimColumn_ghost = static_cast<int>(polygons.size_ghost());
+		auto& new_dimColumn_owned = new_csr_matrix.dimColumn_owned = static_cast<int>(polygons.size_owned());
+		auto& new_dimColumn = new_csr_matrix.dimColumn = static_cast<int>(polygons.size_all());
+		auto& new_nnz = new_csr_matrix.nnz = 0;
+		auto& new_columIndex = new_csr_matrix.columnIndex;
+		auto& new_rowPtr = new_csr_matrix.rowPtr;
+		auto& new_val = new_csr_matrix.values;
 
-		for (auto it = polyhedra->begin(); it != polyhedra->end(); ++it)
+		for (auto it = polyhedra.begin(); it != polyhedra.end(); ++it)
 		{
 			auto polyhedron_global_index = (*it)->get_globalIndex();
 			auto polyhedron_local_index = (*it)->get_localIndex();
@@ -118,7 +118,7 @@ namespace PAMELA
 
 				if ((PolygonOwned.count(polygon_global_index) == 1) || (PolygonGhost.count(polygon_global_index) == 1))	//face is in the partition
 				{
-					auto polygon_local_index = polygons->get_GlobalToLocalIndex().at(polygon_global_index);
+					auto polygon_local_index = polygons.get_GlobalToLocalIndex().at(polygon_global_index);
 					temp.push_back(polygon_local_index);
 					new_val.push_back(polyhedron_local_index);
 					++new_nnz;
@@ -128,11 +128,13 @@ namespace PAMELA
 			new_columIndex.insert(new_columIndex.end(), temp.begin(), temp.end());
 			new_rowPtr.push_back(new_nnz);
 		}
-		return new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, polyhedra, polyhedra, polygons, new_csr_matrix);
+                Adjacency adj(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, polyhedra, polyhedra, polygons);
+                adj.set_adjacencySparseMatrix(new_csr_matrix);
+		return adj;
 	}
 
 
-	Adjacency* AdjacencySet::ClearAfterPartitioning_NonTopological(Adjacency* adjacency, std::set<int>& Polyhedron_owned, std::set<int>& Polyhedron_ghost)
+	Adjacency AdjacencySet::ClearAfterPartitioning_NonTopological(Adjacency* adjacency, std::set<int>& Polyhedron_owned, std::set<int>& Polyhedron_ghost)
 	{
 		auto polyhedra = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
 		auto csr_matrix = adjacency->get_adjacencySparseMatrix();
@@ -213,7 +215,7 @@ namespace PAMELA
 
 
 	// Polyhedra to Points adjacency 
-	Adjacency* AdjacencySet::get_TopologicalAdjacency(PolyhedronCollection* source, PointCollection* target, PolyhedronCollection* base)
+	Adjacency* AdjacencySet::get_TopologicalAdjacency(const PolyhedronCollection& source, const PointCollection& target, const PolyhedronCollection& base)
 	{
 
 		Adjacency* adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, source, target, base);
@@ -254,7 +256,7 @@ namespace PAMELA
 	}
 
 	// Points to Polyhedra adjacency 
-	Adjacency* AdjacencySet::get_TopologicalAdjacency(PointCollection* source, PolyhedronCollection* target, PolyhedronCollection* base)
+	Adjacency* AdjacencySet::get_TopologicalAdjacency(const PointCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base)
 	{
 		Adjacency* adj = Adjacency::transposed(get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON));
 		return adj;
@@ -262,14 +264,14 @@ namespace PAMELA
 
 
 	// Polyhedra to Face adjacency
-	Adjacency* AdjacencySet::get_TopologicalAdjacency(PolyhedronCollection* source, PolygonCollection* target, PolyhedronCollection* base)
+	Adjacency* AdjacencySet::get_TopologicalAdjacency(const PolyhedronCollection& source, const PolygonCollection& target, const PolyhedronCollection& base)
 	{
 
 		LOGERROR("This adjacency must be created while creating Polygons from Polyhedra");
 		return nullptr;
 	}
 
-	Adjacency* AdjacencySet::get_TopologicalAdjacency(PolygonCollection* source, PolyhedronCollection* target, PolyhedronCollection* base)
+	Adjacency* AdjacencySet::get_TopologicalAdjacency(const PolygonCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base)
 	{
 
 		Adjacency* adj = Adjacency::transposed(get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON));
@@ -278,7 +280,7 @@ namespace PAMELA
 
 
 
-	Adjacency* AdjacencySet::get_TopologicalAdjacency(PolyhedronCollection* source, PolyhedronCollection* target, PolygonCollection* base)
+	Adjacency* AdjacencySet::get_TopologicalAdjacency(const PolyhedronCollection& source, const PolyhedronCollection& target, const PolygonCollection& base)
 	{
 		Adjacency* adj1 = get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON);
 		Adjacency* adj2 = get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON);

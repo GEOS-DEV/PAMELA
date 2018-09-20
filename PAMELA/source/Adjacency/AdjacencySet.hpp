@@ -36,9 +36,9 @@ namespace PAMELA
 		//General getter
 		Adjacency* get_TopologicalAdjacency(ELEMENTS::FAMILY source, ELEMENTS::FAMILY target, ELEMENTS::FAMILY base);
 		void ClearAfterPartitioning(std::set<int>& PolyhedronOwned, std::set<int>& PolyheronGhost, std::set<int>& PolygonOwned, std::set<int>& PolygonGhost);
-		Adjacency* ClearAfterPartitioning_Topological(Adjacency* adj, std::set<int>& PolygonOwned,
+		Adjacency ClearAfterPartitioning_Topological(Adjacency* adj, std::set<int>& PolygonOwned,
 		                                        std::set<int>& PolygonGhost);
-		Adjacency* ClearAfterPartitioning_NonTopological(Adjacency* adjacency, std::set<int>& Polyhedron_owned,
+		Adjacency ClearAfterPartitioning_NonTopological(Adjacency* adjacency, std::set<int>& Polyhedron_owned,
 		                                                 std::set<int>& Polyhedron_ghost);
 
 		void Add_NonTopologicalAdjacency(std::string label, Adjacency* adj) { NonTopologicalAdjacencyMap[label] = adj; }
@@ -54,15 +54,15 @@ namespace PAMELA
 		Adjacency* adjacencyExist(ELEMENTS::FAMILY source, ELEMENTS::FAMILY target, ELEMENTS::FAMILY base);
 
 		//Adjacency storage
-		std::unordered_map<std::string, Adjacency*> NonTopologicalAdjacencyMap;
-		std::unordered_map<familyTriplet, Adjacency*, TripletHash> TopologicalAdjacencyMap;
+		std::unordered_map<std::string, Adjacency> NonTopologicalAdjacencyMap;
+		std::unordered_map<familyTriplet, Adjacency, TripletHash> TopologicalAdjacencyMap;
 
 		//Adjacency internal getter or builder
-		Adjacency* get_TopologicalAdjacency(PolyhedronCollection* source, PointCollection* target, PolyhedronCollection* base);
-		Adjacency* get_TopologicalAdjacency(PointCollection* source, PolyhedronCollection* target, PolyhedronCollection* base);
-		Adjacency* get_TopologicalAdjacency(PolyhedronCollection* source, PolygonCollection* target, PolyhedronCollection* base);
-		Adjacency* get_TopologicalAdjacency(PolygonCollection* source, PolyhedronCollection* target, PolyhedronCollection* base);
-		Adjacency* get_TopologicalAdjacency(PolyhedronCollection* source, PolyhedronCollection* target, PolygonCollection* base);
+		Adjacency* get_TopologicalAdjacency(const PolyhedronCollection& source, const PointCollection& target, const PolyhedronCollection& base);
+		Adjacency* get_TopologicalAdjacency(const PointCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base);
+		Adjacency* get_TopologicalAdjacency(const PolyhedronCollection& source, const PolygonCollection& target, const PolyhedronCollection& base);
+		Adjacency* get_TopologicalAdjacency(const PolygonCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base);
+		Adjacency* get_TopologicalAdjacency(const PolyhedronCollection& source, const PolyhedronCollection& target, const PolygonCollection& base);
 
 
 	};

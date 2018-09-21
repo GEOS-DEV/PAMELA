@@ -19,18 +19,19 @@ namespace PAMELA
 		return std::make_pair(columnIndexVec, valuesVec);
 	}
 
-	Adjacency* Adjacency::transposed(Adjacency* input)
+        //TODO maybe we can do a version of this method 
+	Adjacency Adjacency::transposed(const Adjacency& input)
 	{
-		Adjacency* adj = new Adjacency(input->get_targetFamily(), input->get_sourceFamily(), input->get_baseFamily(), input->m_targetElementCollection, input->m_sourceElementCollection, input->m_baseElementCollection);
-		adj->set_adjacencySparseMatrix(*CSRMatrix::transpose(&input->m_adjacencySparseMatrix));
+		Adjacency adj(input.get_targetFamily(), input.get_sourceFamily(), input.get_baseFamily(), input.m_targetElementCollection, input.m_sourceElementCollection, input.m_baseElementCollection);
+		adj.set_adjacencySparseMatrix(CSRMatrix::transpose(&input.m_adjacencySparseMatrix));
 		return  adj;
 	}
 
 
-	Adjacency* Adjacency::multiply(Adjacency* input_lhs, Adjacency* input_rhs)
+	Adjacency Adjacency::multiply(const Adjacency& input_lhs, const Adjacency& input_rhs)
 	{
-		Adjacency* adj = new Adjacency(input_rhs->get_targetFamily(), input_lhs->get_sourceFamily(), input_lhs->get_targetFamily(), input_rhs->m_targetElementCollection, input_lhs->m_sourceElementCollection, input_lhs->m_targetElementCollection);
-		adj->set_adjacencySparseMatrix(*CSRMatrix::product(&input_lhs->m_adjacencySparseMatrix, &input_rhs->m_adjacencySparseMatrix));
+		Adjacency* adj = new Adjacency(input_rhs.et_targetFamily(), input_lhs.get_sourceFamily(), input_lhs.get_targetFamily(), input_rhs.m_targetElementCollection, input_lhs.m_sourceElementCollection, input_lhs.m_targetElementCollection);
+		adj->set_adjacencySparseMatrix(*CSRMatrix::product(&input_lhs.m_adjacencySparseMatrix, &input_rhs.m_adjacencySparseMatrix));
 		return adj;
 	}
 	

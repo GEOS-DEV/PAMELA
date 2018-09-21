@@ -58,11 +58,11 @@ namespace PAMELA
 		std::unordered_map<familyTriplet, Adjacency, TripletHash> TopologicalAdjacencyMap;
 
 		//Adjacency internal getter or builder
-		Adjacency* get_TopologicalAdjacency(const PolyhedronCollection& source, const PointCollection& target, const PolyhedronCollection& base);
-		Adjacency* get_TopologicalAdjacency(const PointCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base);
-		Adjacency* get_TopologicalAdjacency(const PolyhedronCollection& source, const PolygonCollection& target, const PolyhedronCollection& base);
-		Adjacency* get_TopologicalAdjacency(const PolygonCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base);
-		Adjacency* get_TopologicalAdjacency(const PolyhedronCollection& source, const PolyhedronCollection& target, const PolygonCollection& base);
+		Adjacency get_TopologicalAdjacency(const PolyhedronCollection& source, const PointCollection& target, const PolyhedronCollection& base);
+		Adjacency get_TopologicalAdjacency(const PointCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base);
+		Adjacency get_TopologicalAdjacency(const PolyhedronCollection& source, const PolygonCollection& target, const PolyhedronCollection& base);
+		Adjacency get_TopologicalAdjacency(const PolygonCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base);
+		Adjacency get_TopologicalAdjacency(const PolyhedronCollection& source, const PolyhedronCollection& target, const PolygonCollection& base);
 
 
 	};

@@ -136,29 +136,29 @@ namespace PAMELA
 
 	Adjacency AdjacencySet::ClearAfterPartitioning_NonTopological(Adjacency* adjacency, std::set<int>& Polyhedron_owned, std::set<int>& Polyhedron_ghost)
 	{
-		auto polyhedra = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
+		const auto& polyhedra = static_cast<const PolyhedronCollection&>(adjacency->get_sourceElementCollection());
 		auto csr_matrix = adjacency->get_adjacencySparseMatrix();
 
-		auto dimRow = csr_matrix->dimRow;
-		auto nnz = csr_matrix->nnz;
-		auto& columIndex = csr_matrix->columnIndex;
-		auto& rowPtr = csr_matrix->rowPtr;
-		auto& val = csr_matrix->values;
-		auto dimColumn = csr_matrix->dimColumn;
+		auto dimRow = csr_matrix.dimRow;
+		auto nnz = csr_matrix.nnz;
+		auto& columIndex = csr_matrix.columnIndex;
+		auto& rowPtr = csr_matrix.rowPtr;
+		auto& val = csr_matrix.values;
+		auto dimColumn = csr_matrix.dimColumn;
 
-		auto new_csr_matrix = new CSRMatrix;
-		auto& new_dimRow_ghost = new_csr_matrix->dimRow_ghost = static_cast<int>(polyhedra->size_ghost());
-		auto& new_dimRow_owned = new_csr_matrix->dimRow_owned = static_cast<int>(polyhedra->size_owned());
-		auto& new_dimRow = new_csr_matrix->dimRow = static_cast<int>(polyhedra->size_all());
-		auto& new_dimColumn_ghost = new_csr_matrix->dimColumn_ghost = static_cast<int>(polyhedra->size_ghost());
-		auto& new_dimColumn_owned = new_csr_matrix->dimColumn_owned = static_cast<int>(polyhedra->size_owned());
-		auto& new_dimColumn = new_csr_matrix->dimColumn = static_cast<int>(polyhedra->size_all());
-		auto& new_nnz = new_csr_matrix->nnz = 0;
-		auto& new_columIndex = new_csr_matrix->columnIndex;
-		auto& new_rowPtr = new_csr_matrix->rowPtr;
-		auto& new_val = new_csr_matrix->values;
+		CSRMatrix new_csr_matrix;
+		auto& new_dimRow_ghost = new_csr_matrix.dimRow_ghost = static_cast<int>(polyhedra.size_ghost());
+		auto& new_dimRow_owned = new_csr_matrix.dimRow_owned = static_cast<int>(polyhedra.size_owned());
+		auto& new_dimRow = new_csr_matrix.dimRow = static_cast<int>(polyhedra.size_all());
+		auto& new_dimColumn_ghost = new_csr_matrix.dimColumn_ghost = static_cast<int>(polyhedra.size_ghost());
+		auto& new_dimColumn_owned = new_csr_matrix.dimColumn_owned = static_cast<int>(polyhedra.size_owned());
+		auto& new_dimColumn = new_csr_matrix.dimColumn = static_cast<int>(polyhedra.size_all());
+		auto& new_nnz = new_csr_matrix.nnz = 0;
+		auto& new_columIndex = new_csr_matrix.columnIndex;
+		auto& new_rowPtr = new_csr_matrix.rowPtr;
+		auto& new_val = new_csr_matrix.values;
 
-		for (auto it = polyhedra->begin(); it != polyhedra->end(); ++it)
+		for (auto it = polyhedra.begin(); it != polyhedra.end(); ++it)
 		{
 			auto polyhedron_global_index = (*it)->get_globalIndex();
 			auto polyhedron_local_index = (*it)->get_localIndex();
@@ -173,7 +173,7 @@ namespace PAMELA
 
 				if ((Polyhedron_owned.count(polyhedron2_global_index) == 1) || (Polyhedron_ghost.count(polyhedron2_global_index) == 1))	//face is in the partition
 				{
-					auto polyhedron2_local_index = polyhedra->get_GlobalToLocalIndex().at(polyhedron2_global_index);
+					auto polyhedron2_local_index = polyhedra.get_GlobalToLocalIndex().at(polyhedron2_global_index);
 					temp.push_back(polyhedron2_local_index);
 					new_val.push_back(polyhedron_local_index);
 					++new_nnz;
@@ -183,7 +183,9 @@ namespace PAMELA
 			new_columIndex.insert(new_columIndex.end(), temp.begin(), temp.end());
 			new_rowPtr.push_back(new_nnz);
 		}
-		return new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, polyhedra, polyhedra, polyhedra, new_csr_matrix);
+                Adjacency adj(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON, polyhedra, polyhedra, polyhedra);
+                adj.set_adjacencySparseMatrix(new_csr_matrix);
+		return adj;
 	}
 
 	void AdjacencySet::Add_NonTopologicalAdjacencySum(std::string label, std::vector<Adjacency*> sumAdj)
@@ -193,7 +195,7 @@ namespace PAMELA
 
 		auto csr1 = adjacency1->get_adjacencySparseMatrix();
 		auto csr2 = adjacency2->get_adjacencySparseMatrix();
-		auto csr_sum = CSRMatrix::sum(csr1, csr2);
+		auto csr_sum = CSRMatrix::sum(&csr1, &csr2);
 		auto adj1_sourceFamily = adjacency1->get_sourceFamily();
 		auto adj1_targetFamily = adjacency1->get_targetFamily();
 		auto adj1_baseFamily = adjacency1->get_baseFamily();
@@ -209,56 +211,58 @@ namespace PAMELA
 		ASSERT(adj1_sourceFamily == adj2_sourceFamily, "Non matching source elements");
 		ASSERT(adj1_baseFamily == adj2_baseFamily, "Non matching base elements");
 		ASSERT(adj1_targetFamily == adj2_targetFamily, "Non matching target elements");
-		auto adjacency_sum = new Adjacency(adj1_sourceFamily, adj1_targetFamily, adj1_baseFamily, adj1_source, adj1_target, adj1_base, csr_sum);
+                Adjacency adjacency_sum(adj1_sourceFamily, adj1_targetFamily, adj1_baseFamily, adj1_source, adj1_target, adj1_base);
+                adjacency_sum.set_adjacencySparseMatrix(*csr_sum);
 		NonTopologicalAdjacencyMap[label] = adjacency_sum;
 	}
 
 
 	// Polyhedra to Points adjacency 
-	Adjacency* AdjacencySet::get_TopologicalAdjacency(const PolyhedronCollection& source, const PointCollection& target, const PolyhedronCollection& base)
+	Adjacency AdjacencySet::get_TopologicalAdjacency(const PolyhedronCollection& source, const PointCollection& target, const PolyhedronCollection& base)
 	{
 
-		Adjacency* adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, source, target, base);
-		auto collectionSize = source->size_all();
+		Adjacency adj(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON, source, target, base);
+		auto collectionSize = source.size_all();
 		int nbVertex = 0;
 		int vertexIndex = 0;
 		int PolyhedronIndex = 0;
 		int nval = 0;
 		int nrow = 0;
 
-		auto csr_mat = adj->get_adjacencySparseMatrix();
+		auto csr_mat = adj.get_adjacencySparseMatrix();
 
-		csr_mat->rowPtr[0];
+		csr_mat.rowPtr[0];
 		for (size_t i = 0; i != collectionSize; i++)
 		{
-			Polyhedron* polyhedron = source->operator[](static_cast<int>(i));
+			Polyhedron* polyhedron = source[(static_cast<int>(i))];
 			PolyhedronIndex = polyhedron->get_localIndex();
 			const std::vector<Point*>& vertexList = polyhedron->get_vertexList();
 			nbVertex = static_cast<int>(vertexList.size());
 			for (auto j = 0; j < nbVertex; j++)
 			{
 				vertexIndex = vertexList[j]->get_localIndex();
-				csr_mat->columnIndex.push_back(vertexIndex);
-				csr_mat->values.push_back(PolyhedronIndex);
+				csr_mat.columnIndex.push_back(vertexIndex);
+				csr_mat.values.push_back(PolyhedronIndex);
 				nval++;
 			}
 			nrow++;
-			csr_mat->rowPtr[nrow] = nval;
+			csr_mat.rowPtr[nrow] = nval;
 		}
-		csr_mat->nnz = nval;
-		csr_mat->sortRowIndexAndMoveValues();
-		csr_mat->checkMatrix();
+		csr_mat.nnz = nval;
+		csr_mat.sortRowIndexAndMoveValues();
+		csr_mat.checkMatrix();
 
 		//Add to map
-		TopologicalAdjacencyMap[std::make_tuple(source->get_family(), target->get_family(), base->get_family())] = adj;
+                //TODO side effect of the function ?
+		TopologicalAdjacencyMap[std::make_tuple(source.get_family(), target.get_family(), base.get_family())] = adj;
 
 		return adj;
 	}
 
 	// Points to Polyhedra adjacency 
-	Adjacency* AdjacencySet::get_TopologicalAdjacency(const PointCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base)
+	Adjacency AdjacencySet::get_TopologicalAdjacency(const PointCollection& source, const PolyhedronCollection& target, const PolyhedronCollection& base)
 	{
-		Adjacency* adj = Adjacency::transposed(get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON));
+		auto adj = Adjacency::transposed(get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POINT, ELEMENTS::FAMILY::POLYHEDRON));
 		return adj;
 	}
 

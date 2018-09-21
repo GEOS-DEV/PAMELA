@@ -33,8 +33,8 @@ namespace PAMELA
                 void set_adjacencySparseMatrix(const CSRMatrix& adjacencySparseMatrix){m_adjacencySparseMatrix = adjacencySparseMatrix;}
 
 		//Utils
-		static Adjacency* transposed(Adjacency* input);
-		static Adjacency* multiply(Adjacency* input_lhs, Adjacency* input_rhs);
+		static Adjacency transposed(const Adjacency& input);
+		static Adjacency multiply(const Adjacency& input_lhs, const Adjacency& input_rhs);
 		
 		const ParallelEnsembleBase& get_sourceElementCollection() const { return m_sourceElementCollection; }
 		const ParallelEnsembleBase& get_targetElementCollection() const { return m_targetElementCollection; }

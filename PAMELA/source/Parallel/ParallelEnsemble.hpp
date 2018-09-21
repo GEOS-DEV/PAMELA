@@ -68,7 +68,7 @@ namespace PAMELA
 		collection_iterator end_ghost() const { return m_data.end(); }
 
 		//Operators
-		T &operator[](size_t i) { return m_data[i]; }
+		T &operator[](size_t i) const { return m_data[i]; }
 
 
 		//Push back T

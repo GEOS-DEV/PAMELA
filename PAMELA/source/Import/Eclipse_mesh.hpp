@@ -35,12 +35,7 @@ namespace PAMELA
 		static int m_nquadrilaterals;
 		static int m_nhexahedra;
 
-
-
-
 		///Eclipse file data
-
-
 		struct IJK
 		{
 			IJK() { I = -1; J = -1; K = -1; }

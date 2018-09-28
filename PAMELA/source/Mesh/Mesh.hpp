@@ -57,8 +57,7 @@ namespace PAMELA
 		///Partitioning 
 		// This is a graph-based partitioning followed by the add of ghost elements according to ghostBaseElement parameter.
 		void PerformPolyhedronPartitioning(ELEMENTS::FAMILY edgeElement, ELEMENTS::FAMILY ghostBaseElement);
-		std::vector<int> METISPartitioning(Adjacency* adjacency, int npartition);
-		std::vector<int> TRIVIALPartitioning();
+		
 
 		//Adjacency
 		void CreateLineGroupWithAdjacency(std::string Label, Adjacency* adjacency);
@@ -83,6 +82,9 @@ namespace PAMELA
 
 		//Adjacency
 		AdjacencySet* m_AdjacencySet;
+
+		std::vector<int> METISPartitioning(Adjacency* adjacency, int npartition);
+		std::vector<int> TRIVIALPartitioning();
 
 	};
 

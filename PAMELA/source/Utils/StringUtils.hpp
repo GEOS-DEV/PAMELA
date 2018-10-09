@@ -47,7 +47,7 @@ namespace PAMELA
 				v.push_back(sub);
 			}
 
-		};
+		}
 
 		//template<typename T>
 		//void StringToVector(std::string& data, std::vector<T>& v)
@@ -80,7 +80,7 @@ namespace PAMELA
 		{
 			std::istringstream iss(data);
 			iss >> v;
-		};
+		}
 
 
 
@@ -105,13 +105,13 @@ namespace PAMELA
 				}
 			}
 			ASSERT(cpt == 0, " Data size must be a multiple of ChopSize");
-		};
+		}
 
 
 		// safe version of getline avoiding format differences between windows and linux
 		std::istream& safeGetline(std::istream& is, std::string& t);
 
-	};
+	}
 
 
 }

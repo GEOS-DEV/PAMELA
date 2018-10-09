@@ -12,8 +12,12 @@
 namespace PAMELA
 {
 
-	namespace utils
-	{
+    namespace utils
+    {
+        template< typename T>
+            bool nearlyEqual(T a, T b, T epsilon = 1e-6) {
+                return std::fabs(a - b) < epsilon;
+            }
 
 		/* CUSTOM COPY FUNCTIONS */
 		// Call std::copy when iterator value type is the same for input and output and std::transform otherwise

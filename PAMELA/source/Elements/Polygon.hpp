@@ -5,6 +5,7 @@
 #include "Line.hpp"
 #include "Elements/Element.hpp"
 #include "Utils/Assert.hpp"
+#include "Utils/Utils.hpp"
 
 namespace PAMELA
 {
@@ -149,7 +150,7 @@ namespace PAMELA
 		ElementSpe(int index, const std::vector<Point*>& vertexList) :Element(index, vertexList)
 		{
 			ELEMENTS::nVertex.at(m_vtkType);
-			ASSERT(vertexList.size() == ELEMENTS::nVertex.at(elementType), "Vertex list size is not compatible with the element type");
+			ASSERT(vertexList.size() == static_cast<unsigned int>(ELEMENTS::nVertex.at(elementType)), "Vertex list size is not compatible with the element type");
 			ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
 			m_vtkType = elementType;
 		}

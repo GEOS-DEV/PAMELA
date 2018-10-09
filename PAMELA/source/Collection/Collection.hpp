@@ -10,6 +10,7 @@
 #include "Elements/Polygon.hpp"
 #include "Elements/Polyhedron.hpp"
 #include "Collection/ElementEnsemble.hpp"
+#include "Utils/Utils.hpp"
 
 namespace PAMELA
 {
@@ -81,9 +82,9 @@ namespace PAMELA
 	{
 		bool operator()(Point* lhs, Point* rhs) const
 		{
-			return		((lhs)->get_coordinates().x == (rhs)->get_coordinates().x)
-				&& ((lhs)->get_coordinates().y == (rhs)->get_coordinates().y)
-				&& ((lhs)->get_coordinates().z == (rhs)->get_coordinates().z);
+			return	utils::nearlyEqual((lhs)->get_coordinates().x,(rhs)->get_coordinates().x) &&
+				utils::nearlyEqual((lhs)->get_coordinates().y,(rhs)->get_coordinates().y) &&
+				utils::nearlyEqual((lhs)->get_coordinates().z,(rhs)->get_coordinates().z);
 		}
 	};
 

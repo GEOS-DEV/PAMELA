@@ -5,8 +5,10 @@
 #include "Parallel/Communicator.hpp"
 #include <thread>
 #include "MeshDataWriters/MeshDataWriterFactory.hpp"
+#ifdef WITH_VTK
 #include <vtkMultiProcessController.h>
 #include <vtkMPIController.h>
+#endif
 
 int main(int argc, char **argv) {
 
@@ -27,7 +29,7 @@ int main(int argc, char **argv) {
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
-	MainMesh->CreateLineGroupWithAdjacency("TopologicalC2C", MainMesh->getTopologicalMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
+	MainMesh->CreateLineGroupWithAdjacency("TopologicalC2C", MainMesh->getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
 	////-------------------------Output
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.vtm");

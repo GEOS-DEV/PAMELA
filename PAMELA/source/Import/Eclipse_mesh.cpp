@@ -25,7 +25,7 @@ namespace PAMELA
 	std::vector<unsigned int> Eclipse_mesh::m_SPECGRID = { 0,0,0 };
 	std::vector<double>  Eclipse_mesh::m_COORD = {};
 	std::vector<double>  Eclipse_mesh::m_ZCORN = {};
-	std::vector<unsigned int>  Eclipse_mesh::m_ACTNUM = {};
+	std::vector<int>  Eclipse_mesh::m_ACTNUM = {};
 	std::vector<Eclipse_mesh::TPFA>  Eclipse_mesh::m_NNCs = {};
 	std::vector<Eclipse_mesh::TPFA>  Eclipse_mesh::m_EclipseGeneratedTrans = {};
 	std::vector<double> Eclipse_mesh::m_Duplicate_Element;
@@ -366,7 +366,7 @@ namespace PAMELA
 		if (m_ACTNUM.size() == 0)
 		{
 			m_nActiveCells = m_nTotalCells;
-			m_ACTNUM = std::vector<unsigned int>(m_nTotalCells, 1);
+			m_ACTNUM = std::vector<int>(m_nTotalCells, 1);
 		}
 
 		int icellTotal = 0;
@@ -976,7 +976,7 @@ namespace PAMELA
 		else if (keyword == "NNC1")
 		{
 			LOGINFO("     o NNC1 processed");
-			for (auto i=0;i<m_nNNCs;++i)
+			for (unsigned int i=0;i<m_nNNCs;++i)
 			{
 				m_NNCs[i].downstream_index = data[i]-1;
 			}
@@ -984,7 +984,7 @@ namespace PAMELA
 		else if (keyword == "NNC2")
 		{
 			LOGINFO("     o NNC2 processed");
-			for (auto i = 0; i < m_nNNCs; ++i)
+			for (unsigned int i = 0; i < m_nNNCs; ++i)
 			{
 				m_NNCs[i].upstream_index = data[i]-1;
 			}
@@ -1171,7 +1171,7 @@ namespace PAMELA
 				auto well = m_Wells[label] = new WELL(icell,nb_comp);
 				std::vector<double> sub_scon(&scon[0 + iw * ncwmax * nsconz], &scon[(iw + 1)*(ncwmax * nsconz - 1)]);
 				std::vector<int> sub_icon(&icon[0 + iw * ncwmax * niconz], &icon[(iw + 1)*(ncwmax * niconz - 1)]);
-				for (size_t ic = 0; ic != nb_comp; ++ic)
+				for (int ic = 0; ic != nb_comp; ++ic)
 				{
 					std::vector<double> sub_sub_scon(&sub_scon[0 + ic*nsconz], &sub_scon[(ic + 1)*(nsconz - 1)]);
 					std::vector<int> sub_sub_icon(&sub_icon[0 + ic * niconz], &sub_icon[(ic + 1)*(niconz - 1)]);
@@ -1196,7 +1196,7 @@ namespace PAMELA
 			auto xyz = (*itpol)->get_centroidCoordinates();
 			vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz[0], xyz[1], 0));
 			auto comps = well->completions;
-			for (size_t ic = 0; ic != well->nb_completions; ++ic)
+			for (unsigned int ic = 0; ic != well->nb_completions; ++ic)
 			{
 				auto cell_index = comps[ic].hosting_cell_index;
 				auto itpol2 = polyhedron_collection->begin_owned() + cell_index;

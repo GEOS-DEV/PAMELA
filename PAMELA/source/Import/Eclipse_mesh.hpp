@@ -93,8 +93,8 @@ namespace PAMELA
 				head_cell_index = h_index;
 				nb_completions = nb_comp;
 			}
-			int head_cell_index;
-			int nb_completions;
+			unsigned int head_cell_index;
+			unsigned int nb_completions;
 			std::vector<COMPLETION> completions;
 
 		};
@@ -108,7 +108,8 @@ namespace PAMELA
 		static std::vector<unsigned int> m_SPECGRID;
 		static std::vector<double>  m_COORD;
 		static std::vector<double>  m_ZCORN;
-		static std::vector<unsigned int>  m_ACTNUM;
+		static std::vector<int>  m_ACTNUM;
+
 		static std::vector<TPFA>  m_NNCs;
 		static std::vector<TPFA>  m_EclipseGeneratedTrans;
 		static std::unordered_map<IJK,unsigned int, IJKHash> m_IJK2Index ;

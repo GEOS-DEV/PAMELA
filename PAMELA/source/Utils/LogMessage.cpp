@@ -13,20 +13,20 @@ namespace PAMELA
 
 	LogMessage* LogMessage::instance(VerbosityLevelLogFile lvl)
 	{
-		static LogMessage s_instance(lvl);
-		return &s_instance;
+		static LogMessage instance(lvl);
+		return &instance;
 	}
 
 	LogMessage::LogMessage()
 	{
 		m_message_level = VerbosityLevelLogFile::INFO;
 		m_message << "";
-	};
+	}
 
 	LogMessage::LogMessage(VerbosityLevelLogFile lvl)
 	{
 		m_message_level = lvl;
 		m_message << "";
-	};
+	}
 
 }

@@ -398,8 +398,8 @@ namespace PAMELA
 						if (icol != columIndex[icol])
 						{
 							itarget = itarget + 1;
-							auto it = get_PolyhedronCollection()->begin_owned() + columIndex[icol];
-							auto xyz2 = (*it)->get_centroidCoordinates();
+							auto it2 = get_PolyhedronCollection()->begin_owned() + columIndex[icol];
+							auto xyz2 = (*it2)->get_centroidCoordinates();
 							auto target_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz2[0], xyz2[1], xyz2[2]);
 							auto target_rpoint = point_collection.AddElement(Label, target_point);
 							++ipoint;

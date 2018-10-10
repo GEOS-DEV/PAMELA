@@ -23,8 +23,8 @@ namespace PAMELA
 		int partIndex = 1;
 
 		//------------------------------------------------------------- PointCollection -------------------------------------------------------------
-		auto PointCollection = m_mesh->get_PointCollection();
-		auto ActiveGroupMapPoint = PointCollection->get_ActiveGroupsMap();
+		auto pointCollection = m_mesh->get_PointCollection();
+		auto ActiveGroupMapPoint = pointCollection->get_ActiveGroupsMap();
 
 		//--Add active parts
 		for (auto it = ActiveGroupMapPoint.begin(); it != ActiveGroupMapPoint.end(); ++it)	//Loop over group and act on active groups
@@ -32,7 +32,7 @@ namespace PAMELA
 			if (it->second)
 			{
 				std::string grplabel = it->first;
-				auto groupEnsemble = PointCollection->get_Group(grplabel);
+				auto groupEnsemble = pointCollection->get_Group(grplabel);
 				m_PointParts[grplabel] = new Part<Point*>(grplabel, partIndex, groupEnsemble);
 				partIndex++;
 			}
@@ -42,8 +42,8 @@ namespace PAMELA
 
 
 		//------------------------------------------------------------- LineCollection -------------------------------------------------------------
-		auto LineCollection = m_mesh->get_LineCollection();
-		auto ActiveGroupMapLine = LineCollection->get_ActiveGroupsMap();
+		auto lineCollection = m_mesh->get_LineCollection();
+		auto ActiveGroupMapLine = lineCollection->get_ActiveGroupsMap();
 
 		//--Add active parts
 		for (auto it = ActiveGroupMapLine.begin(); it != ActiveGroupMapLine.end(); ++it)	//Loop over group and act on active groups
@@ -51,7 +51,7 @@ namespace PAMELA
 			if (it->second)
 			{
 				std::string grplabel = it->first;
-				auto groupEnsemble = LineCollection->get_Group(grplabel);
+				auto groupEnsemble = lineCollection->get_Group(grplabel);
 				m_LineParts[grplabel] = new Part<Line*>(grplabel, partIndex, groupEnsemble);
 				partIndex++;
 			}
@@ -78,8 +78,8 @@ namespace PAMELA
 
 
 		//------------------------------------------------------------- PolygonCollection -------------------------------------------------------------
-		auto PolygonCollection = m_mesh->get_PolygonCollection();
-		auto ActiveGroupMapPolygon = PolygonCollection->get_ActiveGroupsMap();
+		auto polygonCollection = m_mesh->get_PolygonCollection();
+		auto ActiveGroupMapPolygon = polygonCollection->get_ActiveGroupsMap();
 
 		//--Add active parts
 		for (auto it = ActiveGroupMapPolygon.begin(); it != ActiveGroupMapPolygon.end(); ++it)	//Loop over group and act on active groups
@@ -87,7 +87,7 @@ namespace PAMELA
 			if (it->second)
 			{
 				std::string grplabel = it->first;
-				auto groupEnsemble = PolygonCollection->get_Group(grplabel);
+				auto groupEnsemble = polygonCollection->get_Group(grplabel);
 				m_PolygonParts[grplabel] = new Part<Polygon*>(grplabel, partIndex, groupEnsemble);
 				partIndex++;
 			}
@@ -95,8 +95,8 @@ namespace PAMELA
 		FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYGON", &m_PolygonParts);
 
 		//------------------------------------------------------------- PolyhedronCollection -------------------------------------------------------------
-		auto PolyhedronCollection = m_mesh->get_PolyhedronCollection();
-		auto ActiveGroupMapPolyhedron = PolyhedronCollection->get_ActiveGroupsMap();
+		auto polyhedronCollection = m_mesh->get_PolyhedronCollection();
+		auto ActiveGroupMapPolyhedron = polyhedronCollection->get_ActiveGroupsMap();
 
 		//--Add active parts
 		for (auto it = ActiveGroupMapPolyhedron.begin(); it != ActiveGroupMapPolyhedron.end(); ++it)	//Loop over group and act on active groups
@@ -104,7 +104,7 @@ namespace PAMELA
 			if (it->second)
 			{
 				std::string grplabel = it->first;
-				auto groupEnsemble = PolyhedronCollection->get_Group(grplabel);
+				auto groupEnsemble = polyhedronCollection->get_Group(grplabel);
 				m_PolyhedronParts[grplabel] = new Part<Polyhedron*>(grplabel, partIndex, groupEnsemble);
 				partIndex++;
 			}

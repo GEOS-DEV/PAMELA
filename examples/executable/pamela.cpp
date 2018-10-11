@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
             input_mesh->CreateFacesFromCells();
             input_mesh->PerformPolyhedronPartitioning(
                     ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
-            input_mesh->CreateLineGroupWithAdjacency("TopologicalC2C", input_mesh->getMeshAdjacency()->get_Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
+	input_mesh->CreateLineGroupWithAdjacency("TopologicalC2C", input_mesh->getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
             MeshDataWriter* output_mesh = MeshDataWriterFactory::makeWriter(
                     input_mesh, output_mesh_filename);

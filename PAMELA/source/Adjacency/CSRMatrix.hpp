@@ -13,7 +13,7 @@ namespace PAMELA
 			values.resize(nnz);
 			rowPtr.resize(dim_row + 1);
 			columnIndex.resize(nnz);
-		};
+		}
 		CSRMatrix(int dim_row, int dim_col) :CSRMatrix(dim_row, dim_col, 0) {};
 		CSRMatrix() :CSRMatrix(0, 0, 0) {};
 

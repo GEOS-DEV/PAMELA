@@ -3,7 +3,9 @@ cmake_minimum_required (VERSION 3.1)
 
 project("PAMELA - PArallel MEsh LibrAry" CXX C)
 
-include(cmake/blt/SetupBLT.cmake)
+if(NOT ${BLT_LOADED})
+   include(cmake/blt/SetupBLT.cmake)
+ endif(NOT ${BLT_LOADED})
 
 include(cmake/PAMELA.cmake)
 

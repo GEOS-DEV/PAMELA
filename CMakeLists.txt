@@ -1,11 +1,11 @@
-#Definitions
 cmake_minimum_required (VERSION 3.1)
 
 project("PAMELA - PArallel MEsh LibrAry" CXX C)
 
-if(NOT ${BLT_LOADED})
+if("${BLT_LOADED}"  STREQUAL "")
+   message(STATUS "Loading blt")
    include(cmake/blt/SetupBLT.cmake)
- endif(NOT ${BLT_LOADED})
+ endif("${BLT_LOADED}"  STREQUAL "")
 
 include(cmake/PAMELA.cmake)
 

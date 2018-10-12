@@ -12,7 +12,6 @@ namespace PAMELA
 	{
 		std::ifstream mesh_file;
 		std::string file_contents("A");
-		int file_length = 0;
 
 		//Open file
 		mesh_file.open(filepath);
@@ -24,7 +23,6 @@ namespace PAMELA
 		//file_contents = { std::istreambuf_iterator<char>(mesh_file), std::istreambuf_iterator<char>() };
 
 		file_contents = buffer.str();
-		file_length = static_cast<int>(file_contents.size());
 
 		//Close file
 		mesh_file.close();
@@ -38,7 +36,6 @@ namespace PAMELA
 	{
 		std::ifstream mesh_file;
 		std::string file_contents("A");
-		int file_length = 0;
 
 		//Open file
 		mesh_file.open(filepath, std::ios::binary);
@@ -50,7 +47,6 @@ namespace PAMELA
 		//file_contents = { std::istreambuf_iterator<char>(mesh_file), std::istreambuf_iterator<char>() };
 
 		file_contents = buffer.str();
-		file_length = static_cast<int>(file_contents.size());
 
 		//Close file
 		mesh_file.close();
@@ -113,7 +109,7 @@ namespace PAMELA
 	void StringUtils::RemoveTab(std::vector<std::string>& v)
 	{
 
-		for (int i = 0; i < v.size(); i++)
+		for (unsigned int i = 0; i < v.size(); i++)
 		{
 			std::replace(v[i].begin(), v[i].end(), '\t', ' ');
 		}
@@ -124,7 +120,7 @@ namespace PAMELA
 	void StringUtils::RemoveEndOfLine(std::vector<std::string>& v)
 	{
 
-		for (int i = 0; i < v.size(); i++)
+		for (unsigned int i = 0; i < v.size(); i++)
 		{
 			std::replace(v[i].begin(), v[i].end(), '\n', ' ');
 		}

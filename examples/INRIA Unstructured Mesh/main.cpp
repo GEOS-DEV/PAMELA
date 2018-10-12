@@ -4,8 +4,10 @@
 #include "Parallel/Communicator.hpp"
 #include <thread>
 #include "MeshDataWriters/MeshDataWriterFactory.hpp"
+#ifdef WITH_VTK
 #include <vtkMultiProcessController.h>
 #include <vtkMPIController.h>
+#endif
 
 int main(int argc, char **argv) {
 

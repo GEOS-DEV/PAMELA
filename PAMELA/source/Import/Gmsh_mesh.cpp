@@ -36,7 +36,7 @@ namespace PAMELA
 		m_TypeMap[GMSH_MESH_TYPE::PRISM] = ELEMENTS::TYPE::VTK_WEDGE;
 		m_TypeMap[GMSH_MESH_TYPE::PYRAMID] = ELEMENTS::TYPE::VTK_PYRAMID;
 		m_TypeMap[GMSH_MESH_TYPE::POINT] = ELEMENTS::TYPE::VTK_VERTEX;
-	};
+	}
 
 	Mesh* Gmsh_mesh::CreateMesh(std::string file_path)
 	{
@@ -50,7 +50,9 @@ namespace PAMELA
 
 		std::ifstream mesh_file_;
 		std::string file_contents("A");
+#ifdef WITH_MPI
 		int file_length = 0;
+#endif
 
 		if (irank == 0)
 		{
@@ -60,7 +62,9 @@ namespace PAMELA
 
 			//Transfer file content into string for easing broadcast
 			file_contents = { std::istreambuf_iterator<char>(mesh_file_), std::istreambuf_iterator<char>() };
+#ifdef WITH_MPI
 			file_length = static_cast<int>(file_contents.size());
+#endif
 
 			//Close file
 			mesh_file_.close();

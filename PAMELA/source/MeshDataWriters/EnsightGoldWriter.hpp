@@ -157,7 +157,7 @@ namespace PAMELA
 					{
 						auto VertexList = (*it3)->get_vertexList();
 						auto nVertex = VertexList.size();
-						for (auto j = 0; j != nVertex; ++j)
+						for (unsigned int j = 0; j != nVertex; ++j)
 						{
 							m_geoFile << std::setw(10) << partptr->GlobalToLocalPointMapping.at(VertexList[j]->get_globalIndex()) + 1;
 						}

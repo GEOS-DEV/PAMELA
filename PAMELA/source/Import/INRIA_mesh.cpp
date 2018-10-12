@@ -26,7 +26,7 @@ namespace PAMELA
 		m_TypeMap[INRIA_MESH_TYPE::QUADRILATERAL] = ELEMENTS::TYPE::VTK_QUAD;
 		m_TypeMap[INRIA_MESH_TYPE::TETRAHEDRON] = ELEMENTS::TYPE::VTK_TETRA;
 		m_TypeMap[INRIA_MESH_TYPE::VERTEX] = ELEMENTS::TYPE::VTK_VERTEX;
-	};
+	}
 
 	Mesh* INRIA_mesh::CreateMesh(std::string file_path)
 	{
@@ -40,7 +40,9 @@ namespace PAMELA
 
 		std::ifstream mesh_file_;
 		std::string file_contents("A");
+#ifdef WITH_MPI
 		int file_length = 0;
+#endif
 
 		if (irank == 0)
 		{
@@ -50,7 +52,9 @@ namespace PAMELA
 
 			//Transfer file content into string for easing broadcast
 			file_contents = { std::istreambuf_iterator<char>(mesh_file_), std::istreambuf_iterator<char>() };
+#ifdef WITH_MPI
 			file_length = static_cast<int>(file_contents.size());
+#endif
 
 			//Close file
 			mesh_file_.close();

@@ -94,10 +94,10 @@ namespace PAMELA
 		std::string first;
 		std::string second;
 
-		VariableKey(std::string first, std::string second)
+		VariableKey(std::string First, std::string Second)
 		{
-			this->first = first;
-			this->second = second;
+			this->first = First;
+			this->second = Second;
 		}
 
 		bool operator==(const VariableKey &other) const

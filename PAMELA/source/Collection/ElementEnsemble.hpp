@@ -59,10 +59,8 @@ namespace PAMELA
 		//Push_back unique
 		T push_back_owned_unique(T data)
 		{
-			T returned_element = NULL;
 			auto index = static_cast<int>(this->end_owned() - this->begin_owned());
 			auto insertion = m_pointerToLocalIndex.insert(std::make_pair(data, index));
-			returned_element = insertion.first->first;
 			if (insertion.second) //the element is new and the map has been updated
 			{
 				this->m_data.insert(this->end_owned(), data);
@@ -94,10 +92,8 @@ namespace PAMELA
 
 		T push_back_unique(T data)   //To be use before partitioning
 		{
-			T returned_element = NULL;
 			int index = static_cast<int>(this->end() - this->begin());
 			auto insertion = m_pointerToLocalIndex.insert(std::make_pair(data, index));
-			returned_element = insertion.first->first;
 			if (insertion.second) //the element is new and the map has been updated
 			{
 				this->m_data.push_back(data);

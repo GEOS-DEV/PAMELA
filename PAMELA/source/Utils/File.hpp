@@ -17,12 +17,12 @@ public:
   std::string getShortName() const { return m_ShortName; }
   std::string getExtension() const { return m_Extension; }
   std::string getNameWithoutExtension() const { return m_NameWithoutExtension; }
-  bool exists() const 
+  bool exists() const
   {
-	  std::ifstream f(m_FullName); 
+	  std::ifstream f(m_FullName);
 	  return f.good();
   }
-  
+
 private:
 
   std::string m_FullName;

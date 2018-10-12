@@ -75,7 +75,7 @@ namespace PAMELA
 
 		};
 
-	};
+	}
 
 	/**
 	 * \brief Element base class
@@ -93,8 +93,8 @@ namespace PAMELA
 		//ElementBase(ELEMENTS::FAMILY family, ELEMENTS::TYPE elementType, int index, int partition_owner) : m_vtkType(elementType), m_family(family), m_index(index), m_partitionOwner(partition_owner) {};
 
 		//Getters
-		const int get_localIndex() const { return m_index.Local; }
-		const int get_globalIndex() const { return m_index.Global; }
+		int get_localIndex() const { return m_index.Local; }
+		int get_globalIndex() const { return m_index.Global; }
 		int get_dimension() { return ELEMENTS::dimension.at(m_family); };
 		ELEMENTS::FAMILY get_family() { return m_family; }
 		ELEMENTS::TYPE get_vtkType() { return m_vtkType; }

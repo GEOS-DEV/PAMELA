@@ -8,7 +8,7 @@ namespace PAMELA
 	struct Coordinates
 	{
 		Coordinates() :x(0), y(0), z(0) {}
-		Coordinates(double x, double y, double z) :x(x), y(y), z(z) {}
+		Coordinates(double xx, double yy, double zz) :x(xx), y(yy), z(zz) {}
 		double x, y, z;
 	};
 
@@ -19,7 +19,7 @@ namespace PAMELA
 		if (i0 < i1)
 			return i0;
 		return i1;
-	};
+	}
 
 
 	inline std::vector <double> cross_product(const std::vector <double>& vec1, const std::vector <double>& vec2)

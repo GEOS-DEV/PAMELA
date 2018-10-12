@@ -5,6 +5,7 @@
 #include <map>
 #include "Parallel/Communicator.hpp"
 #include "Utils/File.hpp"
+#include "Utils/Utils.hpp"
 #include "Adjacency/Adjacency.hpp"
 #include <algorithm>    // std::sort
 
@@ -12,25 +13,25 @@ namespace PAMELA
 {
 
 	std::string Eclipse_mesh::m_label;
-	int Eclipse_mesh::m_nvertices = 0;
-	int Eclipse_mesh::m_nquadrilaterals = 0;
-	int Eclipse_mesh::m_nhexahedra = 0;
+	unsigned int Eclipse_mesh::m_nvertices = 0;
+	unsigned int Eclipse_mesh::m_nquadrilaterals = 0;
+	unsigned int Eclipse_mesh::m_nhexahedra = 0;
 
-	int Eclipse_mesh::m_nCOORD = 0;
-	int Eclipse_mesh::m_nZCORN = 0;
-	int Eclipse_mesh::m_nActiveCells = 0;
-	int Eclipse_mesh::m_nTotalCells = 0;
-	int Eclipse_mesh::m_nNNCs = 0;
-	std::vector<int> Eclipse_mesh::m_SPECGRID = { 0,0,0 };
+	unsigned int Eclipse_mesh::m_nCOORD = 0;
+	unsigned int Eclipse_mesh::m_nZCORN = 0;
+	unsigned int Eclipse_mesh::m_nActiveCells = 0;
+	unsigned int Eclipse_mesh::m_nTotalCells = 0;
+	unsigned int Eclipse_mesh::m_nNNCs = 0;
+	std::vector<unsigned int> Eclipse_mesh::m_SPECGRID = { 0,0,0 };
 	std::vector<double>  Eclipse_mesh::m_COORD = {};
 	std::vector<double>  Eclipse_mesh::m_ZCORN = {};
 	std::vector<int>  Eclipse_mesh::m_ACTNUM = {};
 	std::vector<Eclipse_mesh::TPFA>  Eclipse_mesh::m_NNCs = {};
 	std::vector<Eclipse_mesh::TPFA>  Eclipse_mesh::m_EclipseGeneratedTrans = {};
 	std::vector<double> Eclipse_mesh::m_Duplicate_Element;
-	std::unordered_map<Eclipse_mesh::IJK, int, Eclipse_mesh::IJKHash> Eclipse_mesh::m_IJK2Index;
-	std::unordered_map<int, Eclipse_mesh::IJK> Eclipse_mesh::m_Index2IJK;
-	std::unordered_map<int, int> Eclipse_mesh::m_IndexTotal2Active;
+	std::unordered_map<Eclipse_mesh::IJK, unsigned int, Eclipse_mesh::IJKHash> Eclipse_mesh::m_IJK2Index;
+	std::unordered_map<unsigned int, Eclipse_mesh::IJK> Eclipse_mesh::m_Index2IJK;
+	std::unordered_map<unsigned int, unsigned int> Eclipse_mesh::m_IndexTotal2Active;
 	std::unordered_map<ECLIPSE_MESH_TYPE, ELEMENTS::TYPE> Eclipse_mesh::m_TypeMap;
 
 	bool Eclipse_mesh::m_INIT_file=false;
@@ -46,7 +47,7 @@ namespace PAMELA
 	std::unordered_map<std::string, std::vector<int>> Eclipse_mesh::m_OtherProperties_integer;
 	std::unordered_map<std::string, std::vector<char>> Eclipse_mesh::m_OtherProperties_char;
 
-	int Eclipse_mesh::m_nWells=0;
+	unsigned int Eclipse_mesh::m_nWells=0;
 	std::unordered_map<std::string, Eclipse_mesh::WELL*> Eclipse_mesh::m_Wells;
 
 	void Eclipse_mesh::InitElementsMapping()
@@ -55,7 +56,7 @@ namespace PAMELA
 		m_TypeMap[ECLIPSE_MESH_TYPE::HEXAHEDRON] = ELEMENTS::TYPE::VTK_HEXAHEDRON;
 		m_TypeMap[ECLIPSE_MESH_TYPE::QUADRILATERAL] = ELEMENTS::TYPE::VTK_QUAD;
 		m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX] = ELEMENTS::TYPE::VTK_VERTEX;
-	};
+	}
 
 	Mesh* Eclipse_mesh::CreateMeshFromGRDECL(File file)
 	{
@@ -70,7 +71,6 @@ namespace PAMELA
 
 		std::ifstream mesh_file_;
 		std::string file_content("A");
-		int file_length = 0;
 
 		std::vector<std::string> file_list;
 		file_list.push_back(file.getFullName());
@@ -120,12 +120,16 @@ namespace PAMELA
 		{
 
 			std::string file_name;
+#ifdef WITH_MPI
 			int file_length = 0;
+#endif
 
 			if (irank == 0)
 			{
 				file_name = file_list[ifile];
+#ifdef WITH_MPI
 				file_length = static_cast<int>(file_name.size());
+#endif
 			}
 
 #ifdef WITH_MPI
@@ -142,7 +146,9 @@ namespace PAMELA
 				//Parse File content
 				LOGINFO("---- Parsing " + file_name);
 				file_content = StringUtils::FileToString(file_name);
+#ifdef WITH_MPI
 				file_length = static_cast<int>(file_content.size());
+#endif
 			}
 
 #ifdef WITH_MPI
@@ -173,12 +179,16 @@ namespace PAMELA
 	{
 		std::string file_content("A");
 		std::string file_name("N/A");
+#ifdef WITH_MPI
 		int file_length = 0;
+#endif
 
 		if (Communicator::worldRank() == 0)
 		{
 			file_name = file.getFullName();
+#ifdef WITH_MPI
 			file_length = static_cast<int>(file_name.size());
+#endif
 			std::ifstream file_stream(file_name, std::ios::binary);
 			std::istreambuf_iterator<char> b(file_stream), e;
 			file_content = std::string(b, e);
@@ -197,7 +207,9 @@ namespace PAMELA
 		{
 			//Parse File content
 			LOGINFO("---- Parsing " + file_name);
+#ifdef WITH_MPI
 			file_length = static_cast<int>(file_content.size());
+#endif
 		}
 
 #ifdef WITH_MPI
@@ -329,7 +341,6 @@ namespace PAMELA
 	Mesh* Eclipse_mesh::ConvertMesh()
 	{
 		Mesh* mesh = new UnstructuredMesh();
-		ELEMENTS::TYPE elementType;
 		std::vector<Point*> vertexTemp = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 
 		mesh->get_PolyhedronCollection()->addAndCreateGroup("POLYHEDRON_GROUP");
@@ -346,7 +357,7 @@ namespace PAMELA
 
 
 		std::vector<int> layer;
-		std::vector<double> actnum;
+		std::vector<unsigned int> actnum;
 		std::vector<double> duplicate_polyhedron;
 		layer.reserve(nx*ny*nz);
 		actnum.reserve(nx*ny*nz);
@@ -369,9 +380,6 @@ namespace PAMELA
 
 				for (auto i = 0; i != nx; ++i)
 				{
-
-					elementType = m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX];
-
 					i_xm = 4 * nx*j + i * 2 + 8 * nx*ny*k;
 					i_xp = 4 * nx*j + 2 * nx + i * 2 + 8 * nx*ny*k;
 
@@ -392,7 +400,7 @@ namespace PAMELA
 
 					//1
 					i0 = np * 6 - 1;
-					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
+					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
 					{
 						slope = (z_pos[0] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
 					}
@@ -406,7 +414,7 @@ namespace PAMELA
 
 					//5
 					i0 = np * 6 - 1;
-					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
+					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
 					{
 						slope = (z_pos[4] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
 					}
@@ -422,7 +430,7 @@ namespace PAMELA
 					np = i + 1 + (nx + 1)*j;
 					//2
 					i0 = np * 6 - 1;
-					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
+					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
 					{
 						slope = (z_pos[1] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
 					}
@@ -435,7 +443,7 @@ namespace PAMELA
 
 
 					//6
-					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
+					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
 					{
 						slope = (z_pos[5] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
 					}
@@ -452,7 +460,7 @@ namespace PAMELA
 					np = i + (nx + 1)*(j + 1);
 					//3
 					i0 = np * 6 - 1;
-					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
+					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
 					{
 						slope = (z_pos[2] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
 					}
@@ -466,7 +474,7 @@ namespace PAMELA
 
 					//7
 					i0 = np * 6 - 1;
-					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
+					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
 					{
 						slope = (z_pos[6] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
 					}
@@ -482,7 +490,7 @@ namespace PAMELA
 					np = i + (nx + 1)*(j + 1) + 1;
 					//4
 					i0 = np * 6 - 1;
-					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
+					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
 					{
 						slope = (z_pos[3] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
 					}
@@ -496,7 +504,7 @@ namespace PAMELA
 
 					//8
 					i0 = np * 6 - 1;
-					if (m_COORD[i0 + 6] - m_COORD[i0 + 3] != 0)
+					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
 					{
 						slope = (z_pos[7] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
 					}
@@ -573,7 +581,7 @@ namespace PAMELA
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
-					if ((actnum[i]) == 1)
+					if (actnum[i] == 1)
 					{
 
 						temp_double.push_back(prop[i]);
@@ -597,7 +605,7 @@ namespace PAMELA
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
-					if ((actnum[i]) == 1)
+					if (actnum[i] == 1)
 					{
 						temp_int.push_back(prop[i]);
 					}
@@ -609,7 +617,7 @@ namespace PAMELA
 		//--Delete NNC on inactive blocks
 		temp_int.clear();
 		
-		for(auto i=0;i!=m_NNCs.size();++i)
+		for(unsigned int i=0;i!=m_NNCs.size();++i)
 		{
 			if (m_ACTNUM[m_NNCs[i].downstream_index]==1&& m_ACTNUM[m_NNCs[i].upstream_index]==1)
 			{
@@ -617,7 +625,7 @@ namespace PAMELA
 			}
 		}
 		std::vector <TPFA> temp_NNC; temp_NNC.reserve(temp_int.size());
-		for (auto i = 0; i != temp_int.size(); ++i)
+		for (unsigned int i = 0; i != temp_int.size(); ++i)
 		{
 			temp_NNC.push_back(m_NNCs[temp_int[i]]);
 		}
@@ -896,7 +904,7 @@ namespace PAMELA
 		{
 			LOGINFO("     o TRANNNC processed");
 			//m_CellProperties_double[keyword] = data;
-			for (auto i = 0; i < m_nNNCs; ++i)
+			for (unsigned int i = 0; i < m_nNNCs; ++i)
 			{
 				m_NNCs[i].transmissibility = data[i];
 			}
@@ -968,7 +976,7 @@ namespace PAMELA
 		else if (keyword == "NNC1")
 		{
 			LOGINFO("     o NNC1 processed");
-			for (auto i=0;i<m_nNNCs;++i)
+			for (unsigned int i=0;i<m_nNNCs;++i)
 			{
 				m_NNCs[i].downstream_index = data[i]-1;
 			}
@@ -976,7 +984,7 @@ namespace PAMELA
 		else if (keyword == "NNC2")
 		{
 			LOGINFO("     o NNC2 processed");
-			for (auto i = 0; i < m_nNNCs; ++i)
+			for (unsigned int i = 0; i < m_nNNCs; ++i)
 			{
 				m_NNCs[i].upstream_index = data[i]-1;
 			}
@@ -1025,7 +1033,7 @@ namespace PAMELA
 
 			int last_irow = 0, last_rowptr = 0;
 			int cpt = 1;
-			for (auto i = 0; i != data.size(); ++i)
+			for (unsigned int i = 0; i != data.size(); ++i)
 			{
 				int irow = data[i].downstream_index;
 				int icol = data[i].upstream_index;
@@ -1135,7 +1143,7 @@ namespace PAMELA
 			auto nsconz= intehead[33];
 			auto niconz = intehead[32];
 			auto ncwmax= intehead[17];
-			for (size_t iw=0;iw!= m_nWells;++iw)
+			for (unsigned int iw=0;iw!= m_nWells;++iw)
 			{
 				std::vector<int> sub_iwel(&iwel[0 + iw*niwelz], &iwel[(iw+1)*(niwelz - 1)]);
 				auto well_type = sub_iwel[6];
@@ -1163,7 +1171,7 @@ namespace PAMELA
 				auto well = m_Wells[label] = new WELL(icell,nb_comp);
 				std::vector<double> sub_scon(&scon[0 + iw * ncwmax * nsconz], &scon[(iw + 1)*(ncwmax * nsconz - 1)]);
 				std::vector<int> sub_icon(&icon[0 + iw * ncwmax * niconz], &icon[(iw + 1)*(ncwmax * niconz - 1)]);
-				for (size_t ic = 0; ic != nb_comp; ++ic)
+				for (int ic = 0; ic != nb_comp; ++ic)
 				{
 					std::vector<double> sub_sub_scon(&sub_scon[0 + ic*nsconz], &sub_scon[(ic + 1)*(nsconz - 1)]);
 					std::vector<int> sub_sub_icon(&sub_icon[0 + ic * niconz], &sub_icon[(ic + 1)*(niconz - 1)]);
@@ -1188,7 +1196,7 @@ namespace PAMELA
 			auto xyz = (*itpol)->get_centroidCoordinates();
 			vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz[0], xyz[1], 0));
 			auto comps = well->completions;
-			for (size_t ic = 0; ic != well->nb_completions; ++ic)
+			for (unsigned int ic = 0; ic != well->nb_completions; ++ic)
 			{
 				auto cell_index = comps[ic].hosting_cell_index;
 				auto itpol2 = polyhedron_collection->begin_owned() + cell_index;

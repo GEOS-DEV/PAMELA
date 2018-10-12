@@ -31,9 +31,9 @@ namespace PAMELA
 
 
 		static std::string m_label;
-		static int m_nvertices;
-		static int m_nquadrilaterals;
-		static int m_nhexahedra;
+		static unsigned int m_nvertices;
+		static unsigned int m_nquadrilaterals;
+		static unsigned int m_nhexahedra;
 
 		///Eclipse file data
 		struct IJK
@@ -93,8 +93,8 @@ namespace PAMELA
 				head_cell_index = h_index;
 				nb_completions = nb_comp;
 			}
-			int head_cell_index;
-			int nb_completions;
+			unsigned int head_cell_index;
+			unsigned int nb_completions;
 			std::vector<COMPLETION> completions;
 
 		};
@@ -105,21 +105,22 @@ namespace PAMELA
 		}
 
 		//Grid
-		static std::vector<int> m_SPECGRID;
+		static std::vector<unsigned int> m_SPECGRID;
 		static std::vector<double>  m_COORD;
 		static std::vector<double>  m_ZCORN;
 		static std::vector<int>  m_ACTNUM;
+
 		static std::vector<TPFA>  m_NNCs;
 		static std::vector<TPFA>  m_EclipseGeneratedTrans;
-		static std::unordered_map<IJK,int, IJKHash> m_IJK2Index ;
-		static std::unordered_map<int,IJK> m_Index2IJK;
-		static std::unordered_map<int, int> m_IndexTotal2Active;
+		static std::unordered_map<IJK,unsigned int, IJKHash> m_IJK2Index ;
+		static std::unordered_map<unsigned int,IJK> m_Index2IJK;
+		static std::unordered_map<unsigned int, unsigned int> m_IndexTotal2Active;
 
-		static int  m_nCOORD;
-		static int  m_nZCORN;
-		static int m_nActiveCells;
-		static int m_nTotalCells;
-		static int m_nNNCs;
+		static unsigned int  m_nCOORD;
+		static unsigned int  m_nZCORN;
+		static unsigned int m_nActiveCells;
+		static unsigned int m_nTotalCells;
+		static unsigned int m_nNNCs;
 
 		//Duplicate
 		static std::vector<double> m_Duplicate_Element;
@@ -132,7 +133,7 @@ namespace PAMELA
 		static std::unordered_map<std::string, std::vector<char>> m_OtherProperties_char;
 
 		//Wells
-		static int m_nWells;
+		static unsigned int m_nWells;
 		static std::unordered_map<std::string, WELL*> m_Wells;
 
 		static std::unordered_map<ECLIPSE_MESH_TYPE, ELEMENTS::TYPE> m_TypeMap;

@@ -16,6 +16,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 option(COMPILE_TESTS "Compile test" OFF)
 option(COMPILE_EXAMPLES "Compile Examples" OFF)
 
+set(USE_MPI OFF CACHE BOOL "Enable MPI")
+set(USE_VTK OFF CACHE BOOL "Enable VTK")
+
+include(cmake/tpls.cmake)
+
 #Expose important paths
 set(PAMELA_PATH ${CMAKE_SOURCE_DIR} CACHE INTERNAL "PAMELA_PATH" FORCE)
 

@@ -69,13 +69,22 @@ set(PAMELA_sources
   Import/Gmsh_mesh.cpp
   Collection/Collection.cpp)
 
-set(PAMELA_dependencies "")
+if(${USE_MPI})
+  set(pamela_dependencies_list ${pamela_dependencies_list} mpi)
+  set(pamela_dependencies_list ${pamela_dependencies_list} METIS)
+endif(${USE_MPI})
+
+if(${USE_VTK})
+  set(pamela_dependencies_list ${pamela_dependencies_list} VTK)
+endif(${USE_VTK})
+set(PAMELA_dependencies ${pamela_dependencies_list})
+message(STATUS ${PAMELA_dependencies})
 
 message("adding PAMELA_Library")
 blt_add_library(NAME                  ${PAMELA_target}
                 SOURCES               ${PAMELA_sources}
                 HEADERS               ${PAMELA_headers}
                 HEADERS_OUTPUT_SUBDIR PAMELA
-                DEPEND_ON             ${PAMELA_dependencies})
+                DEPEND_ON             mpi VTK METIS)
 
 target_include_directories(${PAMELA_target} PUBLIC ${CMAKE_CURRENT_LIST_DIR}) 

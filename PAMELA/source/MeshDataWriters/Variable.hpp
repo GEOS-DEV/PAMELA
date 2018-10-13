@@ -45,7 +45,7 @@ namespace PAMELA
 		VARIABLE_DIMENSION Dimension;
 		VARIABLE_TYPE Type;
 
-		size_t size() { return Data.size(); };
+		size_t size() { return Data.size(); }
 
 		void set_data(T cst)
 		{
@@ -59,7 +59,7 @@ namespace PAMELA
 			Data.assign(it_begin_vec, it_end_vec);
 		}
 
-		
+
 		std::vector<T> get_data(int i)
 		{
 			if (offset == 1)
@@ -76,13 +76,13 @@ namespace PAMELA
 
 	struct VariableDouble : public Variable<double>
 	{
-		VariableDouble(VARIABLE_DIMENSION dim, std::string label, size_t size) :Variable<double>(dim, VARIABLE_TYPE::DOUBLE, label, size) {};
+		VariableDouble(VARIABLE_DIMENSION dim, std::string label, size_t size) :Variable<double>(dim, VARIABLE_TYPE::DOUBLE, label, size) {}
 	};
 
 
 	struct VariableInt : public Variable<int>
 	{
-		VariableInt(VARIABLE_DIMENSION dim, std::string label, size_t size) :Variable<int>(dim, VARIABLE_TYPE::INTEGER, label, size) {};
+		VariableInt(VARIABLE_DIMENSION dim, std::string label, size_t size) :Variable<int>(dim, VARIABLE_TYPE::INTEGER, label, size) {}
 	};
 
 

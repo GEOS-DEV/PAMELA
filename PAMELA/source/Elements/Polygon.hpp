@@ -26,8 +26,8 @@ namespace PAMELA
 
 		//Getters
 		ELEMENTS::TYPE get_vtkType() const { return m_vtkType; }
-		const std::vector<Point*>& get_vertexList() const { return m_vertexList; };
-		std::vector<Point*>& get_vertexList() { return m_vertexList; };
+		const std::vector<Point*>& get_vertexList() const { return m_vertexList; }
+		std::vector<Point*>& get_vertexList() { return m_vertexList; }
 
 		//Geometry
 		virtual double get_SurfaceArea() = 0;
@@ -154,7 +154,7 @@ namespace PAMELA
 			ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
 			m_vtkType = elementType;
 		}
-		~ElementSpe() {};
+		~ElementSpe() {}
 
 		//Geometry
 		double get_SurfaceArea() override;
@@ -336,5 +336,3 @@ namespace PAMELA
 
 
 }
-
-

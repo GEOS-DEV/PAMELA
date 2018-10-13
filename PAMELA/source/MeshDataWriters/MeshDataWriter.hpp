@@ -22,7 +22,7 @@ namespace PAMELA
 
 	struct AdjacencyData
 	{
-		AdjacencyData(std::string lab) :label(lab) {};
+		AdjacencyData(std::string lab) :label(lab) {}
 		std::string label;
 		std::vector<Point> NodesVector;
 		std::vector<int> iSource;
@@ -122,7 +122,7 @@ namespace PAMELA
 			SetVariableOnAllParts("Partition", Communicator::worldRank());
 		}
 
-		void DeclareAndSetElementGlobalIndex() 
+		void DeclareAndSetElementGlobalIndex()
 		{
 			//DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_DIMENSION::SCALAR,VARIABLE_LOCATION::PER_CELL, "globalIndex_Polyhedron");
 			//DeclareVariable(FAMILY::POLYGON, VARIABLE_DIMENSION::SCALAR,VARIABLE_LOCATION::PER_CELL, "globalIndex_Polygon");
@@ -154,7 +154,7 @@ namespace PAMELA
 					if (it2->second->SubCollection.size_owned() > 0)
 					{
 						auto subpart = it2->second;
-						for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3) 
+						for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3)
 						{
 							globalIndex.push_back_owned((*it3)->get_globalIndex());
 						}

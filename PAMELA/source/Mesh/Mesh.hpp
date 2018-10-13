@@ -36,7 +36,7 @@ namespace PAMELA
 			return m_AdjacencySet;
 		}
 
-		virtual void Distort(double alpha) {};
+		virtual void Distort(double alpha) {}
 
 		////Updaters
 		void CreateFacesFromCells();
@@ -54,15 +54,15 @@ namespace PAMELA
 
 
 
-		///Partitioning 
+		///Partitioning
 		// This is a graph-based partitioning followed by the add of ghost elements according to ghostBaseElement parameter.
 		void PerformPolyhedronPartitioning(ELEMENTS::FAMILY edgeElement, ELEMENTS::FAMILY ghostBaseElement);
-		
+
 
 		//Adjacency
 		void CreateLineGroupWithAdjacency(std::string Label, Adjacency* adjacency);
 
-	
+
 
 	protected:
 

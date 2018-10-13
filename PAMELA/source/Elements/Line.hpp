@@ -23,7 +23,7 @@ namespace PAMELA
 		//virtual ~Element() = 0;// {}
 
 		//Getter
-		const std::vector<Point*>& get_vertexList() const { return m_vertexList; };
+		const std::vector<Point*>& get_vertexList() const { return m_vertexList; }
 
 	protected:
 
@@ -47,13 +47,13 @@ namespace PAMELA
 			ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
 			m_vtkType = elementType;
 		}
-		~ElementSpe() {};
+		~ElementSpe() {}
 
 	private:
 
 		//Functions
-		double get_length() { return 0; };
-		Coordinates get_centroidLocation() { return Coordinates(); };
+		double get_length() { return 0; }
+		Coordinates get_centroidLocation() { return Coordinates(); }
 
 	};
 

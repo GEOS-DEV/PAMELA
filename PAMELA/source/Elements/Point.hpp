@@ -27,7 +27,7 @@ namespace PAMELA
 		Coordinates& get_coordinates() { return m_coordinates; }
 
 		//Getter
-		const std::vector<Element<ELEMENTS::FAMILY::POINT>*>& get_vertexList() const { return m_vertexList; };
+		const std::vector<Element<ELEMENTS::FAMILY::POINT>*>& get_vertexList() const { return m_vertexList; }
 
 	protected:
 
@@ -52,7 +52,7 @@ namespace PAMELA
 			m_vtkType = elementType;
 		}
 
-		~ElementSpe() {};
+		~ElementSpe() {}
 
 	private:
 

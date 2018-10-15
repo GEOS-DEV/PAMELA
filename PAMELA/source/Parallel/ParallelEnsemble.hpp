@@ -11,7 +11,7 @@ namespace PAMELA
 	public:
 		virtual ~ParallelEnsembleBase() = default;
 
-		ParallelEnsembleBase() :m_sizeAll(0), m_sizeOwned(0), m_sizeGhost(0) {};
+		ParallelEnsembleBase() :m_sizeAll(0), m_sizeOwned(0), m_sizeGhost(0) {}
 
 		//Size
 		size_t size_all() const { return m_sizeAll; }
@@ -143,7 +143,7 @@ namespace PAMELA
 		}
 
 		//Data
-		std::vector<T>& data_all() { return m_data; };
+		std::vector<T>& data_all() { return m_data; }
 
 	protected:
 

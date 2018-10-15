@@ -95,7 +95,7 @@ namespace PAMELA
 		//Getters
 		int get_localIndex() const { return m_index.Local; }
 		int get_globalIndex() const { return m_index.Global; }
-		int get_dimension() { return ELEMENTS::dimension.at(m_family); };
+		int get_dimension() { return ELEMENTS::dimension.at(m_family); }
 		ELEMENTS::FAMILY get_family() { return m_family; }
 		ELEMENTS::TYPE get_vtkType() { return m_vtkType; }
 
@@ -108,7 +108,7 @@ namespace PAMELA
 
 	protected:
 
-		//virtual ~ElementBase() = 0; 
+		//virtual ~ElementBase() = 0;
 		ELEMENTS::TYPE m_vtkType;
 		ELEMENTS::FAMILY m_family;
 

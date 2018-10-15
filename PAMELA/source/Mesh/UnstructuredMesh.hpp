@@ -9,7 +9,7 @@ namespace PAMELA
 
 	public:
 
-		UnstructuredMesh() {};
+		UnstructuredMesh() {}
 	};
 
 }

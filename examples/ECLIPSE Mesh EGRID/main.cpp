@@ -68,7 +68,8 @@ int main(int argc, char **argv) {
 	time_t tend = time(0);
 	LOGINFO("It took " + std::to_string(difftime(tend, tstart)) + " second(s).");
 
-	delete MainMesh, OutputWriter;
+	delete MainMesh;
+	delete OutputWriter;
 
 	Communicator::finalize();
 

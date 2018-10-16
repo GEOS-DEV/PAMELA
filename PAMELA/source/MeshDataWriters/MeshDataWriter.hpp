@@ -148,7 +148,6 @@ namespace PAMELA
 			{
 				ParallelEnsemble< double > globalIndex;
 				auto partptr = it->second;
-				int cell_index_local = 0;
 				for (auto it2 = partptr->SubParts.begin(); it2 != partptr->SubParts.end(); ++it2)
 				{
 					if (it2->second->SubCollection.size_owned() > 0)

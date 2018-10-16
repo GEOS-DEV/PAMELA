@@ -3,6 +3,7 @@
 #include "Utils/SimpleMaths.hpp"
 #include "Elements/Element.hpp"
 #include "Utils/Assert.hpp"
+#include "Utils/Utils.hpp"
 
 namespace PAMELA
 {
@@ -17,6 +18,7 @@ namespace PAMELA
 
 		Element(int index, const std::vector<Point*>& vertexList) :ElementBase(), m_vertexList(vertexList)
 		{
+                        utils::pamela_unused(index);
 			m_family = ELEMENTS::FAMILY::LINE;
 		}
 

@@ -7,6 +7,7 @@
 #include "Collection/Collection.hpp"
 #include "Property/Property.hpp"
 #include "Adjacency/AdjacencySet.hpp"
+#include "Utils/Utils.hpp"
 
 namespace PAMELA
 {
@@ -36,7 +37,9 @@ namespace PAMELA
 			return m_AdjacencySet;
 		}
 
-		virtual void Distort(double alpha) {}
+                virtual void Distort(double alpha) {
+                  utils::pamela_unused(alpha);
+                }
 
 		////Updaters
 		void CreateFacesFromCells();
@@ -83,7 +86,7 @@ namespace PAMELA
 		//Adjacency
 		AdjacencySet* m_AdjacencySet;
 
-		std::vector<int> METISPartitioning(Adjacency* adjacency, int npartition);
+		std::vector<int> METISPartitioning(Adjacency* adjacency, unsigned int npartition);
 		std::vector<int> TRIVIALPartitioning();
 
 	};

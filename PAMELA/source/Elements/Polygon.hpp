@@ -20,6 +20,7 @@ namespace PAMELA
 
 		Element(int index, const std::vector<Point*>& vertexList) :ElementBase(), m_vertexList(vertexList)
 		{
+                        utils::pamela_unused(index);
 			m_family = ELEMENTS::FAMILY::POLYGON;
 		}
 		//virtual ~Element() = 0;// {}
@@ -322,6 +323,8 @@ namespace PAMELA
 	template <>
 	inline std::vector<std::vector<double>> ElementSpe<ELEMENTS::FAMILY::POLYGON, ELEMENTS::TYPE::VTK_TRIANGLE>::get_BasisFunctionDerivatives(double xi_1, double xi_2)
 	{
+                utils::pamela_unused(xi_1);
+                utils::pamela_unused(xi_2);
 		std::vector<double> row;
 		std::vector<std::vector<double>> matrix;
 

@@ -345,7 +345,6 @@ namespace PAMELA
 
 		mesh->get_PolyhedronCollection()->addAndCreateGroup("POLYHEDRON_GROUP");
 
-		int jb = 0, kb = 0, ib = 0;
 		int i0 = 0;
 		int np;
 		int nx = m_SPECGRID[0], ny = m_SPECGRID[1], nz = m_SPECGRID[2];
@@ -567,7 +566,6 @@ namespace PAMELA
 		m_CellProperties_integer["Layer"] = layer;
 
 		//Remove non-active properties
-		auto iacthexas = icell;
 
 		std::vector<double> temp_double;
 		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
@@ -863,7 +861,6 @@ namespace PAMELA
 
 		} while (index < static_cast<int>(str.size()));
 
-		auto jj = 4;
 
 
 	}
@@ -1032,7 +1029,6 @@ namespace PAMELA
 			std::sort(data.begin(), data.end());
 
 			int last_irow = 0, last_rowptr = 0;
-			int cpt = 1;
 			for (unsigned int i = 0; i != data.size(); ++i)
 			{
 				int irow = data[i].downstream_index;

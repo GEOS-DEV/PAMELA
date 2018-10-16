@@ -2,6 +2,7 @@
 #include <Parallel/Communicator.hpp>
 // Project includes
 #include <Utils/Assert.hpp>
+#include <Utils/Utils.hpp>
 
 namespace PAMELA
 {
@@ -158,6 +159,8 @@ namespace PAMELA
 	void Communicator::neighborSync(const dbl_vec& send_buf, const uint_vec& send_counts, const uint_vec& send_displs,
 		dbl_vec& recv_buf, const uint_vec& recv_counts, const uint_vec& recv_displs) const
 	{
+                utils::pamela_unused(send_buf);
+                utils::pamela_unused(recv_buf);
 		if (!m_nbr_set)
 			throw std::string("Neigbors not set on communicator");
 #ifdef WITH_MPI

@@ -2,6 +2,7 @@
 #include "Utils/SimpleMaths.hpp"
 #include "Elements/Element.hpp"
 #include "Utils/Assert.hpp"
+#include "Utils/Utils.hpp"
 
 namespace PAMELA
 {
@@ -16,6 +17,7 @@ namespace PAMELA
 
 		Element(int index, double x, double y, double z) :ElementBase(), m_coordinates(Coordinates(x, y, z))
 		{
+                        utils::pamela_unused(index);
 			m_family = ELEMENTS::FAMILY::POINT;
 			m_vertexList = { this };
 		}

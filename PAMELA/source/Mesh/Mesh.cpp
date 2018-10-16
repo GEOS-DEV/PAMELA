@@ -42,7 +42,6 @@ namespace PAMELA
 		auto InitPolyhedronCollectionSize = target->size_all();
 		Adjacency* adj = new Adjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYHEDRON,source, target, base);
 
-		auto collectionSize = source->size_all();
 		int nbFace = 0;
 		int FaceIndex = 0;
 		int PolyhedronIndex = 0;
@@ -140,6 +139,7 @@ namespace PAMELA
 
 	void Mesh::AddImplicitLine(ELEMENTS::TYPE elementType, std::string groupLabel, std::vector<Point*>& pointList)
 	{
+                utils::pamela_unused(elementType);
 		m_ImplicitPointCollection.AddElement(groupLabel, pointList[0]);
 		for (size_t i=1;i!= pointList.size();++i)
 		{
@@ -156,7 +156,6 @@ namespace PAMELA
 		auto CommRankSize = Communicator::worldSize();
 		bool MPIRUN = Communicator::isMPIrun();
 		int ipartition = Communicator::worldRank();
-		int npartition = Communicator::worldSize();
 
 		//if ((CommRankSize > 1) && (MPIRUN))	//TO be removed for debugging
 		//{
@@ -200,7 +199,6 @@ namespace PAMELA
 
 			//PolyhedronAffiliation = METISPartitioning(adjacencyForPartitioning, 2);
 
-			int nbPolyhedronInPartition = static_cast<int>(std::count(PolyhedronAffiliation.begin(), PolyhedronAffiliation.end(), ipartition));
 
 			//POLYHEDRON
 			//--OWNED POLYHEDRA
@@ -239,7 +237,6 @@ namespace PAMELA
 				for (size_t i = 0; i < adj_Polyhedron2PolygonSize; ++i)
 				{
 					auto adj_Polygon2Polyhedron = PolygonPolyhedronAdj->get_SingleElementAdjacency(adj_Polyhedron2Polygon.first[i]);
-					auto adj_Polygon2PolyhedronSize = adj_Polygon2Polyhedron.first.size();
 					auto PolyToPart = vectorUtils::Vector2VectorMapping(adj_Polygon2Polyhedron.first, PolyhedronAffiliation);
 					if ((std::equal(PolyToPart.begin() + 1, PolyToPart.end(), PolyToPart.begin())) || PolyToPart.size() == 1)
 					{
@@ -274,7 +271,6 @@ namespace PAMELA
 				for (auto i = 0; i < adj_Poly2PointSize; ++i)
 				{
 					auto adj_Point2Poly = PointPolyhedronAdj->get_SingleElementAdjacency(adj_Poly2Point.first[i]);
-					int adj_Point2PolySize = static_cast<int>(adj_Point2Poly.first.size());
 					auto PolyToPart = vectorUtils::Vector2VectorMapping(adj_Point2Poly.first, PolyhedronAffiliation);
 					if ((std::equal(PolyToPart.begin() + 1, PolyToPart.end(), PolyToPart.begin())) || PolyToPart.size() == 1)
 					{
@@ -317,7 +313,7 @@ namespace PAMELA
 	}
 
 
-	std::vector<int> Mesh::METISPartitioning(Adjacency* adjacency, int npartition)
+	std::vector<int> Mesh::METISPartitioning(Adjacency* adjacency, unsigned int npartition)
 	{
 
 #ifdef WITH_METIS
@@ -330,24 +326,25 @@ namespace PAMELA
 
 		// make sure locally we use METIS's types (which are in global namespace) and not grid::<type>
 		using idx_t = ::idx_t;
-		using real_t = ::real_t;
 
 		int options[METIS_NOPTIONS];
 		METIS_SetDefaultOptions(options);
 
 		// Some type casts and constants
 		idx_t nnodes = static_cast<idx_t>(adjacency->get_sourceElementCollection()->size_all());
-		idx_t nparts = npartition;
 		idx_t nconst = 1;
 		idx_t objval = 0;
 		std::vector<int> partitionVector(nnodes);
 
+                int int_partition = static_cast<int>(npartition);
 		METIS_PartGraphRecursive(&nnodes, &nconst, &csrMatrix->rowPtr[0], &csrMatrix->columnIndex[0],
-			nullptr, nullptr, nullptr, &npartition, nullptr, nullptr, options, &objval, partitionVector.data());
+			nullptr, nullptr, nullptr, &int_partition, nullptr, nullptr, options, &objval, partitionVector.data());
 
 		return partitionVector;
 
 #else
+                utils::pamela_unused(adjacency);
+                utils::pamela_unused(npartition);
 		LOGERROR("METIS partitioner is not available");
 		return {};
 #endif
@@ -369,7 +366,6 @@ namespace PAMELA
 		//CSR Matrix
 		auto csr_matrix = adjacency->get_adjacencySparseMatrix();
 		auto dimRow = csr_matrix->dimRow;
-		auto nnz = csr_matrix->nnz;
 		auto columIndex = csr_matrix->columnIndex;
 		auto rowPtr = csr_matrix->rowPtr;
 
@@ -378,7 +374,6 @@ namespace PAMELA
 
 		if ((adjacency->get_sourceFamily() == ELEMENTS::FAMILY::POLYHEDRON) && (adjacency->get_targetFamily() == ELEMENTS::FAMILY::POLYHEDRON))
 		{
-			auto sourcetarget = static_cast<PolyhedronCollection*>(adjacency->get_sourceElementCollection());
 
 			//Compute Node coordinates
 			int isource = 0, itarget = 0, ipoint = static_cast<int>(m_PointCollection.size_owned()) , iline = static_cast<int>(m_LineCollection.size_owned());
@@ -406,7 +401,7 @@ namespace PAMELA
 							auto edgev = { source_rpoint , target_rpoint };
 							auto edge = ElementFactory::makeLine(ELEMENTS::TYPE::VTK_LINE, iline, edgev);
 							++iline;
-							auto redge = line_collection.AddElement(Label, edge);
+							line_collection.AddElement(Label, edge);
 						}
 
 					}

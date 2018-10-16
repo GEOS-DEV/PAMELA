@@ -20,6 +20,7 @@ namespace PAMELA
 
 		Element(int index, const std::vector<Point*>& vertexList) :ElementBase(), m_vertexList(vertexList)
 		{
+                        utils::pamela_unused(index);
 			m_family = ELEMENTS::FAMILY::POLYHEDRON;
 		}
 		//virtual ~Element() = 0;// {}
@@ -148,7 +149,7 @@ namespace PAMELA
 	inline double ElementSpe<ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::TYPE::VTK_TETRA>::get_Volume()
 	{
 
-		return  abs(1. / 6. * get_JacobianMatrixAndDeterminant(0, 0, 0).second);;
+		return  std::abs(1. / 6. * get_JacobianMatrixAndDeterminant(0, 0, 0).second);;
 	}
 
 
@@ -180,6 +181,9 @@ namespace PAMELA
 	template <>
 	inline std::vector<std::vector<double>> ElementSpe<ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::TYPE::VTK_TETRA>::get_BasisFunctionDerivatives(double xi_1, double xi_2, double xi_3)
 	{
+                utils::pamela_unused(xi_1);
+                utils::pamela_unused(xi_2);
+                utils::pamela_unused(xi_3);
 		std::vector<double> row;
 		std::vector<std::vector<double>> matrix;
 
@@ -230,7 +234,7 @@ namespace PAMELA
 			volume = volume + Gauss_weight[i] * get_JacobianMatrixAndDeterminant(Gauss_point[i][0], Gauss_point[i][1], Gauss_point[i][2]).second;
 		}
 
-		return abs(volume);
+		return std::fabs(volume);
 	}
 
 
@@ -338,6 +342,9 @@ namespace PAMELA
 	template <>
 	inline std::vector<double> ElementSpe<ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::TYPE::VTK_WEDGE>::get_BasisFunctions(double xi_1, double xi_2, double xi_3)
 	{
+                utils::pamela_unused(xi_1);
+                utils::pamela_unused(xi_2);
+                utils::pamela_unused(xi_3);
 		LOGERROR("NOT SUPPORTED YET");
 		return{ 0,0,0,0,0,0 };  //TODO
 	}
@@ -352,6 +359,9 @@ namespace PAMELA
 	template <>
 	inline std::vector<std::vector<double>> ElementSpe<ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::TYPE::VTK_WEDGE>::get_BasisFunctionDerivatives(double xi_1, double xi_2, double xi_3)
 	{
+                utils::pamela_unused(xi_1);
+                utils::pamela_unused(xi_2);
+                utils::pamela_unused(xi_3);
 		std::vector<double> row;
 		std::vector<std::vector<double>> matrix;
 		LOGERROR("NOT SUPPORTED YET");
@@ -392,6 +402,9 @@ namespace PAMELA
 	template <>
 	inline std::vector<double> ElementSpe<ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::TYPE::VTK_PYRAMID>::get_BasisFunctions(double xi_1, double xi_2, double xi_3)
 	{
+                utils::pamela_unused(xi_1);
+                utils::pamela_unused(xi_2);
+                utils::pamela_unused(xi_3);
 		LOGERROR("NOT SUPPORTED YET");
 		return{ 0,0,0,0,0 };  //TODO
 	}
@@ -406,6 +419,9 @@ namespace PAMELA
 	template <>
 	inline std::vector<std::vector<double>> ElementSpe<ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::TYPE::VTK_PYRAMID>::get_BasisFunctionDerivatives(double xi_1, double xi_2, double xi_3)
 	{
+                utils::pamela_unused(xi_1);
+                utils::pamela_unused(xi_2);
+                utils::pamela_unused(xi_3);
 		std::vector<double> row;
 		std::vector<std::vector<double>> matrix;
 		LOGERROR("NOT SUPPORTED YET");

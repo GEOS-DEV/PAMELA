@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 // Project includes
 #include "Utils/Types.hpp"
 
@@ -14,6 +16,11 @@ namespace PAMELA
 
     namespace utils
     {
+      template < typename T >
+      void pamela_unused( const T& /*unused*/ )
+      {
+      }
+
         template< typename T>
             bool nearlyEqual(T a, T b, T epsilon = 1e-6) {
                 return std::fabs(a - b) < epsilon;

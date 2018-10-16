@@ -289,7 +289,7 @@ namespace PAMELA
 			auto& vertexList = (*it)->get_vertexList();
 			for (auto it2 = vertexList.begin(); it2 != vertexList.end(); ++it2)
 			{
-				auto& coord = (*it2)->get_coordinates().y = m_Lymax;
+				(*it2)->get_coordinates().y = m_Lymax;
 			}
 		}
 		//--South
@@ -299,7 +299,7 @@ namespace PAMELA
 			auto& vertexList = (*it)->get_vertexList();
 			for (auto it2 = vertexList.begin(); it2 != vertexList.end(); ++it2)
 			{
-				auto& coord = (*it2)->get_coordinates().y = m_Lymin;
+				 (*it2)->get_coordinates().y = m_Lymin;
 			}
 		}
 		//--East
@@ -309,7 +309,7 @@ namespace PAMELA
 			auto& vertexList = (*it)->get_vertexList();
 			for (auto it2 = vertexList.begin(); it2 != vertexList.end(); ++it2)
 			{
-				auto& coord = (*it2)->get_coordinates().x = m_Lxmax;
+				(*it2)->get_coordinates().x = m_Lxmax;
 			}
 		}
 		//--West
@@ -319,7 +319,7 @@ namespace PAMELA
 			auto& vertexList = (*it)->get_vertexList();
 			for (auto it2 = vertexList.begin(); it2 != vertexList.end(); ++it2)
 			{
-				auto& coord = (*it2)->get_coordinates().x = m_Lxmin;
+				(*it2)->get_coordinates().x = m_Lxmin;
 			}
 		}
 		//--Top
@@ -329,7 +329,7 @@ namespace PAMELA
 			auto& vertexList = (*it)->get_vertexList();
 			for (auto it2 = vertexList.begin(); it2 != vertexList.end(); ++it2)
 			{
-				auto& coord = (*it2)->get_coordinates().z = m_Lzmax;
+				(*it2)->get_coordinates().z = m_Lzmax;
 			}
 		}
 		//--Bottom
@@ -339,7 +339,7 @@ namespace PAMELA
 			auto& vertexList = (*it)->get_vertexList();
 			for (auto it2 = vertexList.begin(); it2 != vertexList.end(); ++it2)
 			{
-				auto& coord = (*it2)->get_coordinates().z = m_Lzmin;
+				(*it2)->get_coordinates().z = m_Lzmin;
 			}
 		}
 

@@ -1,6 +1,7 @@
 #include "Adjacency/CSRMatrix.hpp"
 #include "Utils/Logger.hpp"
 #include "Utils/Assert.hpp"
+#include "Utils/Utils.hpp"
 #include <algorithm>
 
 namespace PAMELA
@@ -107,6 +108,7 @@ namespace PAMELA
 
 	void CSRMatrix::fillEmpty(int dim_row, int dim_col)
 	{
+                utils::pamela_unused(dim_col);
 		values.resize(0);
 		rowPtr.resize(dim_row + 1);
 		columnIndex.resize(0);
@@ -120,27 +122,20 @@ namespace PAMELA
 
 		//Dimensions
 		int nnz_lhs = matrix_lhs->nnz;
-		int Nc_lhs = matrix_lhs->dimColumn;
 		int Nr_lhs = matrix_lhs->dimRow;
 		int nnz_rhs = matrix_rhs->nnz;
-		int Nc_rhs = matrix_rhs->dimColumn;
-		int Nr_rhs = matrix_rhs->dimRow;
 
 		//Dynamic allocation of trans_mat
 		int nnz_guess = (nnz_lhs + nnz_rhs) * 10;
 		CSRMatrix* mult_mat = new CSRMatrix(Nr_lhs, Nr_lhs, nnz_guess);
 
 		int Mnnz = mult_mat->nnz;
-		int MNc = mult_mat->dimColumn;
-		int MNr = mult_mat->dimRow;
 
 		//Work data
 		auto& rowPtr_lhs = matrix_lhs->rowPtr;
 		auto& columnIndex_lhs = matrix_lhs->columnIndex;
-		auto& values_lhs = matrix_lhs->values;
 		auto& rowPtr_rhs = matrix_rhs->rowPtr;
 		auto& columnIndex_rhs = matrix_rhs->columnIndex;
-		auto& values_rhs = matrix_rhs->values;
 		auto& MrowPtr = mult_mat->rowPtr;
 		auto& McolumnIndex = mult_mat->columnIndex;
 		auto& Mvalues = mult_mat->values;
@@ -153,7 +148,6 @@ namespace PAMELA
 		{
 			for (int ka = rowPtr_lhs[ii]; ka < rowPtr_lhs[ii + 1]; ++ka)
 			{
-				int scal = values_lhs[ka];
 				int jj = columnIndex_lhs[ka];
 				for (int kb = rowPtr_rhs[jj]; kb < rowPtr_rhs[jj + 1]; ++kb)
 				{
@@ -222,27 +216,20 @@ namespace PAMELA
 
 		//Dimensions
 		int nnz_lhs = matrix_lhs->nnz;
-		int Nc_lhs = matrix_lhs->dimColumn;
 		int Nr_lhs = matrix_lhs->dimRow;
 		int nnz_rhs = matrix_rhs->nnz;
-		int Nc_rhs = matrix_rhs->dimColumn;
-		int Nr_rhs = matrix_rhs->dimRow;
 
 		//Dynamic allocation of trans_mat
 		int nnz_guess = (nnz_lhs + nnz_rhs) * 10;
 		CSRMatrix* sum_mat = new CSRMatrix(Nr_lhs, Nr_lhs, nnz_guess);
 
-		int Mnnz = sum_mat->nnz;
 		int MNc = sum_mat->dimColumn;
-		int MNr = sum_mat->dimRow;
 
 		//Work data
 		auto& rowPtr_lhs = matrix_lhs->rowPtr;
 		auto& columnIndex_lhs = matrix_lhs->columnIndex;
-		auto& values_lhs = matrix_lhs->values;
 		auto& rowPtr_rhs = matrix_rhs->rowPtr;
 		auto& columnIndex_rhs = matrix_rhs->columnIndex;
-		auto& values_rhs = matrix_rhs->values;
 		auto& MrowPtr = sum_mat->rowPtr;
 		auto& McolumnIndex = sum_mat->columnIndex;
 		auto& Mvalues = sum_mat->values;

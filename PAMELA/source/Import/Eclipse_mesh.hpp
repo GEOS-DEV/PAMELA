@@ -163,6 +163,8 @@ namespace PAMELA
 		template<class T>
 		static void ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<T>& data)
 		{
+                        utils::pamela_unused(label_prefix);
+                        utils::pamela_unused(data);
 			LOGINFO("     o Skipping " + keyword);
 		}
 
@@ -188,7 +190,6 @@ namespace PAMELA
 		int block_size = 1000 * type_size;
 		int data_size = dim * type_size;
 		int nb_full_blocks = data_size / block_size;
-		auto buffer = new char[block_size];
 
 
 		int n_loops;

@@ -5,6 +5,7 @@
 #include "MeshDataWriters/Variable.hpp"
 #include "Parallel/Communicator.hpp"
 #include "Utils/Logger.hpp"
+#include "Utils/Utils.hpp"
 
 #include <vtkMPIController.h>
 #include <vtkXMLMultiBlockDataWriter.h>
@@ -42,8 +43,8 @@ namespace PAMELA
 
     template<typename T>
     void VTKWriter::MakeChildFile(const PartMap<T>* parts, const std::string& prefix) {
+      utils::pamela_unused(prefix);
 
-        int part = 0;
         for (auto it = parts->begin();it != parts->end();++it) 
 		{
 			m_block_->SetNumberOfBlocks(m_block_->GetNumberOfBlocks()+1);
@@ -65,7 +66,6 @@ namespace PAMELA
                     auto elementType = subpart->ElementType;
                     auto vtkTypeLabel = ElementToLabel.at(elementType);
                     std::vector<int> cell_types;
-                    int cell_index = 0 ;
                     vtkSmartPointer<vtkCellArray> vtkcells= vtkCellArray::New();
                     for (auto it3 = subpart->SubCollection.begin_owned(); it3 != subpart->SubCollection.end_owned(); ++it3)
                     {
@@ -98,7 +98,6 @@ namespace PAMELA
 					if (it3->second->SubCollection.size_owned() > 0)
 					{
 						auto subpart = it3->second;
-						auto elementType = subpart->ElementType;
 						auto dataarray = vtkDoubleArray::New();
 						dataarray->SetName(variableptr->Label.c_str());
 						std::vector<double> data_vector;
@@ -130,8 +129,6 @@ namespace PAMELA
 				else {
 					continue;
 				}
-				auto type = variableptr->Dimension;
-
 			}
 		}
 

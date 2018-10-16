@@ -85,6 +85,6 @@ blt_add_library(NAME                  ${PAMELA_target}
                 SOURCES               ${PAMELA_sources}
                 HEADERS               ${PAMELA_headers}
                 HEADERS_OUTPUT_SUBDIR PAMELA
-                DEPEND_ON             mpi VTK METIS)
+                DEPENDS_ON             mpi VTK METIS)
 
 target_include_directories(${PAMELA_target} PUBLIC ${CMAKE_CURRENT_LIST_DIR}) 

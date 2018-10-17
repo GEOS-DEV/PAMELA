@@ -3,8 +3,13 @@
 #include <typeindex>
 #include "Collection/Indexing.hpp"
 #include "Utils/Assert.hpp"
+#include "Utils/Utils.hpp"
 #include <set>
-
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
 namespace PAMELA
 {
 
@@ -15,7 +20,7 @@ namespace PAMELA
 		//Family
 		enum class FAMILY { POLYHEDRON = 3, POLYGON = 2, LINE = 1, POINT = 0, UNKNOWN = -1 };
 
-		const std::unordered_map<FAMILY, int> dimension =
+		static const std::unordered_map<FAMILY, int> dimension =
 		{
 			{ FAMILY::POLYHEDRON ,3 },
 			{ FAMILY::POLYGON ,2 },

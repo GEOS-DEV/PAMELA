@@ -1,14 +1,19 @@
 // Header include
 #include "Logger.hpp"
 #include "Parallel/Communicator.hpp"
+#include "Utils.hpp"
 
 #define LEVEL_LOG_FILE "DEBUG"
 #define LEVEL_LOG_SCREEN "BRIEF"
-
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
 namespace PAMELA
 {
 
-	//Default values
+        //Default values
 	std::string Logger::m_level_logfile = "INFO";
 	std::string Logger::m_file_name = "simulator.log";
 	std::string Logger::m_level_screen = "BRIEF";
@@ -69,8 +74,7 @@ namespace PAMELA
 		write_file(message);
 		if (m_screen_level >= VerbosityLevelScreen::BRIEF)
 			write_screen("ERROR:   " + msg + " in file " + __FILE__ + " line " + std::to_string(__LINE__));
-		abort();
-
+                abort();
 	}
 
 	void Logger::LogWARNING(std::string msg)

@@ -10,7 +10,6 @@ class File
 
 public:
   explicit File(std::string fileName);
-  ~File();
 
   std::string getFullName() const { return m_FullName; }
   std::string getDirectory() const { return m_Directory; }

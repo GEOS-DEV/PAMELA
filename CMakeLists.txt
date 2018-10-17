@@ -21,12 +21,11 @@ if(NOT is_submodule)
       "    git submodule update" )
   endif()
 
-
   #Path
   set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
-  include(cmake/PAMELA.cmake)
   include(cmake/blt/SetupBLT.cmake)
+  include(cmake/PAMELA.cmake)
 
   #Options
   option(COMPILE_TESTS "Compile test" OFF)

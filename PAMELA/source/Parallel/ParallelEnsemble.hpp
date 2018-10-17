@@ -2,11 +2,6 @@
 #include <vector>
 #include <set>
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-#endif
-
 namespace PAMELA
 {
 

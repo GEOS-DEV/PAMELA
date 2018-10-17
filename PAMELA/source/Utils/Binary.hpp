@@ -1,5 +1,12 @@
 #pragma once
 
+#define LEVEL_LOG_FILE "DEBUG"
+#define LEVEL_LOG_SCREEN "BRIEF"
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-template"
+#endif
+
 const int i = 1;
 //#define IS_BIG_ENDIAN() ( (*(char*)&i) == 0 )
 

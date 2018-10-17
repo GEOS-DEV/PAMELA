@@ -40,8 +40,3 @@ File::File(std::string fileName) :
   }
 
 }
-
-
-File::~File()
-{
-}

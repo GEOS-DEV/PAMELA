@@ -86,7 +86,7 @@ namespace PAMELA
 		InitElementsMapping();
 
 		//Attributes and groups
-		int attribute;
+		int attribute=0;
 		int id;
 		int itype;
 		int ntags;

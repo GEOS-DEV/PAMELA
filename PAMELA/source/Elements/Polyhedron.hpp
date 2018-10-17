@@ -23,7 +23,7 @@ namespace PAMELA
                         utils::pamela_unused(index);
 			m_family = ELEMENTS::FAMILY::POLYHEDRON;
 		}
-		//virtual ~Element() = 0;// {}
+		virtual ~Element() = 0;
 
 		virtual std::vector<Polygon*> CreateFaces() = 0;
 		//Getter
@@ -121,7 +121,7 @@ namespace PAMELA
 			ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
 			m_vtkType = elementType;
 		}
-		~ElementSpe() {}
+		virtual ~ElementSpe() override {}
 
 		//Actions
 		std::vector<Polygon*> CreateFaces() override;

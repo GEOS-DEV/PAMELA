@@ -1,5 +1,6 @@
 #include "MeshDataWriters/MeshDataWriter.hpp"
 #include "Mesh/Mesh.hpp"
+#include "MeshDataWriters/MeshParts.hpp"
 #include "Elements/ElementFactory.hpp"
 
 namespace PAMELA
@@ -21,6 +22,11 @@ namespace PAMELA
 
 		//Part Index
 		int partIndex = 1;
+                std::tie(m_PointParts, partIndex) = getPointPartMap(m_mesh,partIndex);
+                std::tie(m_LineParts, partIndex) = getLinePartMap(m_mesh,partIndex);
+                std::tie(m_PolygonParts, partIndex) = getPolygonPartMap(m_mesh,partIndex);
+                std::tie(m_PolyhedronParts, partIndex) = getPolyhedronPartMap(m_mesh,partIndex);
+                /*
 
 		//------------------------------------------------------------- PointCollection -------------------------------------------------------------
 		auto pointCollection = m_mesh->get_PointCollection();
@@ -110,6 +116,7 @@ namespace PAMELA
 			}
 		}
 		FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYHEDRON", &m_PolyhedronParts);
+                */
 
 		LOGINFO("*** Done");
 	}

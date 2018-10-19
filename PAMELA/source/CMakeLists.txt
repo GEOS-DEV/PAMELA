@@ -31,6 +31,7 @@ set(PAMELA_headers
   MeshDataWriters/Variable.hpp
   MeshDataWriters/Part.hpp
   MeshDataWriters/MeshDataWriter.hpp
+  MeshDataWriters/MeshParts.hpp
   Mesh/MeshFactory.hpp
   Mesh/UnstructuredMesh.hpp
   Mesh/Mesh.hpp
@@ -60,6 +61,7 @@ set(PAMELA_sources
   MeshDataWriters/VTKWriter.cpp
   MeshDataWriters/MeshDataWriterFactory.cpp
   MeshDataWriters/EnsightGoldWriter.cpp
+  MeshDataWriters/MeshParts.cpp
   Mesh/CartesianMesh.cpp
   Mesh/MeshFactory.cpp
   Mesh/Mesh.cpp

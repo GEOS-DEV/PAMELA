@@ -8,6 +8,7 @@
 #include "Property/Property.hpp"
 #include "Adjacency/AdjacencySet.hpp"
 #include "Utils/Utils.hpp"
+#include "MeshDataWriters/Part.hpp"
 
 namespace PAMELA
 {
@@ -90,6 +91,4 @@ namespace PAMELA
 		std::vector<int> TRIVIALPartitioning();
 
 	};
-
-
 }

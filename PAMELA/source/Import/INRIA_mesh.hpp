@@ -25,7 +25,7 @@ namespace PAMELA
 		static int m_ntetrahedra;
 		static int m_nhexahedra;
 
-		static std::unordered_map<INRIA_MESH_TYPE, ELEMENTS::TYPE> m_TypeMap;
+		static std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap;
 
 		static void InitElementsMapping();
 

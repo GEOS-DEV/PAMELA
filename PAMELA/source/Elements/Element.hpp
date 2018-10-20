@@ -20,63 +20,63 @@ namespace PAMELA
 		//Family
 		enum class FAMILY { POLYHEDRON = 3, POLYGON = 2, LINE = 1, POINT = 0, UNKNOWN = -1 };
 
-		static const std::unordered_map<FAMILY, int> dimension =
+		static const std::unordered_map<int, int> dimension =
 		{
-			{ FAMILY::POLYHEDRON ,3 },
-			{ FAMILY::POLYGON ,2 },
-			{ FAMILY::LINE ,1 },
-			{ FAMILY::POINT ,0 },
-			{ FAMILY::UNKNOWN ,-1 },
+			{ static_cast<int>(FAMILY::POLYHEDRON) ,3 },
+			{ static_cast<int>(FAMILY::POLYGON) ,2 },
+			{ static_cast<int>(FAMILY::LINE) ,1 },
+			{ static_cast<int>(FAMILY::POINT) ,0 },
+			{ static_cast<int>(FAMILY::UNKNOWN) ,-1 },
 		};
 
 		//LABEL
-		const std::unordered_map<FAMILY, std::string> label =
+		const std::unordered_map<int, std::string> label =
 		{
-			{ FAMILY::POLYHEDRON ,"POLYHEDRON" },
-			{ FAMILY::POLYGON ,"POLYGON" },
-			{ FAMILY::LINE ,"LINE" },
-			{ FAMILY::POINT ,"POINT" },
-			{ FAMILY::UNKNOWN ,"UNKNOWN" },
+			{ static_cast<int>(FAMILY::POLYHEDRON) ,"POLYHEDRON" },
+			{ static_cast<int>(FAMILY::POLYGON) ,"POLYGON" },
+			{ static_cast<int>(FAMILY::LINE) ,"LINE" },
+			{ static_cast<int>(FAMILY::POINT) ,"POINT" },
+			{ static_cast<int>(FAMILY::UNKNOWN) ,"UNKNOWN" },
 		};
 
 
 		//TYPE
 		enum class TYPE { UNKNOWN = -1, VTK_VERTEX = 1, VTK_LINE = 3, VTK_TRIANGLE = 5, VTK_QUAD = 9, VTK_TETRA = 10, VTK_HEXAHEDRON = 12, VTK_WEDGE = 13, VTK_PYRAMID = 14 };
 
-		const std::unordered_map<TYPE, int> nVertex =
+		const std::unordered_map<int, int> nVertex =
 		{
-			{ TYPE::VTK_VERTEX ,1 },
-			{ TYPE::VTK_LINE ,1 },
-			{ TYPE::VTK_TRIANGLE ,3 },
-			{ TYPE::VTK_QUAD ,4 },
-			{ TYPE::VTK_TETRA ,4 },
-			{ TYPE::VTK_HEXAHEDRON ,8 },
-			{ TYPE::VTK_WEDGE ,6 },
-			{ TYPE::VTK_PYRAMID ,5 },
-			{ TYPE::UNKNOWN ,-1 },
+			{ static_cast<int>(TYPE::VTK_VERTEX) ,1 },
+			{ static_cast<int>(TYPE::VTK_LINE) ,1 },
+			{ static_cast<int>(TYPE::VTK_TRIANGLE) ,3 },
+			{ static_cast<int>(TYPE::VTK_QUAD) ,4 },
+			{ static_cast<int>(TYPE::VTK_TETRA) ,4 },
+			{ static_cast<int>(TYPE::VTK_HEXAHEDRON) ,8 },
+			{ static_cast<int>(TYPE::VTK_WEDGE) ,6 },
+			{ static_cast<int>(TYPE::VTK_PYRAMID) ,5 },
+			{ static_cast<int>(TYPE::UNKNOWN),-1 },
 		};
 
-		const std::unordered_map<TYPE, int> nFace =
+		const std::unordered_map<int, int> nFace =
 		{
-			{ TYPE::VTK_TETRA ,4 },
-			{ TYPE::VTK_HEXAHEDRON ,8 },
-			{ TYPE::VTK_WEDGE ,5 },
-			{ TYPE::VTK_PYRAMID ,5 },
-			{ TYPE::UNKNOWN ,-1 },
+			{ static_cast<int>(TYPE::VTK_TETRA) ,4 },
+			{ static_cast<int>(TYPE::VTK_HEXAHEDRON) ,8 },
+			{ static_cast<int>(TYPE::VTK_WEDGE) ,5 },
+			{ static_cast<int>(TYPE::VTK_PYRAMID) ,5 },
+			{ static_cast<int>(TYPE::UNKNOWN) ,-1 },
 		};
 
 
 		//MAPPING
-		const std::unordered_map<TYPE, FAMILY> TypeToFamily =
+		const std::unordered_map<int, FAMILY> TypeToFamily =
 		{
-			{ TYPE::VTK_VERTEX ,FAMILY::POINT },
-			{ TYPE::VTK_LINE ,FAMILY::LINE },
-			{ TYPE::VTK_TRIANGLE ,FAMILY::POLYGON },
-			{ TYPE::VTK_QUAD ,FAMILY::POLYGON },
-			{ TYPE::VTK_TETRA ,FAMILY::POLYHEDRON },
-			{ TYPE::VTK_HEXAHEDRON ,FAMILY::POLYHEDRON },
-			{ TYPE::VTK_WEDGE ,FAMILY::POLYHEDRON },
-			{ TYPE::VTK_PYRAMID ,FAMILY::POLYHEDRON }
+			{ static_cast<int>(TYPE::VTK_VERTEX) ,FAMILY::POINT },
+			{ static_cast<int>(TYPE::VTK_LINE) ,FAMILY::LINE },
+			{ static_cast<int>(TYPE::VTK_TRIANGLE) ,FAMILY::POLYGON },
+			{ static_cast<int>(TYPE::VTK_QUAD) ,FAMILY::POLYGON },
+			{ static_cast<int>(TYPE::VTK_TETRA) ,FAMILY::POLYHEDRON },
+			{ static_cast<int>(TYPE::VTK_HEXAHEDRON) ,FAMILY::POLYHEDRON },
+			{ static_cast<int>(TYPE::VTK_WEDGE) ,FAMILY::POLYHEDRON },
+			{ static_cast<int>(TYPE::VTK_PYRAMID) ,FAMILY::POLYHEDRON }
 
 		};
 
@@ -100,7 +100,7 @@ namespace PAMELA
 		//Getters
 		int get_localIndex() const { return m_index.Local; }
 		int get_globalIndex() const { return m_index.Global; }
-		int get_dimension() { return ELEMENTS::dimension.at(m_family); }
+		int get_dimension() { return ELEMENTS::dimension.at(static_cast<int>(m_family)); }
 		ELEMENTS::FAMILY get_family() { return m_family; }
 		ELEMENTS::TYPE get_vtkType() { return m_vtkType; }
 

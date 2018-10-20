@@ -136,7 +136,7 @@ namespace PAMELA
 		static unsigned int m_nWells;
 		static std::unordered_map<std::string, WELL*> m_Wells;
 
-		static std::unordered_map<ECLIPSE_MESH_TYPE, ELEMENTS::TYPE> m_TypeMap;
+		static std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap;
 
 		static void InitElementsMapping();
 

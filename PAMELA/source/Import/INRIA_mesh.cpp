@@ -16,16 +16,16 @@ namespace PAMELA
 	int INRIA_mesh::m_ntetrahedra = 0;
 	int INRIA_mesh::m_nhexahedra = 0;
 
-	std::unordered_map<INRIA_MESH_TYPE, ELEMENTS::TYPE> INRIA_mesh::m_TypeMap;
+	std::unordered_map<int, ELEMENTS::TYPE> INRIA_mesh::m_TypeMap;
 
 	void INRIA_mesh::InitElementsMapping()
 	{
-		m_TypeMap[INRIA_MESH_TYPE::TRIANGLE] = ELEMENTS::TYPE::VTK_TRIANGLE;
-		m_TypeMap[INRIA_MESH_TYPE::EDGE] = ELEMENTS::TYPE::VTK_LINE;
-		m_TypeMap[INRIA_MESH_TYPE::HEXAHEDRON] = ELEMENTS::TYPE::VTK_HEXAHEDRON;
-		m_TypeMap[INRIA_MESH_TYPE::QUADRILATERAL] = ELEMENTS::TYPE::VTK_QUAD;
-		m_TypeMap[INRIA_MESH_TYPE::TETRAHEDRON] = ELEMENTS::TYPE::VTK_TETRA;
-		m_TypeMap[INRIA_MESH_TYPE::VERTEX] = ELEMENTS::TYPE::VTK_VERTEX;
+		m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::TRIANGLE)] = ELEMENTS::TYPE::VTK_TRIANGLE;
+		m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::EDGE)] = ELEMENTS::TYPE::VTK_LINE;
+		m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::HEXAHEDRON)] = ELEMENTS::TYPE::VTK_HEXAHEDRON;
+		m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::QUADRILATERAL)] = ELEMENTS::TYPE::VTK_QUAD;
+		m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::TETRAHEDRON)] = ELEMENTS::TYPE::VTK_TETRA;
+		m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::VERTEX)] = ELEMENTS::TYPE::VTK_VERTEX;
 	}
 
 	Mesh* INRIA_mesh::CreateMesh(std::string file_path)
@@ -100,7 +100,7 @@ namespace PAMELA
 				LOGINFO("Reading vertices...");
 
 				//data
-				elementType = m_TypeMap[INRIA_MESH_TYPE::VERTEX];
+				elementType = m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::VERTEX)];
 				double x, y, z;
 				std::vector<Vertex*> vertexTemp = { nullptr };
 				for (int i = 0; i < m_nvertices; i++)
@@ -121,7 +121,7 @@ namespace PAMELA
 				LOGINFO("Reading triangles...");
 
 				//data
-				elementType = m_TypeMap[INRIA_MESH_TYPE::TRIANGLE];
+				elementType = m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::TRIANGLE)];
 				int v0, v1, v2;
 				ElementCollection<Point*>& vertexcollection = *(mesh->get_PointCollection());
 				std::vector<Point*> vertexTemp = { nullptr,nullptr,nullptr };
@@ -147,7 +147,7 @@ namespace PAMELA
 				LOGINFO("Reading quadrilaterals...");
 
 				//data
-				elementType = m_TypeMap[INRIA_MESH_TYPE::QUADRILATERAL];
+				elementType = m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::QUADRILATERAL)];
 				int v0, v1, v2, v3;
 				ElementCollection<Point*>& vertexcollection = *(mesh->get_PointCollection());
 				std::vector<Point*> vertexTemp = { nullptr,nullptr,nullptr,nullptr };
@@ -174,7 +174,7 @@ namespace PAMELA
 				LOGINFO("Reading tetrahedra...");
 
 				//data
-				elementType = m_TypeMap[INRIA_MESH_TYPE::TETRAHEDRON];
+				elementType = m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::TETRAHEDRON)];
 				int v0, v1, v2, v3;
 				ElementCollection<Point*>& vertexcollection = *(mesh->get_PointCollection());
 
@@ -203,7 +203,7 @@ namespace PAMELA
 				LOGINFO("Reading hexahedra...");
 
 				//data
-				elementType = m_TypeMap[INRIA_MESH_TYPE::HEXAHEDRON];
+				elementType = m_TypeMap[static_cast<int>(INRIA_MESH_TYPE::HEXAHEDRON)];
 				int v0, v1, v2, v3, v4, v5, v6, v7;
 				ElementCollection<Point*>& vertexcollection = *(mesh->get_PointCollection());
 				std::vector<Point*> vertexTemp = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };

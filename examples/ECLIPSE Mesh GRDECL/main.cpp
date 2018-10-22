@@ -13,6 +13,8 @@
 int main(int argc, char **argv) {
 
 	using namespace  PAMELA;
+        utils::pamela_unused(argc);
+        utils::pamela_unused(argv);
 
 
 	Communicator::initialize();

@@ -12,6 +12,8 @@
 int main(int argc, char **argv) {
 
 	using namespace  PAMELA;
+        utils::pamela_unused(argc);
+        utils::pamela_unused(argv);
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
 	Communicator::initialize();

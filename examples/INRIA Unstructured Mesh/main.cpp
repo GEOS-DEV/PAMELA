@@ -12,6 +12,8 @@
 int main(int argc, char **argv) {
 
 	using namespace  PAMELA;
+        utils::pamela_unused(argc);
+        utils::pamela_unused(argv);
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
 	Communicator::initialize();
@@ -22,12 +24,13 @@ int main(int argc, char **argv) {
 #endif
 
 
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/medit/small.mesh");
+        std::cout << PAMELA_PATH"/../data/medit/small.mesh" << std::endl;
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/../data/medit/small.mesh");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 	MainMesh->CreateLineGroupWithAdjacency("TopologicalC2C", MainMesh->getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
-	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.case");
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.vtm");
 	OutputWriter->DeclareAndSetElementGlobalIndex();
 	OutputWriter->DeclareAndSetPartitionNumber();
 

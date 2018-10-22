@@ -78,7 +78,6 @@ if(${USE_VTK})
   set(pamela_dependencies_list ${pamela_dependencies_list} VTK)
 endif(${USE_VTK})
 set(PAMELA_dependencies ${pamela_dependencies_list})
-message(STATUS ${PAMELA_dependencies})
 
 message("adding PAMELA_Library")
 blt_add_library(NAME                  ${PAMELA_target}

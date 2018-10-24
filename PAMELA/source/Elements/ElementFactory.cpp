@@ -19,7 +19,7 @@ namespace PAMELA
 	Polygon* ElementFactory::makePolygon(ELEMENTS::TYPE elementType, int index, const std::vector<Point*>& vertexList)
 	{
 
-		ASSERT(ELEMENTS::TypeToFamily.at(elementType) == ELEMENTS::FAMILY::POLYGON, "Element type is not a polygon");
+		ASSERT(ELEMENTS::TypeToFamily.at(static_cast<int>(elementType)) == ELEMENTS::FAMILY::POLYGON, "Element type is not a polygon");
 
 		switch (elementType)
 		{
@@ -39,7 +39,7 @@ namespace PAMELA
 	Polyhedron* ElementFactory::makePolyhedron(ELEMENTS::TYPE elementType, int index, const std::vector<Point*>& vertexList)
 	{
 
-		ASSERT(ELEMENTS::TypeToFamily.at(elementType) == ELEMENTS::FAMILY::POLYHEDRON, "Element type is not a polyhedron");
+		ASSERT(ELEMENTS::TypeToFamily.at(static_cast<int>(elementType)) == ELEMENTS::FAMILY::POLYHEDRON, "Element type is not a polyhedron");
 
 		switch (elementType)
 		{

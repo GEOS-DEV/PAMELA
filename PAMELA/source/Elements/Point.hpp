@@ -49,8 +49,8 @@ namespace PAMELA
 
 		ElementSpe(int index, double x, double y, double z) :Element(index, x, y, z)
 		{
-			ELEMENTS::nVertex.at(elementType);
-			ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
+			ELEMENTS::nVertex.at(static_cast<int>(elementType));
+			ASSERT(ELEMENTS::TypeToFamily.at(static_cast<int>(elementType)) == m_family, "Type not compatible with family");
 			m_vtkType = elementType;
 		}
 

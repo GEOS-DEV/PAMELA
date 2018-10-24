@@ -45,8 +45,8 @@ namespace PAMELA
 	public:
 		ElementSpe(int index, const std::vector<Point*>& vertexList) :Element(index, vertexList)
 		{
-			ELEMENTS::nVertex.at(elementType);
-			ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
+			ELEMENTS::nVertex.at(static_cast<int>(elementType));
+			ASSERT(ELEMENTS::TypeToFamily.at(static_cast<int>(elementType)) == m_family, "Type not compatible with family");
 			m_vtkType = elementType;
 		}
 		~ElementSpe() {}

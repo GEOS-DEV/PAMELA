@@ -218,18 +218,18 @@ namespace PAMELA
 			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
 			{
 				auto vtkType = (*it2)->get_vtkType();
-				partptr->numberOfElementsPerSubPart[vtkType] = partptr->numberOfElementsPerSubPart.at(vtkType) + 1;
+				partptr->numberOfElementsPerSubPart[static_cast<int>(vtkType)] = partptr->numberOfElementsPerSubPart.at(static_cast<int>(vtkType)) + 1;
 			}
 			//----Create as many subparts as there are different elements
 			for (auto it2 = partptr->numberOfElementsPerSubPart.begin(); it2 != partptr->numberOfElementsPerSubPart.end(); ++it2)
 			{
-				partptr->SubParts[it2->first] = new SubPart<T>(it2->second, it2->first);
+				partptr->SubParts[it2->first] = new SubPart<T>(it2->second, static_cast<ELEMENTS::TYPE>(it2->first));
 			}
 			//----Fill subparts with elements
 			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
 			{
 				auto vtkType = (*it2)->get_vtkType();
-				partptr->SubParts[vtkType]->SubCollection.push_back_owned_unique(*it2);
+				partptr->SubParts[static_cast<int>(vtkType)]->SubCollection.push_back_owned_unique(*it2);
 			}
 
 			//----Mapping from local to global
@@ -237,7 +237,7 @@ namespace PAMELA
 			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
 			{
 				auto vtkType = (*it2)->get_vtkType();
-				auto subpart = partptr->SubParts[vtkType];
+				auto subpart = partptr->SubParts[static_cast<int>(vtkType)];
 				//Map local indexes
 				subpart->IndexMapping.push_back(id);
 				id++;

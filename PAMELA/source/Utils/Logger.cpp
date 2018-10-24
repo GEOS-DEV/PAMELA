@@ -2,6 +2,7 @@
 #include "Logger.hpp"
 #include "Parallel/Communicator.hpp"
 #include "Utils.hpp"
+#include <iomanip>
 
 #define LEVEL_LOG_FILE "DEBUG"
 #define LEVEL_LOG_SCREEN "BRIEF"
@@ -147,8 +148,8 @@ namespace PAMELA
 #else
 		now = localtime(&t);
 #endif
-		res << std::put_time(now, "%Y-%m-%d %H:%M:%S");
-		//res << (now.tm_year + 1900) << "-" << (now.tm_mon + 1) << "-" << (now.tm_mday) << "-" << now.tm_hour << ":" << now.tm_min << ":" << now.tm_sec;
+		// res << std::put_time(now, "%Y-%m-%d %H:%M:%S");
+		res << (now->tm_year + 1900) << "-" << (now->tm_mon + 1) << "-" << (now->tm_mday) << "-" << now->tm_hour << ":" << now->tm_min << ":" << now->tm_sec;
 		return res.str();
 	}
 

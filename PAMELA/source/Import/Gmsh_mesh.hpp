@@ -30,7 +30,7 @@ namespace PAMELA
 		static int m_npyramids;
 		static int m_npoints;
 
-		static std::unordered_map<GMSH_MESH_TYPE, ELEMENTS::TYPE> m_TypeMap;
+		static std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap;
 
 		static std::unordered_map<int, std::string> m_TagNamePolygon;
 		static std::unordered_map<int, std::string> m_TagNamePolyhedron;

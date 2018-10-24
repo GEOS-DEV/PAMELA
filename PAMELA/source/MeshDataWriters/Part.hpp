@@ -51,18 +51,18 @@ namespace PAMELA
 		ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* Collection;
 		std::vector<Point*> Points;
 		std::unordered_map<int, int> GlobalToLocalPointMapping;
-		std::unordered_map<ELEMENTS::TYPE, SubPart<T>*> SubParts;
-		std::unordered_map<ELEMENTS::TYPE, int> numberOfElementsPerSubPart
+		std::unordered_map<int, SubPart<T>*> SubParts;
+		std::unordered_map<int, int> numberOfElementsPerSubPart
 			=
 		{
-			{ ELEMENTS::TYPE::VTK_VERTEX,0 },
-			{ ELEMENTS::TYPE::VTK_LINE,0 },
-			{ ELEMENTS::TYPE::VTK_TRIANGLE,0 },
-			{ ELEMENTS::TYPE::VTK_QUAD ,0 },
-			{ ELEMENTS::TYPE::VTK_TETRA,0 },
-			{ ELEMENTS::TYPE::VTK_HEXAHEDRON ,0 },
-			{ ELEMENTS::TYPE::VTK_WEDGE,0 },
-			{ ELEMENTS::TYPE::VTK_PYRAMID,0 }
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_VERTEX),0 },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_LINE),0 },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_TRIANGLE),0 },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_QUAD) ,0 },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_TETRA),0 },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_HEXAHEDRON) ,0 },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_WEDGE),0 },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_PYRAMID),0 }
 		};
 
 		std::vector<VariableDouble*> PerElementVariable;

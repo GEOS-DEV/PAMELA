@@ -42,30 +42,30 @@ namespace PAMELA
 		template<typename T>
 		void DumpVariables_Parts(const PartMap<T>* parts);
 
-		const std::unordered_map<ELEMENTS::TYPE, std::string> ElementToLabel
+		const std::unordered_map<int, std::string> ElementToLabel
 			=
 		{
-			{ ELEMENTS::TYPE::VTK_VERTEX, "point" },
-			{ ELEMENTS::TYPE::VTK_LINE,"bar2" },
-			{ ELEMENTS::TYPE::VTK_TRIANGLE,"tria3" },
-			{ ELEMENTS::TYPE::VTK_QUAD ,"quad4" },
-			{ ELEMENTS::TYPE::VTK_TETRA,"tetra4" },
-			{ ELEMENTS::TYPE::VTK_HEXAHEDRON ,"hexa8" },
-			{ ELEMENTS::TYPE::VTK_WEDGE,"penta6" },
-			{ ELEMENTS::TYPE::VTK_PYRAMID,"pyramid5" }
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_VERTEX), "point" },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_LINE),"bar2" },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_TRIANGLE),"tria3" },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_QUAD) ,"quad4" },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_TETRA),"tetra4" },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_HEXAHEDRON) ,"hexa8" },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_WEDGE),"penta6" },
+			{ static_cast<int>(ELEMENTS::TYPE::VTK_PYRAMID),"pyramid5" }
 		};
 
 
-		const std::unordered_map<ENSIGHT_GOLD_TYPE, FAMILY> TypeToFamily =
+		const std::unordered_map<int, FAMILY> TypeToFamily =
 		{
-			{ ENSIGHT_GOLD_TYPE::ESG_POINT,FAMILY::POINT },
-			{ ENSIGHT_GOLD_TYPE::ESG_BAR2,FAMILY::LINE },
-			{ ENSIGHT_GOLD_TYPE::ESG_TRIA3,FAMILY::POLYGON },
-			{ ENSIGHT_GOLD_TYPE::ENS_QUAD4,FAMILY::POLYGON },
-			{ ENSIGHT_GOLD_TYPE::ENS_TETRA4,FAMILY::POLYHEDRON },
-			{ ENSIGHT_GOLD_TYPE::ENS_HEXA8,FAMILY::POLYHEDRON },
-			{ ENSIGHT_GOLD_TYPE::ENS_PENTA6,FAMILY::POLYHEDRON },
-			{ ENSIGHT_GOLD_TYPE::ENS_PYRAMID5,FAMILY::POLYHEDRON }
+			{ static_cast<int>(ENSIGHT_GOLD_TYPE::ESG_POINT),FAMILY::POINT },
+			{ static_cast<int>(ENSIGHT_GOLD_TYPE::ESG_BAR2),FAMILY::LINE },
+			{ static_cast<int>(ENSIGHT_GOLD_TYPE::ESG_TRIA3),FAMILY::POLYGON },
+			{ static_cast<int>(ENSIGHT_GOLD_TYPE::ENS_QUAD4),FAMILY::POLYGON },
+			{ static_cast<int>(ENSIGHT_GOLD_TYPE::ENS_TETRA4),FAMILY::POLYHEDRON },
+			{ static_cast<int>(ENSIGHT_GOLD_TYPE::ENS_HEXA8),FAMILY::POLYHEDRON },
+			{ static_cast<int>(ENSIGHT_GOLD_TYPE::ENS_PENTA6),FAMILY::POLYHEDRON },
+			{ static_cast<int>(ENSIGHT_GOLD_TYPE::ENS_PYRAMID5),FAMILY::POLYHEDRON }
 		};
 
 		enum class ENSIGHT_GOLD_VARIABLE_DIMENSION { UNKNOWN = -1, SCALAR = 1, VECTOR = 3, TENSOR_SYMM = 6 };
@@ -142,7 +142,7 @@ namespace PAMELA
 				{
 					auto subpart = it2->second;
 					auto elementType = subpart->ElementType;
-					std::string ENSTypeLabel = ElementToLabel.at(elementType);
+					std::string ENSTypeLabel = ElementToLabel.at(static_cast<int>(elementType));
 					m_geoFile << ENSTypeLabel << std::endl;
 					m_geoFile << std::setw(10);
 					//----dimension
@@ -202,7 +202,7 @@ namespace PAMELA
 					{
 						auto subpart = it3->second;
 						auto elementType = subpart->ElementType;
-						std::string ENSTypeLabel = ElementToLabel.at(elementType);
+						std::string ENSTypeLabel = ElementToLabel.at(static_cast<int>(elementType));
 						variableFile << ENSTypeLabel << std::endl;
 						variableFile << std::setw(10);
 						for (auto it4 = subpart->SubCollection.begin_owned(); it4 != subpart->SubCollection.end_owned(); ++it4)

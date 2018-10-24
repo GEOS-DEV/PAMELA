@@ -10,6 +10,7 @@
 #include <utility>
 #include <string>
 #include <sstream>
+#include <array>
 
 namespace PAMELA
 {

@@ -113,7 +113,7 @@ namespace PAMELA
 
 	protected:
 
-		//virtual ~ElementBase() = 0;
+		virtual ~ElementBase() = default ;
 		ELEMENTS::TYPE m_vtkType;
 		ELEMENTS::FAMILY m_family;
 

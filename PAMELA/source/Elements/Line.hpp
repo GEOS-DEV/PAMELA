@@ -22,7 +22,6 @@ namespace PAMELA
 			m_family = ELEMENTS::FAMILY::LINE;
 		}
 
-		virtual ~Element() = 0;
 
 		//Getter
 		const std::vector<Point*>& get_vertexList() const { return m_vertexList; }
@@ -49,7 +48,6 @@ namespace PAMELA
 			ASSERT(ELEMENTS::TypeToFamily.at(static_cast<int>(elementType)) == m_family, "Type not compatible with family");
 			m_vtkType = elementType;
 		}
-		~ElementSpe() {}
 
 	private:
 

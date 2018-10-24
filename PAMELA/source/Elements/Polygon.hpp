@@ -23,7 +23,6 @@ namespace PAMELA
                         utils::pamela_unused(index);
 			m_family = ELEMENTS::FAMILY::POLYGON;
 		}
-		virtual ~Element() = 0;
 
 		//Getters
 		ELEMENTS::TYPE get_vtkType() const { return m_vtkType; }
@@ -155,7 +154,6 @@ namespace PAMELA
 			ASSERT(ELEMENTS::TypeToFamily.at(static_cast<int>(elementType)) == m_family, "Type not compatible with family");
 			m_vtkType = elementType;
 		}
-		virtual ~ElementSpe() override {}
 
 		//Geometry
 		double get_SurfaceArea() override;

@@ -1,5 +1,6 @@
 #include "MeshDataWriters/MeshDataWriter.hpp"
 #include "Mesh/Mesh.hpp"
+#include "MeshDataWriters/MeshParts.hpp"
 #include "Elements/ElementFactory.hpp"
 
 namespace PAMELA
@@ -21,95 +22,10 @@ namespace PAMELA
 
 		//Part Index
 		int partIndex = 1;
-
-		//------------------------------------------------------------- PointCollection -------------------------------------------------------------
-		auto pointCollection = m_mesh->get_PointCollection();
-		auto ActiveGroupMapPoint = pointCollection->get_ActiveGroupsMap();
-
-		//--Add active parts
-		for (auto it = ActiveGroupMapPoint.begin(); it != ActiveGroupMapPoint.end(); ++it)	//Loop over group and act on active groups
-		{
-			if (it->second)
-			{
-				std::string grplabel = it->first;
-				auto groupEnsemble = pointCollection->get_Group(grplabel);
-				m_PointParts[grplabel] = new Part<Point*>(grplabel, partIndex, groupEnsemble);
-				partIndex++;
-			}
-		}
-		FillParts("PART" + PartitionNumberForExtension() + "_" + "POINT", &m_PointParts);
-
-
-
-		//------------------------------------------------------------- LineCollection -------------------------------------------------------------
-		auto lineCollection = m_mesh->get_LineCollection();
-		auto ActiveGroupMapLine = lineCollection->get_ActiveGroupsMap();
-
-		//--Add active parts
-		for (auto it = ActiveGroupMapLine.begin(); it != ActiveGroupMapLine.end(); ++it)	//Loop over group and act on active groups
-		{
-			if (it->second)
-			{
-				std::string grplabel = it->first;
-				auto groupEnsemble = lineCollection->get_Group(grplabel);
-				m_LineParts[grplabel] = new Part<Line*>(grplabel, partIndex, groupEnsemble);
-				partIndex++;
-			}
-		}
-		FillParts("PART" + PartitionNumberForExtension() + "_" + "LINE", &m_LineParts);
-
-
-		//------------------------------------------------------------- ImplicitLineCollection -------------------------------------------------------------
-		auto ImplicitLineCollection = m_mesh->get_ImplicitLineCollection();
-		auto ActiveGroupMapImplicitLine = ImplicitLineCollection->get_ActiveGroupsMap();
-
-		//--Add active parts
-		for (auto it = ActiveGroupMapImplicitLine.begin(); it != ActiveGroupMapImplicitLine.end(); ++it)	//Loop over group and act on active groups
-		{
-			if (it->second)
-			{
-				std::string grplabel = it->first;
-				auto groupEnsemble = ImplicitLineCollection->get_Group(grplabel);
-				m_LineParts[grplabel] = new Part<Line*>(grplabel, partIndex, groupEnsemble);
-				partIndex++;
-			}
-		}
-		FillParts("PART" + PartitionNumberForExtension() + "_" + "LINE", &m_LineParts);
-
-
-		//------------------------------------------------------------- PolygonCollection -------------------------------------------------------------
-		auto polygonCollection = m_mesh->get_PolygonCollection();
-		auto ActiveGroupMapPolygon = polygonCollection->get_ActiveGroupsMap();
-
-		//--Add active parts
-		for (auto it = ActiveGroupMapPolygon.begin(); it != ActiveGroupMapPolygon.end(); ++it)	//Loop over group and act on active groups
-		{
-			if (it->second)
-			{
-				std::string grplabel = it->first;
-				auto groupEnsemble = polygonCollection->get_Group(grplabel);
-				m_PolygonParts[grplabel] = new Part<Polygon*>(grplabel, partIndex, groupEnsemble);
-				partIndex++;
-			}
-		}
-		FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYGON", &m_PolygonParts);
-
-		//------------------------------------------------------------- PolyhedronCollection -------------------------------------------------------------
-		auto polyhedronCollection = m_mesh->get_PolyhedronCollection();
-		auto ActiveGroupMapPolyhedron = polyhedronCollection->get_ActiveGroupsMap();
-
-		//--Add active parts
-		for (auto it = ActiveGroupMapPolyhedron.begin(); it != ActiveGroupMapPolyhedron.end(); ++it)	//Loop over group and act on active groups
-		{
-			if (it->second)
-			{
-				std::string grplabel = it->first;
-				auto groupEnsemble = polyhedronCollection->get_Group(grplabel);
-				m_PolyhedronParts[grplabel] = new Part<Polyhedron*>(grplabel, partIndex, groupEnsemble);
-				partIndex++;
-			}
-		}
-		FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYHEDRON", &m_PolyhedronParts);
+                std::tie(m_PointParts, partIndex) = getPointPartMap(m_mesh,partIndex);
+                std::tie(m_LineParts, partIndex) = getLinePartMap(m_mesh,partIndex);
+                std::tie(m_PolygonParts, partIndex) = getPolygonPartMap(m_mesh,partIndex);
+                std::tie(m_PolyhedronParts, partIndex) = getPolyhedronPartMap(m_mesh,partIndex);
 
 		LOGINFO("*** Done");
 	}

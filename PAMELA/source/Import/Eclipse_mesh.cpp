@@ -32,7 +32,7 @@ namespace PAMELA
 	std::unordered_map<Eclipse_mesh::IJK, unsigned int, Eclipse_mesh::IJKHash> Eclipse_mesh::m_IJK2Index;
 	std::unordered_map<unsigned int, Eclipse_mesh::IJK> Eclipse_mesh::m_Index2IJK;
 	std::unordered_map<unsigned int, unsigned int> Eclipse_mesh::m_IndexTotal2Active;
-	std::unordered_map<ECLIPSE_MESH_TYPE, ELEMENTS::TYPE> Eclipse_mesh::m_TypeMap;
+	std::unordered_map<int, ELEMENTS::TYPE> Eclipse_mesh::m_TypeMap;
 
 	bool Eclipse_mesh::m_INIT_file=false;
 	bool Eclipse_mesh::m_UNRST_file=false;
@@ -52,10 +52,10 @@ namespace PAMELA
 
 	void Eclipse_mesh::InitElementsMapping()
 	{
-		m_TypeMap[ECLIPSE_MESH_TYPE::EDGE] = ELEMENTS::TYPE::VTK_LINE;
-		m_TypeMap[ECLIPSE_MESH_TYPE::HEXAHEDRON] = ELEMENTS::TYPE::VTK_HEXAHEDRON;
-		m_TypeMap[ECLIPSE_MESH_TYPE::QUADRILATERAL] = ELEMENTS::TYPE::VTK_QUAD;
-		m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX] = ELEMENTS::TYPE::VTK_VERTEX;
+		m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::EDGE)] = ELEMENTS::TYPE::VTK_LINE;
+		m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)] = ELEMENTS::TYPE::VTK_HEXAHEDRON;
+		m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::QUADRILATERAL)] = ELEMENTS::TYPE::VTK_QUAD;
+		m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)] = ELEMENTS::TYPE::VTK_VERTEX;
 	}
 
 	Mesh* Eclipse_mesh::CreateMeshFromGRDECL(File file)
@@ -522,18 +522,18 @@ namespace PAMELA
 						m_IndexTotal2Active[icellTotal] = icell;
 
 						//Points
-						vertexTemp[0] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]);
-						vertexTemp[4] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 6, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]);
-						vertexTemp[1] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 5, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]);
-						vertexTemp[5] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 4, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]);
-						vertexTemp[3] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 3, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]);
-						vertexTemp[7] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 2, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]);
-						vertexTemp[2] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 1, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]);
-						vertexTemp[6] = mesh->addPoint(m_TypeMap[ECLIPSE_MESH_TYPE::VERTEX], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]);
+						vertexTemp[0] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]);
+						vertexTemp[4] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 6, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]);
+						vertexTemp[1] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 5, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]);
+						vertexTemp[5] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 4, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]);
+						vertexTemp[3] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 3, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]);
+						vertexTemp[7] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 2, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]);
+						vertexTemp[2] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 1, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]);
+						vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]);
 
 						//Hexa
 						mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP");
-						auto returned_element = mesh->addPolyhedron(m_TypeMap[ECLIPSE_MESH_TYPE::HEXAHEDRON], icell, "POLYHEDRON_GROUP", vertexTemp);
+						auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], icell, "POLYHEDRON_GROUP", vertexTemp);
 
 						if (returned_element != nullptr)
 						{

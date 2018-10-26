@@ -36,6 +36,8 @@ if(NOT is_submodule)
 
   include(cmake/tpls.cmake)
 
+  add_subdirectory(PAMELA)
+
   #Expose important paths
   set(PAMELA_PATH ${CMAKE_SOURCE_DIR} CACHE INTERNAL "PAMELA_PATH" FORCE)
 
@@ -50,5 +52,6 @@ if(NOT is_submodule)
     add_subdirectory(tests)
   endif(COMPILE_TESTS)
 endif()
-
-add_subdirectory(PAMELA)
+if(is_submodule)
+  add_subdirectory(PAMELA)
+endif()

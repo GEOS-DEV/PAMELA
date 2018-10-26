@@ -23,7 +23,6 @@ namespace PAMELA
                         utils::pamela_unused(index);
 			m_family = ELEMENTS::FAMILY::POLYGON;
 		}
-		virtual ~Element() = 0;
 
 		//Getters
 		ELEMENTS::TYPE get_vtkType() const { return m_vtkType; }
@@ -150,12 +149,11 @@ namespace PAMELA
 
 		ElementSpe(int index, const std::vector<Point*>& vertexList) :Element(index, vertexList)
 		{
-			ELEMENTS::nVertex.at(m_vtkType);
-			ASSERT(vertexList.size() == static_cast<unsigned int>(ELEMENTS::nVertex.at(elementType)), "Vertex list size is not compatible with the element type");
-			ASSERT(ELEMENTS::TypeToFamily.at(elementType) == m_family, "Type not compatible with family");
+			ELEMENTS::nVertex.at(static_cast<int>(m_vtkType));
+			ASSERT(vertexList.size() == static_cast<unsigned int>(ELEMENTS::nVertex.at(static_cast<int>(elementType))), "Vertex list size is not compatible with the element type");
+			ASSERT(ELEMENTS::TypeToFamily.at(static_cast<int>(elementType)) == m_family, "Type not compatible with family");
 			m_vtkType = elementType;
 		}
-		virtual ~ElementSpe() override {}
 
 		//Geometry
 		double get_SurfaceArea() override;

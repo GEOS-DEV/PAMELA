@@ -187,9 +187,6 @@ namespace PAMELA
 		PartMap<Polygon*>  m_PolygonParts;
 		PartMap<Polyhedron*>  m_PolyhedronParts;
 
-		template<typename T>
-		void FillParts(std::string prefixLabel, PartMap<T>* parts);
-
 		//Property
 		std::unordered_map<VariableKey, VariableDouble*, VariableKeyHash> m_Variable;
 
@@ -197,77 +194,4 @@ namespace PAMELA
 		std::vector<AdjacencyData> m_Adjacency;
 
 	};
-
-	/**
-	* \brief
-	* \tparam T
-	* \param parts
-	*/
-	template<typename T>
-	void MeshDataWriter::FillParts(std::string prefixLabel, PartMap<T>* parts)
-	{
-		//--Iterate over parts
-		for (auto it = parts->begin(); it != parts->end(); ++it)	//Loop over group and act on active groups
-		{
-			auto partptr = it->second;
-
-			//Update Label
-			partptr->Label = prefixLabel + "_" + partptr->Label;
-
-			//----Count number of elements per part
-			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
-			{
-				auto vtkType = (*it2)->get_vtkType();
-				partptr->numberOfElementsPerSubPart[vtkType] = partptr->numberOfElementsPerSubPart.at(vtkType) + 1;
-			}
-			//----Create as many subparts as there are different elements
-			for (auto it2 = partptr->numberOfElementsPerSubPart.begin(); it2 != partptr->numberOfElementsPerSubPart.end(); ++it2)
-			{
-				partptr->SubParts[it2->first] = new SubPart<T>(it2->second, it2->first);
-			}
-			//----Fill subparts with elements
-			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
-			{
-				auto vtkType = (*it2)->get_vtkType();
-				partptr->SubParts[vtkType]->SubCollection.push_back_owned_unique(*it2);
-			}
-
-			//----Mapping from local to global
-			int id = 0;
-			for (auto it2 = partptr->Collection->begin_owned(); it2 != partptr->Collection->end_owned(); ++it2)
-			{
-				auto vtkType = (*it2)->get_vtkType();
-				auto subpart = partptr->SubParts[vtkType];
-				//Map local indexes
-				subpart->IndexMapping.push_back(id);
-				id++;
-
-				//std::set<Point*> PointsSet;
-
-				//Insert vertices
-				auto vertexlist = (*it2)->get_vertexList();
-				int vertexsize = static_cast<int>(vertexlist.size());
-				for (auto i = 0; i != vertexsize; ++i)
-				{
-					partptr->Points.push_back(vertexlist[i]);
-				}
-
-			}
-
-			std::sort(partptr->Points.begin(), partptr->Points.end());
-			partptr->Points.erase(std::unique(partptr->Points.begin(), partptr->Points.end()), partptr->Points.end());
-
-
-			//----Map Point Coordinates
-			int i = 0;
-			for (auto it2 = partptr->Points.begin(); it2 != partptr->Points.end(); ++it2)
-			{
-				partptr->GlobalToLocalPointMapping[(*it2)->get_globalIndex()] = i;
-				i++;
-			}
-
-		}
-
-	}
-
 }

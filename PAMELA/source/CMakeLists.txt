@@ -31,6 +31,7 @@ set(PAMELA_headers
   MeshDataWriters/Variable.hpp
   MeshDataWriters/Part.hpp
   MeshDataWriters/MeshDataWriter.hpp
+  MeshDataWriters/MeshParts.hpp
   Mesh/MeshFactory.hpp
   Mesh/UnstructuredMesh.hpp
   Mesh/Mesh.hpp
@@ -60,6 +61,7 @@ set(PAMELA_sources
   MeshDataWriters/VTKWriter.cpp
   MeshDataWriters/MeshDataWriterFactory.cpp
   MeshDataWriters/EnsightGoldWriter.cpp
+  MeshDataWriters/MeshParts.cpp
   Mesh/CartesianMesh.cpp
   Mesh/MeshFactory.cpp
   Mesh/Mesh.cpp
@@ -78,7 +80,6 @@ if(${USE_VTK})
   set(pamela_dependencies_list ${pamela_dependencies_list} VTK)
 endif(${USE_VTK})
 set(PAMELA_dependencies ${pamela_dependencies_list})
-message(STATUS ${PAMELA_dependencies})
 
 message("adding PAMELA_Library")
 blt_add_library(NAME                  ${PAMELA_target}

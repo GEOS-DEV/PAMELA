@@ -22,11 +22,11 @@ namespace PAMELA
 	//Variable locations
 	enum class VARIABLE_LOCATION { UNKNOWN = -1, PER_NODE = 1, PER_CELL = 2 };
 	//Variable size
-	const std::unordered_map<VARIABLE_DIMENSION, int> VariableDimensionToSize =
+	const std::unordered_map<int, int> VariableDimensionToSize =
 	{
-		{ VARIABLE_DIMENSION::SCALAR,1 },
-		{ VARIABLE_DIMENSION::VECTOR,3 },
-		{ VARIABLE_DIMENSION::TENSOR_SYMM,6 },
+		{ static_cast<int>(VARIABLE_DIMENSION::SCALAR), 1 },
+		{ static_cast<int>(VARIABLE_DIMENSION::VECTOR), 3 },
+		{ static_cast<int>(VARIABLE_DIMENSION::TENSOR_SYMM), 6 },
 	};
 
 
@@ -36,7 +36,7 @@ namespace PAMELA
 	{
 		Variable(VARIABLE_DIMENSION dim, VARIABLE_TYPE type, std::string label, size_t size) : Label(label), Dimension(dim), Type(type)
 		{
-			offset = VariableDimensionToSize.at(dim);
+			offset = VariableDimensionToSize.at(static_cast<int>(dim));
 			Data = std::vector<T>(size*offset);
 		}
 

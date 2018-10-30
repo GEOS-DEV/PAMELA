@@ -24,22 +24,14 @@ if(NOT is_submodule)
   #Path
   set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
+  include(cmake/blt/SetupBLT.cmake)
+  include(cmake/PAMELA.cmake)
+
   #Options
   option(PAMELA_WITH_TESTS "Compile test" OFF)
   option(PAMELA_WITH_EXAMPLES "Compile Examples" OFF)
   option(PAMELA_WITH_VTK "Enable VTK" OFF)
   option(PAMELA_WITH_MPI "Enable MPI" OFF)
-
-  #Enable testing using BLT
-  if(${PAMELA_WITH_TESTS})
-    set(ENABLE_TEST ON)
-  endif(${PAMELA_WITH_TESTS})
-
-
-  include(cmake/blt/SetupBLT.cmake)
-  include(cmake/PAMELA.cmake)
-
-
 
   include(cmake/tpls.cmake)
 

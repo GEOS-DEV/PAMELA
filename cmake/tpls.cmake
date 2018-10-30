@@ -1,4 +1,4 @@
-if(USE_MPI)
+if(PAMELA_WITH_MPI)
     find_package(MPI REQUIRED)
 
     message(STATUS "MPI C Compile Flags:  ${MPI_C_COMPILE_FLAGS}")
@@ -16,10 +16,11 @@ blt_register_library(NAME mpi
                      TREAT_INCLUDES_AS_SYSTEM ON
                      LIBRARIES ${MPI_C_LIBRARIES} ${MPI_CXX_LIBRARIES}
                      COMPILE_FLAGS "${MPI_C_COMPILE_FLAGS} -DWITH_MPI"
-                     LINK_FLAGS    "${MPI_C_COMPILE_FLAGS}")
+LINK_FLAGS "${MPI_C_COMPILE_FLAGS}")
+
 endif()
 
-if(USE_MPI)
+if(PAMELA_WITH_MPI)
   find_package(METIS REQUIRED)
    message(STATUS "Found METIS")
    blt_register_library(NAME METIS

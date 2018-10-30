@@ -2,7 +2,6 @@
 #include <fstream>
 
 #include "Parallel/Communicator.hpp"
-#include "tests_config.h"
 #include "test_io.h"
 
 #ifdef WITH_VTK
@@ -19,7 +18,7 @@ int main(int argc, char **argv) {
     vtkMultiProcessController::SetGlobalController(controler.Get());
 #endif
 
-    std::ifstream file_list(test_path + "medium.txt");
+    std::ifstream file_list(std::string(PAMELA_PATH) + "/tests/medium.txt");
     load_and_save(file_list);
 
 }

@@ -30,7 +30,7 @@ if(USE_MPI)
 endif()
 
 #VTK
-if(USE_VTK)
+if(PAMELA_WITH_VTK)
   find_package(VTK REQUIRED COMPONENTS vtkParallelMPI vtkIOParallelXML)
    blt_register_library(NAME VTK
                      INCLUDES ${VTK_INCLUDE_DIRS}

@@ -29,10 +29,10 @@ if(NOT is_submodule)
 
   #Options
   option(COMPILE_TESTS "Compile test" OFF)
-  option(COMPILE_EXAMPLES "Compile Examples" OFF)
+  option(PAMELA_WITH_EXAMPLES "Compile Examples" OFF)
 
   set(USE_MPI OFF CACHE BOOL "Enable MPI")
-  set(USE_VTK OFF CACHE BOOL "Enable VTK")
+  set(PAMELA_WITH_VTK OFF CACHE BOOL "Enable VTK")
 
   include(cmake/tpls.cmake)
 
@@ -42,9 +42,9 @@ if(NOT is_submodule)
   set(PAMELA_PATH ${CMAKE_SOURCE_DIR} CACHE INTERNAL "PAMELA_PATH" FORCE)
 
   # Examples
-  if(COMPILE_EXAMPLES)
+  if(PAMELA_WITH_EXAMPLES)
     add_subdirectory(examples)
-  endif(COMPILE_EXAMPLES)
+  endif(PAMELA_WITH_EXAMPLES)
 
   #Tests
   if(COMPILE_TESTS)

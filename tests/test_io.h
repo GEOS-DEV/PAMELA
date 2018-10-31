@@ -28,7 +28,6 @@ namespace PAMELA {
 
     //Dump variables
     output_mesh->Dump();
-    Communicator::finalize();
   }
   void load_and_save( std::ifstream& input) {
     std::string line;

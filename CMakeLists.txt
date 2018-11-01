@@ -24,6 +24,7 @@ if(NOT is_submodule)
   #Path
   set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
+  set(BLT_CXX_STD "c++14")
   include(cmake/blt/SetupBLT.cmake)
   include(cmake/PAMELA.cmake)
 

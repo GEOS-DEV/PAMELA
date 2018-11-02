@@ -71,14 +71,14 @@ set(PAMELA_sources
   Import/Gmsh_mesh.cpp
   Collection/Collection.cpp)
 
-if(${USE_MPI})
+if(${PAMELA_WITH_MPI})
   set(pamela_dependencies_list ${pamela_dependencies_list} mpi)
   set(pamela_dependencies_list ${pamela_dependencies_list} METIS)
-endif(${USE_MPI})
+endif(${PAMELA_WITH_MPI})
 
-if(${USE_VTK})
+if(${PAMELA_WITH_VTK})
   set(pamela_dependencies_list ${pamela_dependencies_list} VTK)
-endif(${USE_VTK})
+endif(${PAMELA_WITH_VTK})
 set(PAMELA_dependencies ${pamela_dependencies_list})
 
 message("adding PAMELA_Library")

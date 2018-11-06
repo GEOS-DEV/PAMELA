@@ -20,8 +20,10 @@ blt_register_library(NAME mpi
 endif()
 
 if(PAMELA_WITH_MPI)
-  find_package(METIS REQUIRED)
+   find_package(METIS REQUIRED)
    message(STATUS "Found METIS")
+   message(STATUS "METIS Include path: ${METIS_INCLUDE_PATH}")
+   message(STATUS "METIS Libraries: ${METIS_LIBRARIES}")
    blt_register_library(NAME METIS
                      INCLUDES ${METIS_INCLUDE_PATH}
                      TREAT_INCLUDES_AS_SYSTEM ON

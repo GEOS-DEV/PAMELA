@@ -337,10 +337,10 @@ namespace PAMELA
 		std::vector<idx_t> partitionVector(nnodes);
 
                 idx_t int_partition = static_cast<idx_t>(npartition);
-		METIS_PartGraphRecursive(&nnodes, &nconst, &csrMatrix->rowPtr[0], &csrMatrix->columnIndex[0],
+		METIS_PartGraphRecursive(&nnodes, &nconst, reinterpret_cast<idx_t*>(&csrMatrix->rowPtr[0]), reinterpret_cast<idx_t*>(&csrMatrix->columnIndex[0]),
 			nullptr, nullptr, nullptr, &int_partition, nullptr, nullptr, options, &objval, partitionVector.data());
 
-		return partitionVector;
+		return std::vector<int>(partitionVector.begin(), partitionVector.end());
 
 #else
                 utils::pamela_unused(adjacency);

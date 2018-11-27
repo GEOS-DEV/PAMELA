@@ -2,8 +2,8 @@
 #include <vector>
 #include "Mesh/UnstructuredMesh.hpp"
 #include "Utils/Binary.hpp"
+#include "Utils/File.hpp"
 
-class File;
 
 namespace PAMELA
 {

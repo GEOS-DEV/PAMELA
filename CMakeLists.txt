@@ -24,15 +24,18 @@ if(NOT is_submodule)
   #Path
   set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
+  set(BLT_CXX_STD "c++14")
   include(cmake/blt/SetupBLT.cmake)
   include(cmake/PAMELA.cmake)
 
   #Options
-  option(COMPILE_TESTS "Compile test" OFF)
-  option(COMPILE_EXAMPLES "Compile Examples" OFF)
+  option(PAMELA_WITH_TESTS "Compile test" OFF)
+  option(PAMELA_WITH_EXAMPLES "Compile Examples" OFF)
+  option(PAMELA_WITH_VTK "Enable VTK" OFF)
+  option(PAMELA_WITH_MPI "Enable MPI" OFF)
 
-  set(USE_MPI OFF CACHE BOOL "Enable MPI")
-  set(USE_VTK OFF CACHE BOOL "Enable VTK")
+  include(cmake/blt/SetupBLT.cmake)
+  include(cmake/PAMELA.cmake)
 
   include(cmake/tpls.cmake)
 
@@ -42,15 +45,15 @@ if(NOT is_submodule)
   set(PAMELA_PATH ${CMAKE_SOURCE_DIR} CACHE INTERNAL "PAMELA_PATH" FORCE)
 
   # Examples
-  if(COMPILE_EXAMPLES)
+  if(PAMELA_WITH_EXAMPLES)
     add_subdirectory(examples)
-  endif(COMPILE_EXAMPLES)
+  endif(PAMELA_WITH_EXAMPLES)
 
   #Tests
-  if(COMPILE_TESTS)
+  if(PAMELA_WITH_TESTS)
     enable_testing()
     add_subdirectory(tests)
-  endif(COMPILE_TESTS)
+  endif(PAMELA_WITH_TESTS)
 endif()
 if(is_submodule)
   add_subdirectory(PAMELA)

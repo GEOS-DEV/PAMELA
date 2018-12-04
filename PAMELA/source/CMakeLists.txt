@@ -71,14 +71,28 @@ set(PAMELA_sources
   Import/Gmsh_mesh.cpp
   Collection/Collection.cpp)
 
-if(${USE_MPI})
+if(${PAMELA_WITH_MPI})
   set(pamela_dependencies_list ${pamela_dependencies_list} mpi)
   set(pamela_dependencies_list ${pamela_dependencies_list} METIS)
-endif(${USE_MPI})
+endif(${PAMELA_WITH_MPI})
 
-if(${USE_VTK})
+if(${PAMELA_WITH_VTK})
   set(pamela_dependencies_list ${pamela_dependencies_list} VTK)
-endif(${USE_VTK})
+endif(${PAMELA_WITH_VTK})
+
+if(NOT ${GEOSX_TPL_DIR} STREQUAL "" )
+  message(STATUS "PAMELA is configured with GEOSX !")
+  if(ENABLE_METIS)
+    message(STATUS "Configuring PAMELA with metis of GEOSX tpls")
+    set(pamela_dependencies_list ${pamela_dependencies_list} metis)
+    set(pamela_flags ${pamela_flags} "-DWITH_METIS")
+  endif(ENABLE_METIS)
+  if(ENABLE_MPI)
+    message(STATUS "Configuring PAMELA with MPI")
+    set(pamela_dependencies_list ${pamela_dependencies_list} mpi)
+    set(pamela_flags ${pamela_flags} "-DWITH_MPI")
+  endif(ENABLE_MPI)
+endif(NOT ${GEOSX_TPL_DIR} STREQUAL "")
 set(PAMELA_dependencies ${pamela_dependencies_list})
 
 message("adding PAMELA_Library")
@@ -86,6 +100,7 @@ blt_add_library(NAME                  ${PAMELA_target}
                 SOURCES               ${PAMELA_sources}
                 HEADERS               ${PAMELA_headers}
                 HEADERS_OUTPUT_SUBDIR PAMELA
+                DEFINES          ${pamela_flags}
                 DEPENDS_ON             ${PAMELA_dependencies})
 
 target_include_directories(${PAMELA_target} PUBLIC ${CMAKE_CURRENT_LIST_DIR}) 

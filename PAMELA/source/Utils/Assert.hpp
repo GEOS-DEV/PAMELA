@@ -1,9 +1,9 @@
 #pragma once
-#ifndef ASSERT_HPP_INCLUDED
-#define ASSERT_HPP_INCLUDED
 
 #include "Logger.hpp"
 
+
+namespace PAMELA {
 #ifndef NDEBUG
 #   define ASSERT(condition, message) \
     do { \
@@ -14,5 +14,4 @@
 #else
 #   define ASSERT(condition, message) do { } while (false)
 #endif
-
-#endif //ASSERT_HPP_INCLUDED
+} // namespace

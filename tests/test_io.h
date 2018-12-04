@@ -4,40 +4,41 @@
 
 #include "Mesh/MeshFactory.hpp"
 #include "MeshDataWriters/MeshDataWriterFactory.hpp"
-#include "tests_config.h"
 
 namespace PAMELA {
-    void save(const std::string& filename_out, Mesh * input_mesh) {
-        MeshDataWriter* output_mesh = MeshDataWriterFactory::makeWriter(
-                input_mesh,filename_out);
+  void save(const std::string& filename_out, Mesh * input_mesh) {
 
-        output_mesh->DeclareVariable(
-                FAMILY::POLYHEDRON, VARIABLE_TYPE::SCALAR,
-                VARIABLE_LOCATION::PER_CELL, "Partition");
+    MeshDataWriter* output_mesh = MeshDataWriterFactory::makeWriter(
+        input_mesh, filename_out);
 
-        output_mesh->SetVariable("Partition", Communicator::worldRank());
-
-        output_mesh->Init();
-
-
-        //Dump variables
-        output_mesh->Dump();
+    auto mesh_props = input_mesh->get_PolyhedronProperty_double()->get_PropertyMap();
+    for (auto it = mesh_props.begin(); it != mesh_props.end(); ++it)
+    {
+      output_mesh->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_DIMENSION::SCALAR, VARIABLE_LOCATION::PER_CELL, it->first);
     }
-    void load_and_save( std::ifstream& input) {
-        std::string line;
-        while (std::getline(input, line)) {
-            const std::string filename_in = test_data_path + line;
-            Mesh* input_mesh = MeshFactory::makeMesh(filename_in);
-            input_mesh->CreateFacesFromCells();
-            input_mesh->PerformPolyhedronPartitioning(
-                    ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 
-            std::string filename = filename_in.substr(filename_in.find_last_of("/") + 1);
-            std::string file_wo_extension
-                = filename.substr(0,filename.find_last_of("."));
-            const std::string filename_out = test_output_path + file_wo_extension;
-            save(filename_out+".vtm",input_mesh);
-            save(filename_out+".case",input_mesh);
-        }
+    output_mesh->DeclareAndSetElementGlobalIndex();
+    output_mesh->DeclareAndSetPartitionNumber();
+    output_mesh->Init();
+    for (auto& mesh_prop : mesh_props)
+    {
+      output_mesh->SetVariableOnPolyhedron(mesh_prop.first, mesh_prop.second);
     }
+
+
+    //Dump variables
+    output_mesh->Dump();
+  }
+  void load_and_save( std::ifstream& input) {
+    std::string line;
+    while (std::getline(input, line)) {
+      const std::string filename_in = std::string(PAMELA_PATH) + "/data/" + line;
+      Mesh* input_mesh = MeshFactory::makeMesh(filename_in);
+      input_mesh->CreateFacesFromCells();
+      input_mesh->PerformPolyhedronPartitioning(
+          ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
+      input_mesh->CreateLineGroupWithAdjacency("TopologicalC2C", input_mesh->getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
+      save("vtk_mesh.vtm",input_mesh);
+    }
+  }
 }

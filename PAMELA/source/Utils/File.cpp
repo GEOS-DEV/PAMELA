@@ -5,6 +5,7 @@
 #include <algorithm>
 
 
+namespace PAMELA {
 File::File(std::string fileName) :
   m_FullName(fileName),
   m_Directory(""),
@@ -40,3 +41,4 @@ File::File(std::string fileName) :
   }
 
 }
+} // namespace

@@ -1,4 +1,4 @@
-if(USE_MPI)
+if(PAMELA_WITH_MPI)
     find_package(MPI REQUIRED)
 
     message(STATUS "MPI C Compile Flags:  ${MPI_C_COMPILE_FLAGS}")
@@ -19,9 +19,11 @@ blt_register_library(NAME mpi
                      LINK_FLAGS    "${MPI_C_COMPILE_FLAGS}")
 endif()
 
-if(USE_MPI)
-  find_package(METIS REQUIRED)
+if(PAMELA_WITH_MPI)
+   find_package(METIS REQUIRED)
    message(STATUS "Found METIS")
+   message(STATUS "METIS Include path: ${METIS_INCLUDE_PATH}")
+   message(STATUS "METIS Libraries: ${METIS_LIBRARIES}")
    blt_register_library(NAME METIS
                      INCLUDES ${METIS_INCLUDE_PATH}
                      TREAT_INCLUDES_AS_SYSTEM ON
@@ -30,7 +32,7 @@ if(USE_MPI)
 endif()
 
 #VTK
-if(USE_VTK)
+if(PAMELA_WITH_VTK)
   find_package(VTK REQUIRED COMPONENTS vtkParallelMPI vtkIOParallelXML)
    blt_register_library(NAME VTK
                      INCLUDES ${VTK_INCLUDE_DIRS}

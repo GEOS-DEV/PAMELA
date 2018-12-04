@@ -4,7 +4,6 @@
 #include "Elements/Element.hpp"
 #include <map>
 #include "Parallel/Communicator.hpp"
-#include "Utils/File.hpp"
 #include "Utils/Utils.hpp"
 #include "Adjacency/Adjacency.hpp"
 #include <algorithm>    // std::sort

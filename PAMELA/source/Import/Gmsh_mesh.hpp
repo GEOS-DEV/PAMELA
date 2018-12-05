@@ -14,9 +14,6 @@ namespace PAMELA
 		static Mesh* CreateMesh(const std::string file_path);
 
 	private:
-
-		virtual ~Gmsh_mesh() = 0;//{ };
-
 		static std::string m_label;
 		static int m_nphysicalregions;
 		static int m_dimension;
@@ -29,8 +26,6 @@ namespace PAMELA
 		static int m_nprisms;
 		static int m_npyramids;
 		static int m_npoints;
-
-		static std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap;
 
 		static std::unordered_map<int, std::string> m_TagNamePolygon;
 		static std::unordered_map<int, std::string> m_TagNamePolyhedron;

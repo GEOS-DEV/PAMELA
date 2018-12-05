@@ -122,6 +122,7 @@ namespace PAMELA
 
 		for (unsigned int i = 0; i < v.size(); i++)
 		{
+			std::replace(v[i].begin(), v[i].end(), '\r', ' ');
 			std::replace(v[i].begin(), v[i].end(), '\n', ' ');
 		}
 
@@ -137,6 +138,7 @@ namespace PAMELA
 	void StringUtils::RemoveEndOfLine(std::string& v)
 	{
 
+		std::replace(v.begin(), v.end(), '\r', ' ');
 		std::replace(v.begin(), v.end(), '\n', ' ');
 
 	}

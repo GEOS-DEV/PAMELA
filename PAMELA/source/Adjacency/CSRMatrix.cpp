@@ -143,7 +143,7 @@ namespace PAMELA
 		std::vector<int> iw(Mnnz, -1);
 		int len = -1;
 
-		MrowPtr[1] = 0;
+		MrowPtr[0] = 0;
 		for (int ii = 0; ii < Nr_lhs; ++ii)
 		{
 			for (int ka = rowPtr_lhs[ii]; ka < rowPtr_lhs[ii + 1]; ++ka)

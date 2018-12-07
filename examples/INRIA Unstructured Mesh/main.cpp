@@ -9,6 +9,8 @@
 #include <vtkMPIController.h>
 #endif
 
+//#include "vld.h"
+
 int main(int argc, char **argv) {
 
 	using namespace  PAMELA;

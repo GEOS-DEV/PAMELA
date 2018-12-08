@@ -35,10 +35,11 @@ if(NOT is_submodule)
   set(USE_VTK OFF CACHE BOOL "Enable VTK")
 
   include(cmake/tpls.cmake)
-
+  
+  # Add source
   add_subdirectory(PAMELA)
 
-  #Expose important paths
+  #Expose paths
   set(PAMELA_PATH ${CMAKE_SOURCE_DIR} CACHE INTERNAL "PAMELA_PATH" FORCE)
 
   # Examples

@@ -39,7 +39,7 @@ namespace PAMELA
 		struct IJK
 		{
 			IJK() { I = -1; J = -1; K = -1; }
-			IJK(int i, int j, int k) { I = i; J = j; K = k; }
+			IJK(int i0, int j0, int k0):I(i0),J(j0),K(k0) {}
 			bool operator==(IJK const& other) const { return ((*this).I == other.I)&((*this).J == other.J)&((*this).K == other.K); }
 			int I;
 			int J;

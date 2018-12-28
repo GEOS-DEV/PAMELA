@@ -2,10 +2,10 @@
 
 #define LEVEL_LOG_FILE "DEBUG"
 #define LEVEL_LOG_SCREEN "BRIEF"
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-template"
-#endif
+//#ifdef __clang__
+//#pragma clang diagnostic push
+//#pragma clang diagnostic ignored "-Wunused-template"
+//#endif
 
 //#define IS_BIG_ENDIAN() ( (*(char*)&i) == 0 )
 

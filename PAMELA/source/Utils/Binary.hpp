@@ -2,10 +2,12 @@
 
 #define LEVEL_LOG_FILE "DEBUG"
 #define LEVEL_LOG_SCREEN "BRIEF"
-//#ifdef __clang__
-//#pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wunused-template"
-//#endif
+#ifdef __clang__
+#if __clang_major__ > 4
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-template"
+#endif
+#endif
 
 //#define IS_BIG_ENDIAN() ( (*(char*)&i) == 0 )
 
@@ -28,3 +30,9 @@ namespace PAMELA
 	}
 
 }
+
+#ifdef __clang__
+#if __clang_major__ > 4
+#pragma clang diagnostic pop
+#endif
+#endif

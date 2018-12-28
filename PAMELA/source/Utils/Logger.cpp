@@ -75,7 +75,7 @@ namespace PAMELA
 		write_file(message);
 		if (m_screen_level >= VerbosityLevelScreen::BRIEF)
 			write_screen("ERROR:   " + msg + " in file " + __FILE__ + " line " + std::to_string(__LINE__));
-                abort();
+		abort();
 	}
 
 	void Logger::LogWARNING(std::string msg)

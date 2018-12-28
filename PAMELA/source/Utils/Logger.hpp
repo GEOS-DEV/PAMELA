@@ -57,7 +57,7 @@ namespace PAMELA
 		static Logger* instance();
 		static void init(std::string LevelLogFile, std::string file_name, std::string LevelScreen);
 
-		void LogERROR(std::string msg) __attribute__((noreturn));
+		void LogERROR(std::string msg);
 		void LogWARNING(std::string msg);
 		void LogINFO(std::string msg);
 		void LogDEBUG(std::string msg);

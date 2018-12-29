@@ -3,8 +3,10 @@
 #define LEVEL_LOG_FILE "DEBUG"
 #define LEVEL_LOG_SCREEN "BRIEF"
 #ifdef __clang__
+#if __clang_major__ > 4
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-template"
+#endif
 #endif
 
 const int i = 1;
@@ -29,3 +31,9 @@ namespace PAMELA
 	}
 
 }
+
+#ifdef __clang__
+#if __clang_major__ > 4
+#pragma clang diagnostic pop
+#endif
+#endif

@@ -7,22 +7,6 @@
 
 namespace PAMELA
 {
-
-	std::string Gmsh_mesh::m_label;
-	int Gmsh_mesh::m_dimension = 0;
-	int Gmsh_mesh::m_nelements = 0;
-	int Gmsh_mesh::m_nnodes = 0;
-	int Gmsh_mesh::m_ntriangles = 0;
-	int Gmsh_mesh::m_nquadrangles = 0;
-	int Gmsh_mesh::m_ntetrahedra = 0;
-	int Gmsh_mesh::m_nhexahedra = 0;
-	int Gmsh_mesh::m_nprisms = 0;
-	int Gmsh_mesh::m_npyramids = 0;
-	int Gmsh_mesh::m_nphysicalregions = 0;
-
-	std::unordered_map<int, std::string> Gmsh_mesh::m_TagNamePolygon;
-	std::unordered_map<int, std::string> Gmsh_mesh::m_TagNamePolyhedron;
-
 	Mesh* Gmsh_mesh::CreateMesh(std::string file_path)
 	{
 

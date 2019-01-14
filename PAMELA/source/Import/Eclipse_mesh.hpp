@@ -27,7 +27,7 @@ namespace PAMELA
       void FillMeshWithProperties(Mesh* mesh);
 
 
-      std::string m_label;
+      std::string m_label {""};
 
       ///Eclipse file data
       struct IJK
@@ -99,38 +99,38 @@ namespace PAMELA
       }
 
       //Grid
-      std::vector<unsigned int> m_SPECGRID;
-      std::vector<double>  m_COORD;
-      std::vector<double>  m_ZCORN;
-      std::vector<int>  m_ACTNUM;
+      std::vector<unsigned int> m_SPECGRID {0,0,0};
+      std::vector<double>  m_COORD {};
+      std::vector<double>  m_ZCORN {};
+      std::vector<int>  m_ACTNUM {};
 
-      std::vector<TPFA>  m_NNCs;
-      std::vector<TPFA>  m_EclipseGeneratedTrans;
-      std::unordered_map<IJK,unsigned int, IJKHash> m_IJK2Index ;
-      std::unordered_map<unsigned int,IJK> m_Index2IJK;
-      std::unordered_map<unsigned int, unsigned int> m_IndexTotal2Active;
+      std::vector<TPFA>  m_NNCs {};
+      std::vector<TPFA>  m_EclipseGeneratedTrans {};
+      std::unordered_map<IJK,unsigned int, IJKHash> m_IJK2Index {};
+      std::unordered_map<unsigned int,IJK> m_Index2IJK {};
+      std::unordered_map<unsigned int, unsigned int> m_IndexTotal2Active {};
 
-      unsigned int  m_nCOORD;
-      unsigned int  m_nZCORN;
-      unsigned int m_nActiveCells;
-      unsigned int m_nTotalCells;
-      unsigned int m_nNNCs;
+      unsigned int m_nCOORD {0};
+      unsigned int m_nZCORN {0};
+      unsigned int m_nActiveCells {0};
+      unsigned int m_nTotalCells {0};
+      unsigned int m_nNNCs {0};
 
       //Duplicate
-      std::vector<double> m_Duplicate_Element;
+      std::vector<double> m_Duplicate_Element {};
 
       //Properties
-      std::unordered_map<std::string, std::vector<double>> m_CellProperties_double;
-      std::unordered_map<std::string, std::vector<int>> m_CellProperties_integer;
-      std::unordered_map<std::string, std::vector<double>> m_OtherProperties_double;
-      std::unordered_map<std::string, std::vector<int>> m_OtherProperties_integer;
-      std::unordered_map<std::string, std::vector<char>> m_OtherProperties_char;
+      std::unordered_map<std::string, std::vector<double>> m_CellProperties_double {};
+      std::unordered_map<std::string, std::vector<int>> m_CellProperties_integer {};
+      std::unordered_map<std::string, std::vector<double>> m_OtherProperties_double {};
+      std::unordered_map<std::string, std::vector<int>> m_OtherProperties_integer {};
+      std::unordered_map<std::string, std::vector<char>> m_OtherProperties_char {};
 
       //Wells
-      unsigned int m_nWells;
-      std::unordered_map<std::string, WELL*> m_Wells;
+      unsigned int m_nWells {0};
+      std::unordered_map<std::string, WELL*> m_Wells {};
 
-      std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap;
+      std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap {};
 
       void InitElementsMapping();
 
@@ -143,9 +143,9 @@ namespace PAMELA
 
       };
 
-      bool m_INIT_file;
-      bool m_UNRST_file;
-      int m_firstSEQ;
+      bool m_INIT_file {false};
+      bool m_UNRST_file {false};
+      int m_firstSEQ {-1};
       //Egrid
 
       template<class T>

@@ -31,7 +31,8 @@ namespace PAMELA
 		if ((file_extension == "mesh") || (file_extension == "MESH"))
 		{
 			LOGINFO("INRIA MESH FORMAT IDENTIFIED");
-			return INRIA_mesh::CreateMesh(file_path);
+                        INRIA_mesh meshBuilder;
+			return meshBuilder.CreateMesh(file_path);
 		}
 		if ((file_extension == "msh") || (file_extension == "MSH"))
 		{

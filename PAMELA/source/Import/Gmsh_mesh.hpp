@@ -5,34 +5,35 @@
 namespace PAMELA
 {
 
-	enum class GMSH_MESH_TYPE {NODE=0, LINE=1, TRIANGLE=2,QUADRANGLE=3,TETRAHEDRON=4,HEXAHEDRON=5, PRISM=6, PYRAMID=7,POINT=15};
+  enum class GMSH_MESH_TYPE {NODE=0, LINE=1, TRIANGLE=2,QUADRANGLE=3,TETRAHEDRON=4,HEXAHEDRON=5, PRISM=6, PYRAMID=7,POINT=15};
 
-	class Gmsh_mesh
-	{
+  class Gmsh_mesh
+  {
 
-	public:
-		static Mesh* CreateMesh(const std::string file_path);
+    public:
+      Gmsh_mesh() = default;
+      Mesh* CreateMesh(const std::string file_path);
 
-	private:
-		static std::string m_label;
-		static int m_nphysicalregions;
-		static int m_dimension;
-		static int m_nelements;
-		static int m_nnodes;
-		static int m_ntriangles;
-		static int m_nquadrangles;
-		static int m_ntetrahedra;
-		static int m_nhexahedra;
-		static int m_nprisms;
-		static int m_npyramids;
-		static int m_npoints;
+    private:
+      std::string m_label {""};
+      int m_nphysicalregions {0};
+      int m_dimension {0};
+      int m_nelements {0};
+      int m_nnodes {0};
+      int m_ntriangles {0};
+      int m_nquadrangles {0};
+      int m_ntetrahedra {0};
+      int m_nhexahedra {0};
+      int m_nprisms {0};
+      int m_npyramids {0};
+      int m_npoints {0};
 
-		static std::unordered_map<int, std::string> m_TagNamePolygon;
-		static std::unordered_map<int, std::string> m_TagNamePolyhedron;
+      std::unordered_map<int, std::string> m_TagNamePolygon {};
+      std::unordered_map<int, std::string> m_TagNamePolyhedron {};
 
-		static void InitElementsMapping();
+      void InitElementsMapping();
 
 
-	};
+  };
 
 }

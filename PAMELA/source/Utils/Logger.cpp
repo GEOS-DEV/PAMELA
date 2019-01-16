@@ -1,11 +1,11 @@
 // Header include
 #include "Logger.hpp"
-#include "Parallel/Communicator.hpp"
 #include "Utils.hpp"
 #include <iomanip>
 
 #define LEVEL_LOG_FILE "DEBUG"
 #define LEVEL_LOG_SCREEN "BRIEF"
+#define FILE_NAME "simulator.log"
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
@@ -13,26 +13,10 @@
 #endif
 namespace PAMELA
 {
-
-        //Default values
-	std::string Logger::m_level_logfile = "INFO";
-	std::string Logger::m_file_name = "simulator.log";
-	std::string Logger::m_level_screen = "BRIEF";
-	std::string Logger::m_MPI_prefix = "";
-
-
 	Logger* Logger::instance()
 	{
-		static Logger s_instance(LEVEL_LOG_FILE, m_file_name, LEVEL_LOG_SCREEN);
+		static Logger s_instance(LEVEL_LOG_FILE, FILE_NAME, LEVEL_LOG_SCREEN);
 		return &s_instance;
-	}
-
-
-	void Logger::init(std::string LevelLogFile, std::string file_name, std::string LevelScreen)
-	{
-		m_level_logfile = LevelLogFile;
-		m_file_name = file_name;
-		m_level_screen = LevelScreen;
 	}
 
 	Logger::Logger(std::string LevelLogFile, std::string file_name, std::string LevelScreen)
@@ -57,14 +41,6 @@ namespace PAMELA
 			m_screen_level = VerbosityLevelScreen::BRIEF;
 		if (LevelScreen == "ALL")
 			m_screen_level = VerbosityLevelScreen::ALL;
-
-		//MPI
-#ifdef WITH_MPI
-		m_MPI_prefix = std::to_string(Communicator::worldRank()) + " >>> ";
-#else
-		m_MPI_prefix = "";
-#endif
-
 	}
 
 

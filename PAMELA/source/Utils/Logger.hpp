@@ -19,6 +19,8 @@
 #define LogFatal(msg) do {Logger::instance()->Log((*(LogMessage::instance(VerbosityLevelLogFile::ERROR))<<msg));} while (0)
 #define LogMessage2(lvl) do {*(LogMessage::instance(VerbosityLevelLogFile::lvl));} while (0)
 
+#define __attribute__(A)
+
 namespace PAMELA
 {
 

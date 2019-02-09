@@ -332,6 +332,64 @@ namespace PAMELA
 				}
 
 			}
+			else if ((line == "$ElementData"))
+			{
+				LOGINFO("Reading element data...");
+                                int nb_string_tags;
+                                int nb_double_tags;
+                                int nb_int_tags;
+
+                                std::string ppt_name;
+                                double time_value;
+                                int time_step;
+                                int nb_components;
+                                int nb_values;
+
+                                /// Read the property name
+                                mesh_file >> nb_string_tags;
+                                ASSERT(nb_string_tags > 0, "Property has to be named");
+                                mesh_file >> ppt_name;
+                                if( nb_string_tags > 1) {
+                                  std::string trash;
+                                  for(int i = 0 ; i < nb_string_tags -1 ; i++) {
+                                    mesh_file >> trash;
+                                  }
+                                }
+
+                                /// Read the time value
+                                mesh_file >> nb_double_tags;
+                                if( nb_double_tags !=0) {
+                                  mesh_file >> time_value;
+                                  if( nb_double_tags > 1) {
+                                    double trash;
+                                    for(int i = 0 ; i < nb_double_tags-1 ; i++) {
+                                      mesh_file >> trash;
+                                    }
+                                  }
+                                }
+
+                                /// Read the time step and the number of elements
+                                mesh_file >> nb_int_tags;
+                                ASSERT(nb_int_tags > 2, "Property " + ppt_name + " has to have 3 integers tags (time step, nb of components, nb of elements");
+                                mesh_file >> time_step >> nb_components >> nb_values;
+                                ASSERT(nb_values == static_cast<int>(mesh->get_PolyhedronCollection()->size_all()), "");
+                                if( nb_int_tags > 3) {
+                                  int trash;
+                                  for(int i = 0 ; i < nb_int_tags -3 ; i++) {
+                                    mesh_file >> trash;
+                                  }
+                                }
+
+                                /// Fill the properties
+		                auto props_double = mesh->get_PolyhedronProperty_double();
+                                props_double->ReferenceProperty( ppt_name);
+                                std::vector< double > ppt_vector(nb_values);
+                                int trash;
+                                for(int i = 0 ; i < nb_values ; i++) {
+                                  mesh_file  >> trash >> ppt_vector[i];
+                                }
+                                props_double->SetProperty(ppt_name,ppt_vector);
+                        }
 
 			else
 			{

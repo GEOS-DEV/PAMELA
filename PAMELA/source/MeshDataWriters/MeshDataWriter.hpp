@@ -104,8 +104,24 @@ namespace PAMELA
 		template<class T>
 		void SetVariableOnPolyhedron(std::string label, ParallelEnsemble<T>& values)
 		{
-			auto var = m_Variable.at(VariableKey(label, m_PolyhedronParts.begin()->first));
-			var->set_data(values.begin_owned(), values.end_owned());
+                        for( auto polyhedronPartItr = m_PolyhedronParts.begin();
+                             polyhedronPartItr != m_PolyhedronParts.end();
+                             ++polyhedronPartItr)
+                        {
+                          auto var = m_Variable.at(VariableKey(label, polyhedronPartItr->first));
+                          auto polyhedronPartPtr = polyhedronPartItr->second;
+                          auto nbElements = polyhedronPartPtr->Collection->size_owned();
+                          auto globalToLocal = polyhedronPartPtr->Collection->get_GlobalToLocalIndex();
+                          std::vector< T > values_in_part(nbElements);
+                          for(auto elemItr = globalToLocal.begin(); elemItr != globalToLocal.end();
+                              elemItr++)
+                          {
+                            auto globalIndex = elemItr->first;
+                            auto localIndex = elemItr->second;
+                            values_in_part[localIndex]= values[globalIndex];
+                          }
+			  var->set_data(values_in_part.begin(), values_in_part.end());
+                        }
 		}
 
 		void DeclareAndSetPartitionNumber()

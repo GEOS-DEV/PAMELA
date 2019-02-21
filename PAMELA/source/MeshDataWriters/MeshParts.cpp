@@ -94,7 +94,6 @@ namespace PAMELA {
       {
         std::string grplabel = it->first;
         auto groupEnsemble = polyhedronCollection->get_Group(grplabel);
-        std::cout << grplabel << std::endl;
         partMap[grplabel] = new Part<Polyhedron*>(grplabel, partIndex, localIndex++, groupEnsemble);
         partIndex++;
       }

@@ -87,13 +87,15 @@ namespace PAMELA {
     auto ActiveGroupMapPolyhedron = polyhedronCollection->get_ActiveGroupsMap();
 
     //--Add active parts
+    int localIndex = 0;
     for (auto it = ActiveGroupMapPolyhedron.begin(); it != ActiveGroupMapPolyhedron.end(); ++it)	//Loop over group and act on active groups
     {
       if (it->second)
       {
         std::string grplabel = it->first;
         auto groupEnsemble = polyhedronCollection->get_Group(grplabel);
-        partMap[grplabel] = new Part<Polyhedron*>(grplabel, partIndex, groupEnsemble);
+        std::cout << grplabel << std::endl;
+        partMap[grplabel] = new Part<Polyhedron*>(grplabel, partIndex, localIndex++, groupEnsemble);
         partIndex++;
       }
     }
@@ -107,13 +109,14 @@ namespace PAMELA {
     auto ActiveGroupMapPolygon = polygonCollection->get_ActiveGroupsMap();
 
     //--Add active parts
+    int localIndex = 0;
     for (auto it = ActiveGroupMapPolygon.begin(); it != ActiveGroupMapPolygon.end(); ++it)	//Loop over group and act on active groups
     {
       if (it->second)
       {
         std::string grplabel = it->first;
         auto groupEnsemble = polygonCollection->get_Group(grplabel);
-        partMap[grplabel] = new Part<Polygon*>(grplabel, partIndex, groupEnsemble);
+        partMap[grplabel] = new Part<Polygon*>(grplabel, partIndex, localIndex++, groupEnsemble);
         partIndex++;
       }
     }
@@ -127,13 +130,14 @@ namespace PAMELA {
     auto ActiveGroupMapLine = lineCollection->get_ActiveGroupsMap();
 
     //--Add active parts
+    int localIndex = 0;
     for (auto it = ActiveGroupMapLine.begin(); it != ActiveGroupMapLine.end(); ++it)	//Loop over group and act on active groups
     {
       if (it->second)
       {
         std::string grplabel = it->first;
         auto groupEnsemble = lineCollection->get_Group(grplabel);
-        partMap[grplabel] = new Part<Line*>(grplabel, partIndex, groupEnsemble);
+        partMap[grplabel] = new Part<Line*>(grplabel, partIndex, localIndex++, groupEnsemble);
         partIndex++;
       }
     }
@@ -143,13 +147,14 @@ namespace PAMELA {
     auto ActiveGroupMapImplicitLine = ImplicitLineCollection->get_ActiveGroupsMap();
 
     //--Add active parts
+    localIndex = 0;
     for (auto it = ActiveGroupMapImplicitLine.begin(); it != ActiveGroupMapImplicitLine.end(); ++it)	//Loop over group and act on active groups
     {
       if (it->second)
       {
         std::string grplabel = it->first;
         auto groupEnsemble = ImplicitLineCollection->get_Group(grplabel);
-        partMap[grplabel] = new Part<Line*>(grplabel, partIndex, groupEnsemble);
+        partMap[grplabel] = new Part<Line*>(grplabel, partIndex, localIndex++, groupEnsemble);
         partIndex++;
       }
     }
@@ -163,13 +168,14 @@ namespace PAMELA {
     auto ActiveGroupMapPoint = pointCollection->get_ActiveGroupsMap();
 
     //--Add active parts
+    int localIndex = 0;
     for (auto it = ActiveGroupMapPoint.begin(); it != ActiveGroupMapPoint.end(); ++it)	//Loop over group and act on active groups
     {
       if (it->second)
       {
         std::string grplabel = it->first;
         auto groupEnsemble = pointCollection->get_Group(grplabel);
-        partMap[grplabel] = new Part<Point*>(grplabel, partIndex, groupEnsemble);
+        partMap[grplabel] = new Part<Point*>(grplabel, partIndex, localIndex++, groupEnsemble);
         partIndex++;
       }
     }

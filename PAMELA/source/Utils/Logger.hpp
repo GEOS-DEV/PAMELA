@@ -19,8 +19,6 @@
 #define LogFatal(msg) do {Logger::instance()->Log((*(LogMessage::instance(VerbosityLevelLogFile::ERROR))<<msg));} while (0)
 #define LogMessage2(lvl) do {*(LogMessage::instance(VerbosityLevelLogFile::lvl));} while (0)
 
-#define __attribute__(A)
-
 namespace PAMELA
 {
 
@@ -57,7 +55,7 @@ namespace PAMELA
 		static Logger* instance();
 		static void init(std::string LevelLogFile, std::string file_name, std::string LevelScreen);
 
-		void LogERROR(std::string msg) __attribute__((noreturn));
+		[[ noreturn ]] void LogERROR(std::string msg) __attribute__((noreturn));
 		void LogWARNING(std::string msg);
 		void LogINFO(std::string msg);
 		void LogDEBUG(std::string msg);

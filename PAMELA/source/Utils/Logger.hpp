@@ -2,6 +2,7 @@
 
 // Project includes
 #include "Utils/LogMessage.hpp"
+#include "Parallel/Communicator.hpp"
 
 // Std library includes
 #include <fstream>
@@ -63,16 +64,7 @@ namespace PAMELA
 		void Log(LogMessage& msg);
 
 	protected:
-
 		Logger(std::string level_logfile, std::string file_name, std::string level_screen);
-
-		//Input
-		static std::string m_level_logfile;
-		static std::string m_file_name;
-		static std::string m_level_screen;
-		//MPI rank
-		static std::string m_MPI_prefix;
-
 	private:
 
 		//Screen
@@ -105,8 +97,14 @@ namespace PAMELA
 	template<typename T>
 	void Logger::write_screen(T &&t)
 	{
-		std::cout << m_MPI_prefix;
-		std::cout << t << std::endl;
+          std::string MPI_prefix;
+#ifdef WITH_MPI
+          MPI_prefix = std::to_string(Communicator::worldRank()) + " >>> ";
+#else
+          MPI_prefix = "";
+#endif
+          std::cout << MPI_prefix;
+          std::cout << t << std::endl;
 	}
 
 	template<typename Head, typename Tail, typename... Tails>

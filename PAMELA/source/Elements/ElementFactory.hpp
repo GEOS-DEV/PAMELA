@@ -8,23 +8,10 @@
 
 namespace PAMELA
 {
-
-	class ElementFactory
-	{
-
-	public:
-
-		//Makers
-		static Point* makePoint(ELEMENTS::TYPE  elementType, int index, double x, double y, double z);
-		static Line*  makeLine(ELEMENTS::TYPE  elementType, int index, const std::vector<Point*>& vertexList);
-		static Polygon*  makePolygon(ELEMENTS::TYPE  elementType, int index, const std::vector<Point*>& vertexList);
-		static Polyhedron* makePolyhedron(ELEMENTS::TYPE elementType, int index, const std::vector<Point*>& vertexList);
-
-	protected:
-
-		ElementFactory() = delete;
-
-
-	};
-
+  namespace ElementFactory {
+    Point* makePoint(ELEMENTS::TYPE  elementType, int index, double x, double y, double z);
+    Line*  makeLine(ELEMENTS::TYPE  elementType, int index, const std::vector<Point*>& vertexList);
+    Polygon*  makePolygon(ELEMENTS::TYPE  elementType, int index, const std::vector<Point*>& vertexList);
+    Polyhedron* makePolyhedron(ELEMENTS::TYPE elementType, int index, const std::vector<Point*>& vertexList);
+  }
 }

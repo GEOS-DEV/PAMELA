@@ -62,7 +62,16 @@ namespace PAMELA
 					buffer = StringUtils::RemoveString("'", buffer);
 					buffer = StringUtils::RemoveString("'", buffer);
 					buffer = StringUtils::RemoveString("/", buffer);
-					file_list.push_back(file.getDirectory() + "/" + buffer);
+                                        std::string path;
+                                        if( file.getDirectory().empty() )
+                                        {
+                                          path = buffer;
+                                        }
+                                        else
+                                        {
+                                          path = file.getDirectory() + "/" + buffer;
+                                        }
+					file_list.push_back(path);
 					nfiles++;
 				}
 			}
@@ -640,9 +649,9 @@ namespace PAMELA
 			StringUtils::RemoveEndOfLine(line);
 			StringUtils::RemoveTab(line);
 			StringUtils::Trim(line);
-			if (line == "SPECGRID")
+			if (line == "SPECGRID" || line == "DIMENS" )
 			{
-				LOGINFO("     o SPECGRID Found");
+				LOGINFO("     o SPECGRID or DIMENS Found");
 				std::vector<int> buf_int;
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::FromStringTo(buffer, buf_int);

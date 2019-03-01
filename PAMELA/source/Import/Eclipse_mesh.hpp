@@ -117,7 +117,7 @@ namespace PAMELA
       unsigned int m_nNNCs {0};
 
       //Duplicate
-      std::vector<double> m_Duplicate_Element {};
+      std::vector<int> m_Duplicate_Element {};
 
       //Properties
       std::unordered_map<std::string, std::vector<double>> m_CellProperties_double {};

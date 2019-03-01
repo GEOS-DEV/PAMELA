@@ -326,7 +326,6 @@ namespace PAMELA
 
 		std::vector<int> layer;
 		std::vector<unsigned int> actnum;
-		std::vector<double> duplicate_polyhedron;
 		layer.reserve(nx*ny*nz);
 		actnum.reserve(nx*ny*nz);
 		m_Duplicate_Element.reserve(nx*ny*nz);
@@ -548,7 +547,7 @@ namespace PAMELA
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
-					if (actnum[i] == 1)
+					if (actnum[i] == 1 && m_Duplicate_Element[i] == 0)
 					{
 
 						temp_double.push_back(prop[i]);
@@ -572,7 +571,7 @@ namespace PAMELA
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
-					if (actnum[i] == 1)
+					if (actnum[i] == 1 && m_Duplicate_Element[i] == 0)
 					{
 						temp_int.push_back(prop[i]);
 					}
@@ -624,14 +623,16 @@ namespace PAMELA
 		//Transfer property to mesh object
 		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
 		{
-			ASSERT(it->second.size() == props_double->get_Owner()->size_owned(), "Property set size is different from its owner");
+			ASSERT(it->second.size() == props_double->get_Owner()->size_owned(), "Property " + 
+                            it->first + " size is different from its owner");
 			props_double->ReferenceProperty(it->first);
 			props_double->SetProperty(it->first, it->second);
 		}
 
 		for (auto it = m_CellProperties_integer.begin(); it != m_CellProperties_integer.end(); ++it)
 		{
-			ASSERT(it->second.size() == props_int->get_Owner()->size_owned(), "Property set size is different from its owner");
+			ASSERT(it->second.size() == props_int->get_Owner()->size_owned(), "Property " + 
+                            it->first + " size is different from its owner");
 			props_int->ReferenceProperty(it->first);
 			props_int->SetProperty(it->first, it->second);
 		}

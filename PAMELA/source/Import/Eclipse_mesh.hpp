@@ -145,16 +145,16 @@ namespace PAMELA
 
       bool m_INIT_file {false};
       bool m_UNRST_file {false};
-      int m_firstSEQ {-1};
+      std::vector< int > m_sequence_ids;
       //Egrid
 
       template<class T>
         void ExtractBinaryBlock(std::string& str, int& index, int dim, int type_size, std::vector<T>& output);
 
       template<class T>
-        void ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<T>& data)
+        void ConvertBinaryBlock(std::string keyword, std::vector<T>& data, const std::string& label_suffix = "")
         {
-          utils::pamela_unused(label_prefix);
+          utils::pamela_unused(label_suffix);
           utils::pamela_unused(data);
           LOGINFO("     o Skipping " + keyword);
         }
@@ -166,11 +166,11 @@ namespace PAMELA
   };
 
   template<>
-    void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<double>& data);
+    void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::vector<double>& data, const std::string& suffix);
   template<>
-    void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<int>& data);
+    void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::vector<int>& data, const std::string& suffix);
   template<>
-    void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<char>& data);
+    void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::vector<char>& data, const std::string& suffix);
 
 
   template <class T>

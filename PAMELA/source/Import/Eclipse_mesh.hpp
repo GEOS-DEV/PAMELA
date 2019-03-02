@@ -24,7 +24,8 @@ namespace PAMELA
       void ParseStringFromBinaryFile(std::string& str);
       std::string extractDataBelowKeyword(std::istringstream& string_block);
       Mesh* ConvertMesh();
-      void FillMeshWithProperties(Mesh* mesh);
+     void ProcessWells(const std::string& suffix = "");
+     void FillMeshWithProperties(Mesh* mesh);
 
 
       std::string m_label {""};

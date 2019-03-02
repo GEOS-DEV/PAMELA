@@ -1096,94 +1096,98 @@ namespace PAMELA
 		
 	}
 
-	void Eclipse_mesh::CreateWellAndCompletion(Mesh* mesh)
-	{
-		//Import well data
-		if (m_OtherProperties_integer.find("INTEHEAD")!= m_OtherProperties_integer.end())
-		{
+        void Eclipse_mesh::ProcessWells(const std::string& suffix)
+        {
+          auto intehead = m_OtherProperties_integer.at("INTEHEAD" + suffix);
+          m_nWells = intehead[16];
+          if( m_nWells == 0)
+          {
+            return;
+          }
+          auto niwelz = intehead[24];
+          auto iwel = m_OtherProperties_integer.at("IWEL" + suffix);
+          auto scon = m_OtherProperties_double.at("SCON" + suffix);
+          auto icon = m_OtherProperties_integer.at("ICON" + suffix);
+          auto nsconz= intehead[33];
+          auto niconz = intehead[32];
+          auto ncwmax= intehead[17];
+          for (unsigned int iw=0;iw!= m_nWells;++iw)
+          {
+            std::vector<int> sub_iwel(&iwel[0 + iw*niwelz], &iwel[(iw+1)*(niwelz - 1)]);
+            auto well_type = sub_iwel[6];
+            std::string label;
+            if (well_type==1)
+            {
+              label = "PRODUCER";
+            }
+            else if (well_type == 2)
+            {
+              label = "OIL_INJECTOR";
+            }
+            else if (well_type == 3)
+            {
+              label = "WATER_INJECTOR";
+            }
+            else if (well_type == 4)
+            {
+              label = "GAS_INJECTOR";
+            }
+            label = label + "_" + std::to_string(iw);
 
-                        std::string suffix;
-                        int seq_id_begin = 0;
-                        if(m_sequence_ids.size() > 0)
-                        {
-                          seq_id_begin = 1;
-                        }
-                        for(int seq = 0 ; seq < static_cast<int>( m_sequence_ids.size()); seq++)
-                        {
-                          std::cout << "mdr" << std::endl;
-                          suffix = "_SEQNUM_" + std::to_string(m_sequence_ids[seq]);
-                          auto intehead = m_OtherProperties_integer.at("INTEHEAD");
-                          m_nWells = intehead[16];
-                          auto niwelz = intehead[24];
-                          auto iwel = m_OtherProperties_integer.at("IWEL" + suffix);
-                          auto scon = m_OtherProperties_double.at("SCON" + suffix);
-                          auto icon = m_OtherProperties_integer.at("ICON" + suffix);
-                          auto nsconz= intehead[33];
-                          auto niconz = intehead[32];
-                          auto ncwmax= intehead[17];
-                          for (unsigned int iw=0;iw!= m_nWells;++iw)
-                          {
-                            std::vector<int> sub_iwel(&iwel[0 + iw*niwelz], &iwel[(iw+1)*(niwelz - 1)]);
-                            auto well_type = sub_iwel[6];
-                            std::string label;
-                            if (well_type==1)
-                            {
-                              label = "PRODUCER";
-                            }
-                            else if (well_type == 2)
-                            {
-                              label = "OIL_INJECTOR";
-                            }
-                            else if (well_type == 3)
-                            {
-                              label = "WATER_INJECTOR";
-                            }
-                            else if (well_type == 4)
-                            {
-                              label = "GAS_INJECTOR";
-                            }
-                            label = label + "_" + std::to_string(iw);
+            auto icell = m_IJK2Index.at(IJK(sub_iwel[0]-1, sub_iwel[1]-1, sub_iwel[2]-1));
+            auto nb_comp = sub_iwel[4];
+            auto well = m_Wells[label] = new WELL(icell,nb_comp);
+            std::vector<double> sub_scon(&scon[0 + iw * ncwmax * nsconz], &scon[(iw + 1)*(ncwmax * nsconz - 1)]);
+            std::vector<int> sub_icon(&icon[0 + iw * ncwmax * niconz], &icon[(iw + 1)*(ncwmax * niconz - 1)]);
+            for (int ic = 0; ic != nb_comp; ++ic)
+            {
+              std::vector<double> sub_sub_scon(&sub_scon[0 + ic*nsconz], &sub_scon[(ic + 1)*(nsconz - 1)]);
+              std::vector<int> sub_sub_icon(&sub_icon[0 + ic * niconz], &sub_icon[(ic + 1)*(niconz - 1)]);
+              auto cf = sub_sub_scon[0];
+              auto kh = sub_sub_scon[3];
+              auto icell_comp = m_IJK2Index.at(IJK(sub_sub_icon[1] - 1, sub_sub_icon[2] - 1, sub_sub_icon[3] - 1));
+              well->completions.push_back(COMPLETION(icell_comp, cf, kh));
+            }
 
-                            auto icell = m_IJK2Index.at(IJK(sub_iwel[0]-1, sub_iwel[1]-1, sub_iwel[2]-1));
-                            auto nb_comp = sub_iwel[4];
-                            auto well = m_Wells[label] = new WELL(icell,nb_comp);
-                            std::vector<double> sub_scon(&scon[0 + iw * ncwmax * nsconz], &scon[(iw + 1)*(ncwmax * nsconz - 1)]);
-                            std::vector<int> sub_icon(&icon[0 + iw * ncwmax * niconz], &icon[(iw + 1)*(ncwmax * niconz - 1)]);
-                            for (int ic = 0; ic != nb_comp; ++ic)
-                            {
-                              std::vector<double> sub_sub_scon(&sub_scon[0 + ic*nsconz], &sub_scon[(ic + 1)*(nsconz - 1)]);
-                              std::vector<int> sub_sub_icon(&sub_icon[0 + ic * niconz], &sub_icon[(ic + 1)*(niconz - 1)]);
-                              auto cf = sub_sub_scon[0];
-                              auto kh = sub_sub_scon[3];
-                              auto icell_comp = m_IJK2Index.at(IJK(sub_sub_icon[1] - 1, sub_sub_icon[2] - 1, sub_sub_icon[3] - 1));
-                              well->completions.push_back(COMPLETION(icell_comp, cf, kh));
-                            }
+          }
+        }
+        void Eclipse_mesh::CreateWellAndCompletion(Mesh* mesh)
+        {
+          //Import well data
+          if (m_OtherProperties_integer.find("INTEHEAD")!= m_OtherProperties_integer.end())
+          {
+            if(m_sequence_ids.size() == 0 )
+            {
+              ProcessWells();
+            }
+            for(int seq = 0 ; seq < static_cast< int >(m_sequence_ids.size()); seq++)
+            {
+              std::string suffix = "_SEQNUM_" + std::to_string(m_sequence_ids[seq]);
+              ProcessWells(suffix);
+            }
 
-                          }
-                        }
+          }
 
-                }
-
-		//Create line and point groups
-		auto polyhedron_collection = mesh->get_PolyhedronCollection();
-		for (auto itw=m_Wells.begin(); itw != m_Wells.end();++itw)
-		{
-			std::vector<Point*> vecpoint;
-			auto well = itw->second;
-			auto hcindex = well->head_cell_index;
-			auto itpol = polyhedron_collection->begin_owned() + hcindex;
-			auto xyz = (*itpol)->get_centroidCoordinates();
-			vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz[0], xyz[1], 0));
-			auto comps = well->completions;
-			for (unsigned int ic = 0; ic != well->nb_completions; ++ic)
-			{
-				auto cell_index = comps[ic].hosting_cell_index;
-				auto itpol2 = polyhedron_collection->begin_owned() + cell_index;
-				auto xyz2 = (*itpol2)->get_centroidCoordinates();
-				vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz2[0], xyz2[1], xyz2[2]));
-			}
-			mesh->AddImplicitLine(ELEMENTS::TYPE::VTK_LINE, itw->first, vecpoint);
-			mesh->get_ImplicitLineCollection()->MakeActiveGroup(itw->first);
-		}
-	}
+          //Create line and point groups
+          auto polyhedron_collection = mesh->get_PolyhedronCollection();
+          for (auto itw=m_Wells.begin(); itw != m_Wells.end();++itw)
+          {
+            std::vector<Point*> vecpoint;
+            auto well = itw->second;
+            auto hcindex = well->head_cell_index;
+            auto itpol = polyhedron_collection->begin_owned() + hcindex;
+            auto xyz = (*itpol)->get_centroidCoordinates();
+            vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz[0], xyz[1], 0));
+            auto comps = well->completions;
+            for (unsigned int ic = 0; ic != well->nb_completions; ++ic)
+            {
+              auto cell_index = comps[ic].hosting_cell_index;
+              auto itpol2 = polyhedron_collection->begin_owned() + cell_index;
+              auto xyz2 = (*itpol2)->get_centroidCoordinates();
+              vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz2[0], xyz2[1], xyz2[2]));
+            }
+            mesh->AddImplicitLine(ELEMENTS::TYPE::VTK_LINE, itw->first, vecpoint);
+            mesh->get_ImplicitLineCollection()->MakeActiveGroup(itw->first);
+          }
+        }
 }

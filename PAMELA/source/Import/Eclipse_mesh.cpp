@@ -212,7 +212,12 @@ namespace PAMELA
 
 
 		////Search for INIT file
-		File init_file = File(egrid_file.getDirectory() + "/" + egrid_file.getNameWithoutExtension() + ".INIT");
+                std::string path;
+                if( !egrid_file.getDirectory().empty() )
+                {
+                  path = egrid_file.getDirectory() + "/";
+                }
+		File init_file = File(path + egrid_file.getNameWithoutExtension() + ".INIT");
 		if (init_file.exists())
 		{
 			m_INIT_file = true;
@@ -221,7 +226,7 @@ namespace PAMELA
 
 
 		////Search for UNRST file
-		File restart_file = File(egrid_file.getDirectory() + "/" + egrid_file.getNameWithoutExtension() + ".UNRST");
+		File restart_file = File(path + egrid_file.getNameWithoutExtension() + ".UNRST");
 		if (restart_file.exists())
 		{
 			m_UNRST_file = true;
@@ -326,7 +331,6 @@ namespace PAMELA
 
 		std::vector<int> layer;
 		std::vector<unsigned int> actnum;
-		std::vector<double> duplicate_polyhedron;
 		layer.reserve(nx*ny*nz);
 		actnum.reserve(nx*ny*nz);
 		m_Duplicate_Element.reserve(nx*ny*nz);
@@ -529,7 +533,6 @@ namespace PAMELA
 
 		layer.shrink_to_fit();
 		actnum.shrink_to_fit();
-		m_Duplicate_Element.shrink_to_fit();
 
 		//Layers
 		m_CellProperties_integer["Layer"] = layer;
@@ -548,7 +551,7 @@ namespace PAMELA
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
-					if (actnum[i] == 1)
+					if (actnum[i] == 1 )
 					{
 
 						temp_double.push_back(prop[i]);
@@ -624,14 +627,16 @@ namespace PAMELA
 		//Transfer property to mesh object
 		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
 		{
-			ASSERT(it->second.size() == props_double->get_Owner()->size_owned(), "Property set size is different from its owner");
+			ASSERT(it->second.size() == props_double->get_Owner()->size_owned(), "Property " + 
+                            it->first + " size is different from its owner");
 			props_double->ReferenceProperty(it->first);
 			props_double->SetProperty(it->first, it->second);
 		}
 
 		for (auto it = m_CellProperties_integer.begin(); it != m_CellProperties_integer.end(); ++it)
 		{
-			ASSERT(it->second.size() == props_int->get_Owner()->size_owned(), "Property set size is different from its owner");
+			ASSERT(it->second.size() == props_int->get_Owner()->size_owned(), "Property " + 
+                            it->first + " size is different from its owner");
 			props_int->ReferenceProperty(it->first);
 			props_int->SetProperty(it->first, it->second);
 		}
@@ -741,7 +746,7 @@ namespace PAMELA
 
 	void Eclipse_mesh::ParseStringFromBinaryFile(std::string& str)
 	{
-		std::string prefix;
+	        std::string suffix;
 		int index = 0;
 		do
 		{
@@ -782,15 +787,12 @@ namespace PAMELA
 
 				if (keyword == "SEQNUM")		//for UNRST file
 				{
-					prefix = "_SEQNUM_" + std::to_string(data[0]);
-					if (m_firstSEQ==-1)
-					{
-						m_firstSEQ = data[0];
-					}
+					m_sequence_ids.push_back(data[0]);
+					 suffix = "_SEQNUM_" + std::to_string(data[0]);
 				}
 				else
 				{
-					ConvertBinaryBlock(keyword, prefix, data);
+					ConvertBinaryBlock(keyword, data, suffix);
 				}
 				
 			}
@@ -800,28 +802,28 @@ namespace PAMELA
 				std::vector<float> data;
 				ExtractBinaryBlock(str, index, ksize, kdim, data);
 				std::vector<double> temp(data.begin(), data.end());
-				ConvertBinaryBlock(keyword, prefix, temp);
+				ConvertBinaryBlock(keyword,  temp, suffix);
 			}
 			else if (ktype == "CHAR")
 			{
 				int kdim = 8;
 				std::vector <char> data;
 				ExtractBinaryBlock(str, index, ksize, kdim, data);
-				ConvertBinaryBlock(keyword, prefix, data);
+				ConvertBinaryBlock(keyword, data, suffix);
 			}
 			else if (ktype == "LOGI")
 			{
 				int kdim = 4;
 				std::vector <bool> data;
 				ExtractBinaryBlock(str, index, ksize, kdim, data);
-				ConvertBinaryBlock(keyword, prefix, data);
+				ConvertBinaryBlock(keyword,  data, suffix);
 			}
 			else if (ktype == "DOUB")
 			{
 				int kdim = 8;
 				std::vector <double> data;
 				ExtractBinaryBlock(str, index, ksize, kdim, data);
-				ConvertBinaryBlock(keyword, prefix, data);
+				ConvertBinaryBlock(keyword, data, suffix );
 			}
 			else
 			{
@@ -854,7 +856,7 @@ namespace PAMELA
 	}
 
 	template<>
-	void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<double>& data)
+	void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::vector<double>& data, const std::string& label_suffix)
 	{
 		if (keyword == "COORD")
 		{
@@ -880,19 +882,19 @@ namespace PAMELA
 			if ((data.size() == m_nActiveCells) || (data.size() == m_nTotalCells))//|| (data.size() == m_nNNCs))
 			{
 				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
-				m_CellProperties_double[keyword + label_prefix] = data;
+				m_CellProperties_double[keyword + label_suffix] = data;
 			}
 			else
 			{
 				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
-				m_OtherProperties_double[keyword  + label_prefix] = data;
+				m_OtherProperties_double[keyword  + label_suffix] = data;
 			}
 		}
 
 	}
 
 	template<>
-	void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<int>& data)
+	void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::vector<int>& data, const std::string& label_suffix)
 	{
 		if (keyword == "GRIDHEAD")
 		{
@@ -960,12 +962,12 @@ namespace PAMELA
 			if ((data.size() == m_nActiveCells) || (data.size() == m_nTotalCells))//|| (data.size() == m_nNNCs))
 			{
 				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
-				m_CellProperties_integer[keyword + label_prefix] = data;
+				m_CellProperties_integer[keyword + label_suffix] = data;
 			}
 			else
 			{
 				LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
-				m_OtherProperties_integer[keyword  + label_prefix] = data;
+				m_OtherProperties_integer[keyword  + label_suffix] = data;
 			}
 		}
 
@@ -973,11 +975,11 @@ namespace PAMELA
 	}
 
 	template<>
-	void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::string label_prefix, std::vector<char>& data)
+	void Eclipse_mesh::ConvertBinaryBlock(std::string keyword, std::vector<char>& data, const std::string& suffix)
 	{
 
 		LOGINFO("     o " + keyword + " processed. Dimension is " + std::to_string(data.size()));
-		m_OtherProperties_char[keyword + label_prefix] = data;
+		m_OtherProperties_char[keyword + suffix] = data;
 
 
 	}
@@ -1091,85 +1093,98 @@ namespace PAMELA
 		
 	}
 
-	void Eclipse_mesh::CreateWellAndCompletion(Mesh* mesh)
-	{
-		//Import well data
-		if (m_OtherProperties_integer.find("INTEHEAD")!= m_OtherProperties_integer.end())
-		{
+        void Eclipse_mesh::ProcessWells(const std::string& suffix)
+        {
+          auto intehead = m_OtherProperties_integer.at("INTEHEAD" + suffix);
+          m_nWells = intehead[16];
+          if( m_nWells == 0)
+          {
+            return;
+          }
+          auto niwelz = intehead[24];
+          auto iwel = m_OtherProperties_integer.at("IWEL" + suffix);
+          auto scon = m_OtherProperties_double.at("SCON" + suffix);
+          auto icon = m_OtherProperties_integer.at("ICON" + suffix);
+          auto nsconz= intehead[33];
+          auto niconz = intehead[32];
+          auto ncwmax= intehead[17];
+          for (unsigned int iw=0;iw!= m_nWells;++iw)
+          {
+            std::vector<int> sub_iwel(&iwel[0 + iw*niwelz], &iwel[(iw+1)*(niwelz - 1)]);
+            auto well_type = sub_iwel[6];
+            std::string label;
+            if (well_type==1)
+            {
+              label = "PRODUCER";
+            }
+            else if (well_type == 2)
+            {
+              label = "OIL_INJECTOR";
+            }
+            else if (well_type == 3)
+            {
+              label = "WATER_INJECTOR";
+            }
+            else if (well_type == 4)
+            {
+              label = "GAS_INJECTOR";
+            }
+            label = label + "_" + std::to_string(iw);
 
-			std::string seq_prefix = "_SEQNUM_" + std::to_string(m_firstSEQ);
+            auto icell = m_IJK2Index.at(IJK(sub_iwel[0]-1, sub_iwel[1]-1, sub_iwel[2]-1));
+            auto nb_comp = sub_iwel[4];
+            auto well = m_Wells[label] = new WELL(icell,nb_comp);
+            std::vector<double> sub_scon(&scon[0 + iw * ncwmax * nsconz], &scon[(iw + 1)*(ncwmax * nsconz - 1)]);
+            std::vector<int> sub_icon(&icon[0 + iw * ncwmax * niconz], &icon[(iw + 1)*(ncwmax * niconz - 1)]);
+            for (int ic = 0; ic != nb_comp; ++ic)
+            {
+              std::vector<double> sub_sub_scon(&sub_scon[0 + ic*nsconz], &sub_scon[(ic + 1)*(nsconz - 1)]);
+              std::vector<int> sub_sub_icon(&sub_icon[0 + ic * niconz], &sub_icon[(ic + 1)*(niconz - 1)]);
+              auto cf = sub_sub_scon[0];
+              auto kh = sub_sub_scon[3];
+              auto icell_comp = m_IJK2Index.at(IJK(sub_sub_icon[1] - 1, sub_sub_icon[2] - 1, sub_sub_icon[3] - 1));
+              well->completions.push_back(COMPLETION(icell_comp, cf, kh));
+            }
 
-			auto intehead = m_OtherProperties_integer.at("INTEHEAD"+ seq_prefix);
-			m_nWells = intehead[16];
-			auto niwelz = intehead[24];
-			auto iwel = m_OtherProperties_integer.at("IWEL" + seq_prefix);
-			auto scon = m_OtherProperties_double.at("SCON" + seq_prefix);
-			auto icon = m_OtherProperties_integer.at("ICON" + seq_prefix);
-			auto nsconz= intehead[33];
-			auto niconz = intehead[32];
-			auto ncwmax= intehead[17];
-			for (unsigned int iw=0;iw!= m_nWells;++iw)
-			{
-				std::vector<int> sub_iwel(&iwel[0 + iw*niwelz], &iwel[(iw+1)*(niwelz - 1)]);
-				auto well_type = sub_iwel[6];
-				std::string label;
-				if (well_type==1)
-				{
-					label = "PRODUCER";
-				}
-				else if (well_type == 2)
-				{
-					label = "OIL_INJECTOR";
-				}
-				else if (well_type == 3)
-				{
-					label = "WATER_INJECTOR";
-				}
-				else if (well_type == 4)
-				{
-					label = "GAS_INJECTOR";
-				}
-				label = label + "_" + std::to_string(iw);
+          }
+        }
+        void Eclipse_mesh::CreateWellAndCompletion(Mesh* mesh)
+        {
+          //Import well data
+          if (m_OtherProperties_integer.find("INTEHEAD")!= m_OtherProperties_integer.end())
+          {
+            if(m_sequence_ids.size() == 0 )
+            {
+              ProcessWells();
+            }
+            for(int seq = 0 ; seq < static_cast< int >(m_sequence_ids.size()); seq++)
+            {
+              std::string suffix = "_SEQNUM_" + std::to_string(m_sequence_ids[seq]);
+              ProcessWells(suffix);
+            }
 
-				auto icell = m_IJK2Index.at(IJK(sub_iwel[0]-1, sub_iwel[1]-1, sub_iwel[2]-1));
-				auto nb_comp = sub_iwel[4];
-				auto well = m_Wells[label] = new WELL(icell,nb_comp);
-				std::vector<double> sub_scon(&scon[0 + iw * ncwmax * nsconz], &scon[(iw + 1)*(ncwmax * nsconz - 1)]);
-				std::vector<int> sub_icon(&icon[0 + iw * ncwmax * niconz], &icon[(iw + 1)*(ncwmax * niconz - 1)]);
-				for (int ic = 0; ic != nb_comp; ++ic)
-				{
-					std::vector<double> sub_sub_scon(&sub_scon[0 + ic*nsconz], &sub_scon[(ic + 1)*(nsconz - 1)]);
-					std::vector<int> sub_sub_icon(&sub_icon[0 + ic * niconz], &sub_icon[(ic + 1)*(niconz - 1)]);
-					auto cf = sub_sub_scon[0];
-					auto kh = sub_sub_scon[3];
-					auto icell_comp = m_IJK2Index.at(IJK(sub_sub_icon[1] - 1, sub_sub_icon[2] - 1, sub_sub_icon[3] - 1));
-					well->completions.push_back(COMPLETION(icell_comp, cf, kh));
-				}
+          }
 
-			}
-
-		}
-
-		//Create line and point groups
-		auto polyhedron_collection = mesh->get_PolyhedronCollection();
-		for (auto itw=m_Wells.begin(); itw != m_Wells.end();++itw)
-		{
-			std::vector<Point*> vecpoint;
-			auto well = itw->second;
-			auto hcindex = well->head_cell_index;
-			auto itpol = polyhedron_collection->begin_owned() + hcindex;
-			auto xyz = (*itpol)->get_centroidCoordinates();
-			vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz[0], xyz[1], 0));
-			auto comps = well->completions;
-			for (unsigned int ic = 0; ic != well->nb_completions; ++ic)
-			{
-				auto cell_index = comps[ic].hosting_cell_index;
-				auto itpol2 = polyhedron_collection->begin_owned() + cell_index;
-				auto xyz2 = (*itpol2)->get_centroidCoordinates();
-				vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz2[0], xyz2[1], xyz2[2]));
-			}
-			mesh->AddImplicitLine(ELEMENTS::TYPE::VTK_LINE, itw->first, vecpoint);
-			mesh->get_ImplicitLineCollection()->MakeActiveGroup(itw->first);
-		}
-	}
+          //Create line and point groups
+          auto polyhedron_collection = mesh->get_PolyhedronCollection();
+          for (auto itw=m_Wells.begin(); itw != m_Wells.end();++itw)
+          {
+            std::vector<Point*> vecpoint;
+            auto well = itw->second;
+            auto hcindex = well->head_cell_index;
+            auto itpol = polyhedron_collection->begin_owned() + hcindex;
+            auto xyz = (*itpol)->get_centroidCoordinates();
+            vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz[0], xyz[1], 0));
+            auto comps = well->completions;
+            for (unsigned int ic = 0; ic != well->nb_completions; ++ic)
+            {
+              auto cell_index = comps[ic].hosting_cell_index;
+              auto itpol2 = polyhedron_collection->begin_owned() + cell_index;
+              auto xyz2 = (*itpol2)->get_centroidCoordinates();
+              vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz2[0], xyz2[1], xyz2[2]));
+            }
+            mesh->AddImplicitLine(ELEMENTS::TYPE::VTK_LINE, itw->first, vecpoint);
+            mesh->get_ImplicitLineCollection()->MakeActiveGroup(itw->first);
+          }
+        }
 }

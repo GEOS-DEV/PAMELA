@@ -2,6 +2,7 @@
 
 // Project includes
 #include "Utils/LogMessage.hpp"
+#include "Parallel/Communicator.hpp"
 
 // Std library includes
 #include <fstream>
@@ -18,8 +19,6 @@
 //ADGPRS Native style
 #define LogFatal(msg) do {Logger::instance()->Log((*(LogMessage::instance(VerbosityLevelLogFile::ERROR))<<msg));} while (0)
 #define LogMessage2(lvl) do {*(LogMessage::instance(VerbosityLevelLogFile::lvl));} while (0)
-
-#define __attribute__(A)
 
 namespace PAMELA
 {
@@ -57,7 +56,7 @@ namespace PAMELA
 		static Logger* instance();
 		static void init(std::string LevelLogFile, std::string file_name, std::string LevelScreen);
 
-		void LogERROR(std::string msg) __attribute__((noreturn));
+		[[ noreturn ]] void LogERROR(std::string msg) __attribute__((noreturn));
 		void LogWARNING(std::string msg);
 		void LogINFO(std::string msg);
 		void LogDEBUG(std::string msg);
@@ -65,16 +64,7 @@ namespace PAMELA
 		void Log(LogMessage& msg);
 
 	protected:
-
 		Logger(std::string level_logfile, std::string file_name, std::string level_screen);
-
-		//Input
-		static std::string m_level_logfile;
-		static std::string m_file_name;
-		static std::string m_level_screen;
-		//MPI rank
-		static std::string m_MPI_prefix;
-
 	private:
 
 		//Screen
@@ -107,8 +97,14 @@ namespace PAMELA
 	template<typename T>
 	void Logger::write_screen(T &&t)
 	{
-		std::cout << m_MPI_prefix;
-		std::cout << t << std::endl;
+          std::string MPI_prefix;
+#ifdef WITH_MPI
+          MPI_prefix = std::to_string(Communicator::worldRank()) + " >>> ";
+#else
+          MPI_prefix = "";
+#endif
+          std::cout << MPI_prefix;
+          std::cout << t << std::endl;
 	}
 
 	template<typename Head, typename Tail, typename... Tails>

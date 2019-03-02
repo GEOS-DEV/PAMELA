@@ -5,31 +5,27 @@
 namespace PAMELA
 {
 
-	enum class INRIA_MESH_TYPE { VERTEX, TRIANGLE, EDGE, QUADRILATERAL, TETRAHEDRON, PENTRAHEDRON, HEXAHEDRON };
+  enum class INRIA_MESH_TYPE { VERTEX, TRIANGLE, EDGE, QUADRILATERAL, TETRAHEDRON, PENTRAHEDRON, HEXAHEDRON };
 
-	class INRIA_mesh
-	{
+  class INRIA_mesh
+  {
 
-	public:
-		static Mesh* CreateMesh(const std::string file_path);
+    public:
+      INRIA_mesh() = default;
+      Mesh* CreateMesh(const std::string file_path);
 
-	private:
+    private:
+      std::string m_label {""};
+      int m_dimension {0};
+      int m_nvertices {0};
+      int m_ntriangles {0};
+      int m_nquadrilaterals {0};
+      int m_ntetrahedra {0};
+      int m_nhexahedra {0};
 
-		virtual ~INRIA_mesh() = 0;//{ };
+      std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap {};
 
-		static std::string m_label;
-		static int m_dimension;
-		static int m_nvertices;
-		static int m_ntriangles;
-		static int m_nquadrilaterals;
-		static int m_ntetrahedra;
-		static int m_nhexahedra;
-
-		static std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap;
-
-		static void InitElementsMapping();
-
-
-	};
+      void InitElementsMapping();
+  };
 
 }

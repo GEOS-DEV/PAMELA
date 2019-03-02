@@ -7,37 +7,6 @@
 
 namespace PAMELA
 {
-
-	std::string Gmsh_mesh::m_label;
-	int Gmsh_mesh::m_dimension = 0;
-	int Gmsh_mesh::m_nelements = 0;
-	int Gmsh_mesh::m_nnodes = 0;
-	int Gmsh_mesh::m_ntriangles = 0;
-	int Gmsh_mesh::m_nquadrangles = 0;
-	int Gmsh_mesh::m_ntetrahedra = 0;
-	int Gmsh_mesh::m_nhexahedra = 0;
-	int Gmsh_mesh::m_nprisms = 0;
-	int Gmsh_mesh::m_npyramids = 0;
-	int Gmsh_mesh::m_nphysicalregions = 0;
-
-	std::unordered_map<int, ELEMENTS::TYPE> Gmsh_mesh::m_TypeMap;
-	std::unordered_map<int, std::string> Gmsh_mesh::m_TagNamePolygon;
-	std::unordered_map<int, std::string> Gmsh_mesh::m_TagNamePolyhedron;
-
-
-	void Gmsh_mesh::InitElementsMapping()
-	{
-		m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::NODE)] = ELEMENTS::TYPE::VTK_VERTEX;
-		m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::LINE)] = ELEMENTS::TYPE::VTK_LINE;
-		m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::TRIANGLE)] = ELEMENTS::TYPE::VTK_TRIANGLE;
-		m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::QUADRANGLE)] = ELEMENTS::TYPE::VTK_QUAD;
-		m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::TETRAHEDRON)] = ELEMENTS::TYPE::VTK_TETRA;
-		m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::HEXAHEDRON)] = ELEMENTS::TYPE::VTK_HEXAHEDRON;
-		m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::PRISM)] = ELEMENTS::TYPE::VTK_WEDGE;
-		m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::PYRAMID)] = ELEMENTS::TYPE::VTK_PYRAMID;
-		m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::POINT)] = ELEMENTS::TYPE::VTK_VERTEX;
-	}
-
 	Mesh* Gmsh_mesh::CreateMesh(std::string file_path)
 	{
 
@@ -82,9 +51,6 @@ namespace PAMELA
 		std::istringstream mesh_file;
 		mesh_file.str(file_contents);
 
-		//Init
-		InitElementsMapping();
-
 		//Attributes and groups
 		int attribute=0;
 		int id;
@@ -112,7 +78,7 @@ namespace PAMELA
 				LOGINFO("Reading nodes...");
 
 				//data
-				elementType = m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::NODE)];
+				elementType =ELEMENTS::TYPE::VTK_VERTEX;
 				double x, y, z;
 				std::vector<Vertex*> vertexTemp = { nullptr };
 				for (int i = 0; i != m_nnodes; i++)
@@ -174,7 +140,7 @@ namespace PAMELA
 					{
 
 					case 2:	//TRIANGLE
-						elementType = m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::TRIANGLE)];
+                                                elementType =ELEMENTS::TYPE::VTK_TRIANGLE;
 						mesh_file >> v0 >> v1 >> v2;
 						vertexTemp3[0] = vertexcollection[v0 - 1];
 						vertexTemp3[1] = vertexcollection[v1 - 1];
@@ -197,7 +163,7 @@ namespace PAMELA
 						break;
 
 					case 3:	//QUADRANGLE
-						elementType = m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::QUADRANGLE)];
+				                elementType =ELEMENTS::TYPE::VTK_QUAD;
 						mesh_file >> v0 >> v1 >> v2 >> v3;
 						vertexTemp4[0] = vertexcollection[v0 - 1];
 						vertexTemp4[1] = vertexcollection[v1 - 1];
@@ -221,7 +187,7 @@ namespace PAMELA
 						break;
 
 					case 4:	//TETRAHEDRON
-						elementType = m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::TETRAHEDRON)];
+                                                elementType =ELEMENTS::TYPE::VTK_TETRA;
 						mesh_file >> v0 >> v1 >> v2 >> v3;
 						vertexTemp4[0] = vertexcollection[v0 - 1];
 						vertexTemp4[1] = vertexcollection[v1 - 1];
@@ -245,7 +211,7 @@ namespace PAMELA
 						break;
 
 					case 5:	//HEXAHEDRON
-						elementType = m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::HEXAHEDRON)];
+                                                elementType =ELEMENTS::TYPE::VTK_HEXAHEDRON;
 						mesh_file >> v0 >> v1 >> v2 >> v3 >> v4 >> v5 >> v6 >> v7;
 						vertexTemp8[0] = vertexcollection[v0 - 1];
 						vertexTemp8[1] = vertexcollection[v1 - 1];
@@ -273,7 +239,7 @@ namespace PAMELA
 						break;
 
 					case 6:	//PRISM
-						elementType = m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::PRISM)];
+                                                elementType =ELEMENTS::TYPE::VTK_WEDGE;
 						mesh_file >> v0 >> v1 >> v2 >> v3 >> v4 >> v5;
 						vertexTemp6[0] = vertexcollection[v0 - 1];
 						vertexTemp6[1] = vertexcollection[v1 - 1];
@@ -299,7 +265,7 @@ namespace PAMELA
 						break;
 
 					case 7:	//PYRAMID
-						elementType = m_TypeMap[static_cast<int>(GMSH_MESH_TYPE::PYRAMID)];
+                                                elementType =ELEMENTS::TYPE::VTK_PYRAMID;
 						mesh_file >> v0 >> v1 >> v2 >> v3 >> v4;
 						vertexTemp5[0] = vertexcollection[v0 - 1];
 						vertexTemp5[1] = vertexcollection[v1 - 1];
@@ -332,6 +298,65 @@ namespace PAMELA
 				}
 
 			}
+			else if ((line == "$ElementData"))
+			{
+				LOGINFO("Reading element data...");
+                                int nb_string_tags;
+                                int nb_double_tags;
+                                int nb_int_tags;
+
+                                std::string ppt_name;
+                                double time_value;
+                                int time_step;
+                                int nb_components;
+                                int nb_values;
+
+                                /// Read the property name
+                                mesh_file >> nb_string_tags;
+                                ASSERT(nb_string_tags > 0, "Property has to be named");
+                                mesh_file >> ppt_name;
+                                if( nb_string_tags > 1) {
+                                  std::string trash;
+                                  for(int i = 0 ; i < nb_string_tags -1 ; i++) {
+                                    mesh_file >> trash;
+                                  }
+                                }
+
+                                /// Read the time value
+                                mesh_file >> nb_double_tags;
+                                if( nb_double_tags !=0) {
+                                  mesh_file >> time_value;
+                                  if( nb_double_tags > 1) {
+                                    double trash;
+                                    for(int i = 0 ; i < nb_double_tags-1 ; i++) {
+                                      mesh_file >> trash;
+                                    }
+                                  }
+                                }
+
+                                /// Read the time step and the number of elements
+                                mesh_file >> nb_int_tags;
+                                ASSERT(nb_int_tags > 2, "Property " + ppt_name + " has to have 3 integers tags (time step, nb of components, nb of elements");
+                                mesh_file >> time_step >> nb_components >> nb_values;
+                                ASSERT(nb_values == static_cast<int>(mesh->get_PolyhedronCollection()->size_all()), "");
+                                if( nb_int_tags > 3) {
+                                  int trash;
+                                  for(int i = 0 ; i < nb_int_tags -3 ; i++) {
+                                    mesh_file >> trash;
+                                  }
+                                }
+
+                                /// Fill the properties
+		                auto props_double = mesh->get_PolyhedronProperty_double();
+                                props_double->ReferenceProperty( ppt_name);
+                                std::vector< double > ppt_vector(nb_values);
+                                ASSERT(static_cast<int>(props_double->get_Owner()->size_owned()) == nb_values, "Wrong property size");
+                                int trash;
+                                for(int i = 0 ; i < nb_values ; i++) {
+                                  mesh_file  >> trash >> ppt_vector[i];
+                                }
+                                props_double->SetProperty(ppt_name,ppt_vector);
+                        }
 
 			else
 			{

@@ -56,7 +56,7 @@ endif()
 
 # Standard package handling
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(METIS REQUIRED_VARS METIS_LIBRARY METIS_INCLUDE_PATH METIS_TEST_RUNS)
+find_package_handle_standard_args(METIS REQUIRED_VARS METIS_LIBRARY METIS_INCLUDE_PATH)
 
 if(METIS_FOUND)
   get_filename_component(METIS_LIBRARY_DIR "${METIS_LIBRARY}" PATH)

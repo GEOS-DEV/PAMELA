@@ -4,52 +4,12 @@
 #include "Elements/Element.hpp"
 #include <map>
 #include "Parallel/Communicator.hpp"
-#include "Utils/File.hpp"
 #include "Utils/Utils.hpp"
 #include "Adjacency/Adjacency.hpp"
 #include <algorithm>    // std::sort
 
 namespace PAMELA
 {
-
-	std::string Eclipse_mesh::m_label;
-	unsigned int Eclipse_mesh::m_nvertices = 0;
-	unsigned int Eclipse_mesh::m_nquadrilaterals = 0;
-	unsigned int Eclipse_mesh::m_nhexahedra = 0;
-
-	unsigned int Eclipse_mesh::m_nCOORD = 0;
-	unsigned int Eclipse_mesh::m_nZCORN = 0;
-	unsigned int Eclipse_mesh::m_nActiveCells = 0;
-	unsigned int Eclipse_mesh::m_nTotalCells = 0;
-	unsigned int Eclipse_mesh::m_nNNCs = 0;
-	std::vector<unsigned int> Eclipse_mesh::m_SPECGRID = { 0,0,0 };
-	std::vector<double>  Eclipse_mesh::m_COORD = {};
-	std::vector<double>  Eclipse_mesh::m_ZCORN = {};
-	std::vector<int>  Eclipse_mesh::m_ACTNUM = {};
-	std::vector<Eclipse_mesh::TPFA>  Eclipse_mesh::m_NNCs = {};
-	std::vector<Eclipse_mesh::TPFA>  Eclipse_mesh::m_EclipseGeneratedTrans = {};
-	std::vector<double> Eclipse_mesh::m_Duplicate_Element;
-	std::unordered_map<Eclipse_mesh::IJK, unsigned int, Eclipse_mesh::IJKHash> Eclipse_mesh::m_IJK2Index;
-	std::unordered_map<unsigned int, Eclipse_mesh::IJK> Eclipse_mesh::m_Index2IJK;
-	std::unordered_map<unsigned int, unsigned int> Eclipse_mesh::m_IndexTotal2Active;
-	std::unordered_map<int, ELEMENTS::TYPE> Eclipse_mesh::m_TypeMap;
-
-	bool Eclipse_mesh::m_INIT_file=false;
-	bool Eclipse_mesh::m_UNRST_file=false;
-
-	int Eclipse_mesh::m_firstSEQ=-1;
-
-	UNITS  Eclipse_mesh::m_UnitSystem = UNITS::UNKNOWN;
-
-	std::unordered_map<std::string, std::vector<double>> Eclipse_mesh::m_CellProperties_double;
-	std::unordered_map<std::string, std::vector<int>> Eclipse_mesh::m_CellProperties_integer;
-	std::unordered_map<std::string, std::vector<double>> Eclipse_mesh::m_OtherProperties_double;
-	std::unordered_map<std::string, std::vector<int>> Eclipse_mesh::m_OtherProperties_integer;
-	std::unordered_map<std::string, std::vector<char>> Eclipse_mesh::m_OtherProperties_char;
-
-	unsigned int Eclipse_mesh::m_nWells=0;
-	std::unordered_map<std::string, Eclipse_mesh::WELL*> Eclipse_mesh::m_Wells;
-
 	void Eclipse_mesh::InitElementsMapping()
 	{
 		m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::EDGE)] = ELEMENTS::TYPE::VTK_LINE;
@@ -102,7 +62,16 @@ namespace PAMELA
 					buffer = StringUtils::RemoveString("'", buffer);
 					buffer = StringUtils::RemoveString("'", buffer);
 					buffer = StringUtils::RemoveString("/", buffer);
-					file_list.push_back(file.getDirectory() + "/" + buffer);
+                                        std::string path;
+                                        if( file.getDirectory().empty() )
+                                        {
+                                          path = buffer;
+                                        }
+                                        else
+                                        {
+                                          path = file.getDirectory() + "/" + buffer;
+                                        }
+					file_list.push_back(path);
 					nfiles++;
 				}
 			}
@@ -680,9 +649,9 @@ namespace PAMELA
 			StringUtils::RemoveEndOfLine(line);
 			StringUtils::RemoveTab(line);
 			StringUtils::Trim(line);
-			if (line == "SPECGRID")
+			if (line == "SPECGRID" || line == "DIMENS" )
 			{
-				LOGINFO("     o SPECGRID Found");
+				LOGINFO("     o SPECGRID or DIMENS Found");
 				std::vector<int> buf_int;
 				buffer = extractDataBelowKeyword(mesh_file);
 				StringUtils::FromStringTo(buffer, buf_int);

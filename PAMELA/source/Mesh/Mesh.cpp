@@ -327,20 +327,23 @@ namespace PAMELA
 		// make sure locally we use METIS's types (which are in global namespace) and not grid::<type>
 		using idx_t = ::idx_t;
 
-		int options[METIS_NOPTIONS];
+		idx_t options[METIS_NOPTIONS];
 		METIS_SetDefaultOptions(options);
 
 		// Some type casts and constants
 		idx_t nnodes = static_cast<idx_t>(adjacency->get_sourceElementCollection()->size_all());
 		idx_t nconst = 1;
 		idx_t objval = 0;
-		std::vector<int> partitionVector(nnodes);
+		std::vector<idx_t> partitionVector(nnodes);
 
-                int int_partition = static_cast<int>(npartition);
-		METIS_PartGraphRecursive(&nnodes, &nconst, &csrMatrix->rowPtr[0], &csrMatrix->columnIndex[0],
+                idx_t int_partition = static_cast<idx_t>(npartition);
+                //TODO This is a copy to have idx_t. It can be memory consuming.
+                std::vector<idx_t> rowPtrMetis(csrMatrix->rowPtr.begin(), csrMatrix->rowPtr.end());
+                std::vector<idx_t> columnIndexMetis(csrMatrix->columnIndex.begin(), csrMatrix->columnIndex.end());
+		METIS_PartGraphRecursive(&nnodes, &nconst, rowPtrMetis.data(), columnIndexMetis.data(),
 			nullptr, nullptr, nullptr, &int_partition, nullptr, nullptr, options, &objval, partitionVector.data());
 
-		return partitionVector;
+		return std::vector<int>(partitionVector.begin(), partitionVector.end());
 
 #else
                 utils::pamela_unused(adjacency);

@@ -523,9 +523,6 @@ namespace PAMELA
 						m_Index2IJK[icell] = IJK(i, j, k);
 						icell++;
 					}
-                                        else
-                                        {
-                                        }
 
 					layer.push_back(k);
 					actnum.push_back(m_ACTNUM[icellTotal]);
@@ -554,7 +551,7 @@ namespace PAMELA
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
-					if (actnum[i] == 1 && m_Duplicate_Element[i] == 0)
+					if (actnum[i] == 1 )
 					{
 
 						temp_double.push_back(prop[i]);
@@ -578,7 +575,7 @@ namespace PAMELA
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
-					if (actnum[i] == 1 && m_Duplicate_Element[i] == 0)
+					if (actnum[i] == 1)
 					{
 						temp_int.push_back(prop[i]);
 					}

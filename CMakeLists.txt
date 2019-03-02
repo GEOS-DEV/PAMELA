@@ -11,6 +11,7 @@ endif()
 
 if(NOT is_submodule)
   project("PAMELA - PArallel MEsh LibrAry" CXX C)
+  set(CMAKE_BUILD_TYPE Debug)
 
   # Check if BLT is available
   if (NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/blt/SetupBLT.cmake)

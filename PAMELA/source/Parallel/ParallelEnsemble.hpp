@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <set>
+#include <unordered_map>
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -74,6 +75,18 @@ namespace PAMELA
 
 		//Operators
 		T &operator[](size_t i) { return m_data[i]; }
+
+                T & AccessToElementDuringImport( size_t i)
+                {
+                  if( m_data[i] == nullptr )
+                  {
+                    return m_data[m_oldToNewIndex[static_cast< int>(i)]];
+                  }
+                  else
+                  {
+                    return m_data[i];
+                  }
+                }
 
 
 		//Push back T
@@ -154,6 +167,10 @@ namespace PAMELA
 
 		//data
 		std::vector<T> m_data;
+
+
+                // Map from old element index to new for duplicate element
+                std::unordered_map< int, int> m_oldToNewIndex;
 
 	};
 

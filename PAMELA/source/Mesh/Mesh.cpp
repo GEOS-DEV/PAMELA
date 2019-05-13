@@ -58,7 +58,7 @@ namespace PAMELA
 			for (int j = 0; j < nbFace; j++)
 			{
 				auto returned_polygon = target->push_back_unique(faces[j]);
-				FaceIndex = returned_polygon->get_localIndex();
+				FaceIndex = returned_polygon.first->get_localIndex();
 				adj->m_adjacencySparseMatrix->columnIndex.push_back(FaceIndex);
 				adj->m_adjacencySparseMatrix->values.push_back(PolyhedronIndex);
 				nval++;
@@ -80,59 +80,58 @@ namespace PAMELA
 	}
 
 
-	Point* Mesh::addPoint(ELEMENTS::TYPE elementType, int index, std::string groupLabel, double x, double y, double z)
+        std::pair< Point*, bool > Mesh::addPoint(ELEMENTS::TYPE elementType, int index, std::string groupLabel, double x, double y, double z)
 	{
 		Point* element = ElementFactory::makePoint(elementType, index, x, y, z);
 		auto returnedElement = m_PointCollection.AddElement(groupLabel, element);
-		if (element!=returnedElement)
+		if (!returnedElement.second)
 		{
-			//LOGWARNING("Try to add an existing element");
+			LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
 
-	Point* Mesh::addPoint(std::string groupLabel, Point* point)
+        std::pair<Point*, bool > Mesh::addPoint(std::string groupLabel, Point* point)
 	{
 		auto returnedElement = m_PointCollection.AddElement(groupLabel, point);
-		if (point != returnedElement)
+		if (returnedElement.second)
 		{
 			//LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
 
-	Line* Mesh::addLine(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
+        std::pair< Line*, bool> Mesh::addLine(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
 	{
 		Line* element = ElementFactory::makeLine(elementType, elementIndex, vertexList);
 		auto returnedElement = m_LineCollection.AddElement(groupLabel, element);
-		if (element != returnedElement)
+		if (!returnedElement.second)
 		{
 			LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
 
-	Polygon* Mesh::addPolygon(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
+        std::pair< Polygon*, bool > Mesh::addPolygon(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
 	{
 		Polygon* element = ElementFactory::makePolygon(elementType, elementIndex, vertexList);
 		auto returnedElement = m_PolygonCollection.AddElement(groupLabel, element);
-		if (element != returnedElement)
+		if ( !returnedElement.second )
 		{
 			LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
 
-	Polyhedron* Mesh::addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
+        std::pair< Polyhedron*, bool> Mesh::addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
 	{
 		Polyhedron* element = ElementFactory::makePolyhedron(elementType, elementIndex, vertexList);
 		auto returnedElement = m_PolyhedronCollection.AddElement(groupLabel, element);
-		if (element != returnedElement)
+		if ( !returnedElement.second)
 		{
-			//LOGWARNING("Try to add an existing element");
-			return returnedElement;
+			LOGWARNING("Try to add an existing element");
 		}
-		return nullptr;
+		return returnedElement;
 		
 
 	}
@@ -388,7 +387,7 @@ namespace PAMELA
 					auto it = get_PolyhedronCollection()->begin_owned() + irow;
 					auto xyz1 = (*it)->get_centroidCoordinates();
 					auto source_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz1[0], xyz1[1], xyz1[2]);
-					auto source_rpoint = point_collection.AddElement(Label, source_point);
+					auto source_rpoint = point_collection.AddElement(Label, source_point).first;
 					++ipoint; ++nb_points;
 					itarget = isource;
 					for (auto icol = rowPtr[irow]; icol != rowPtr[irow + 1]; ++icol)
@@ -399,7 +398,7 @@ namespace PAMELA
 							auto it2 = get_PolyhedronCollection()->begin_owned() + columIndex[icol];
 							auto xyz2 = (*it2)->get_centroidCoordinates();
 							auto target_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz2[0], xyz2[1], xyz2[2]);
-							auto target_rpoint = point_collection.AddElement(Label, target_point);
+							auto target_rpoint = point_collection.AddElement(Label, target_point).first;
 							++ipoint;
 							auto edgev = { source_rpoint , target_rpoint };
 							auto edge = ElementFactory::makeLine(ELEMENTS::TYPE::VTK_LINE, iline, edgev);

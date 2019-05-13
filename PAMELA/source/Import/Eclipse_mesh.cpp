@@ -482,20 +482,20 @@ namespace PAMELA
 						m_IndexTotal2Active[icellTotal] = icell;
 
 						//Points
-						vertexTemp[0] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]);
-						vertexTemp[4] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 6, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]);
-						vertexTemp[1] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 5, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]);
-						vertexTemp[5] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 4, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]);
-						vertexTemp[3] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 3, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]);
-						vertexTemp[7] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 2, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]);
-						vertexTemp[2] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 1, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]);
-						vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]);
+						vertexTemp[0] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]).first;
+						vertexTemp[4] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 6, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]).first;
+						vertexTemp[1] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 5, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]).first;
+						vertexTemp[5] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 4, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]).first;
+						vertexTemp[3] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 3, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]).first;
+						vertexTemp[7] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 2, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]).first;
+						vertexTemp[2] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 1, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]).first;
+						vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]).first;
 
 						//Hexa
 						mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP");
 						auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], icell, "POLYHEDRON_GROUP", vertexTemp);
 
-						if (returned_element != nullptr)
+						if (!returned_element.second)
 						{
 							//m_Duplicate_Element[returned_element->get_globalIndex()] = 1;
 							m_Duplicate_Element.push_back(2);

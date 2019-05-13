@@ -189,10 +189,10 @@ namespace PAMELA
 					case 4:	//TETRAHEDRON
                                                 elementType =ELEMENTS::TYPE::VTK_TETRA;
 						mesh_file >> v0 >> v1 >> v2 >> v3;
-						vertexTemp4[0] = vertexcollection[v0 - 1];
-						vertexTemp4[1] = vertexcollection[v1 - 1];
-						vertexTemp4[2] = vertexcollection[v2 - 1];
-						vertexTemp4[3] = vertexcollection[v3 - 1];
+						vertexTemp4[0] = vertexcollection.AccessToElementDuringImport(v0 - 1);
+						vertexTemp4[1] = vertexcollection.AccessToElementDuringImport(v1 - 1);
+						vertexTemp4[2] = vertexcollection.AccessToElementDuringImport(v2 - 1);
+						vertexTemp4[3] = vertexcollection.AccessToElementDuringImport(v3 - 1);
 
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)

@@ -57,7 +57,7 @@ namespace PAMELA
 
 
 		//Push_back unique
-		T push_back_owned_unique(T data)
+                std::pair< T, bool > push_back_owned_unique(T data)
 		{
 			auto index = static_cast<int>(this->end_owned() - this->begin_owned());
 			auto insertion = m_pointerToLocalIndex.insert(std::make_pair(data, index));
@@ -66,12 +66,12 @@ namespace PAMELA
 				this->m_data.insert(this->end_owned(), data);
 				(*data).set_localIndex(index);
 				this->Increment_owned();
-				return data;
+				return std::make_pair( data, true );
 			}
-			return insertion.first->first;
+			return std::make_pair(insertion.first->first, false);
 		}
 
-		T push_back_ghost_unique(T data)
+		std::pair< T, bool > push_back_ghost_unique(T data)
 		{
 			T returned_element = NULL;
 			int index = static_cast<int>(this->end_ghost() - this->begin_ghost());
@@ -83,14 +83,14 @@ namespace PAMELA
 				(*data).set_localIndex(index);
 				this->Increment_ghost();
 				//m_elementToLocalIndexMap.insert(std::make_pair(data, index));
-				return data;
+				return std::make_pair( data, true );
 			}
-			return insertion.first->first;
+			return std::make_pair(insertion.first->first, false);
 		}
 
 
 
-		T push_back_unique(T data)   //To be use before partitioning
+		std::pair< T, bool > push_back_unique(T data)   //To be use before partitioning
 		{
 			int index = static_cast<int>(this->end() - this->begin());
 			auto insertion = m_pointerToLocalIndex.insert(std::make_pair(data, index));
@@ -100,9 +100,9 @@ namespace PAMELA
 				(*data).set_localIndex(index);
 				(*data).set_globalIndex(index);
 				this->Increment_all();
-				return data;
+				return std::make_pair( data, true );
 			}
-			return insertion.first->first;
+			return std::make_pair(insertion.first->first, false);
 		}
 
 

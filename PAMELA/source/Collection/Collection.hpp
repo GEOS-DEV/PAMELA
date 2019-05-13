@@ -166,21 +166,26 @@ namespace PAMELA
 		ELEMENTS::FAMILY get_family() const { return m_family; }
 
 		//Add elements
-		T AddElement(std::string label, T Element)
+                std::pair< T, bool > AddElement(std::string label, T cur_element)
 		{
 			if (!groupExist(label))
 			{
 				addAndCreateGroup(label);
 			}
 			auto grp = m_labelToGroup[label];
-			grp->push_back_unique(Element);
-			auto add = this->push_back_unique(Element);//TODO:index twice
-			return add;
+			grp->push_back_unique(cur_element);
+			auto returnedElement = this->push_back_unique(cur_element);//TODO:index twice
+                        if( !returnedElement.second ) // element was not added, it's a duplicated.
+                        {
+                          this->m_oldToNewIndex.insert( std::make_pair(cur_element->get_initIndex(), returnedElement.first->get_localIndex()) );
+                          std::cout << "new : " <<  returnedElement.first->get_localIndex() << " old : " << cur_element->get_initIndex() << std::endl;
+                        }
+			return returnedElement;
 		}
 
 
 
-		T AddElement_owned(std::string label, T Element)
+		std::pair< T, bool > AddElement_owned(std::string label, T Element)
 		{
 			if (!groupExist(label))
 			{
@@ -192,7 +197,7 @@ namespace PAMELA
 			return add;
 		}
 
-		T AddElement_ghost(std::string label, T Element)
+		std::pair< T, bool > AddElement_ghost(std::string label, T Element)
 		{
 			if (!groupExist(label))
 			{

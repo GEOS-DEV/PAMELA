@@ -20,6 +20,7 @@ namespace PAMELA
                         utils::pamela_unused(index);
 			m_family = ELEMENTS::FAMILY::POINT;
 			m_vertexList = { this };
+                        m_index.Init = index;
 		}
 
 

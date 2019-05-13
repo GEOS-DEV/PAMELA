@@ -10,6 +10,7 @@ namespace PAMELA
 		IndexData(int idl, int idg) :Local(idl), Global(idg) {}
 		int Local;
 		int Global;
+                int Init;
 	};
 
 }

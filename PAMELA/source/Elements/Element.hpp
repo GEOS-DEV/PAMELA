@@ -108,6 +108,7 @@ namespace PAMELA
 		//Getters
 		int get_localIndex() const { return m_index.Local; }
 		int get_globalIndex() const { return m_index.Global; }
+		int get_initIndex() const { return m_index.Init; }
 		int get_dimension() { return ELEMENTS::dimension.at(static_cast<int>(m_family)); }
 		ELEMENTS::FAMILY get_family() { return m_family; }
 		ELEMENTS::TYPE get_vtkType() { return m_vtkType; }
@@ -116,6 +117,7 @@ namespace PAMELA
 		void set_index(int i) { set_localIndex(i); }
 		void set_localIndex(int i) { m_index.Local = i; }
 		void set_globalIndex(int i) { m_index.Global = i; }
+		void set_initIndex(int i) { m_index.Init = i; }
 		void set_partionOwner(int i) { m_partitionOwner = i; }
 		void set_IsGhost() { m_IsGhost = true; }
 

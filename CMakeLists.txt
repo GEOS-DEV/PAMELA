@@ -11,6 +11,7 @@ endif()
 
 if(NOT is_submodule)
   project("PAMELA - PArallel MEsh LibrAry" CXX C)
+  set(CMAKE_BUILD_TYPE Debug)
 
   # Check if BLT is available
   if (NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/blt/SetupBLT.cmake)
@@ -38,10 +39,11 @@ if(NOT is_submodule)
   include(cmake/PAMELA.cmake)
 
   include(cmake/tpls.cmake)
-
+  
+  # Add source
   add_subdirectory(PAMELA)
 
-  #Expose important paths
+  #Expose paths
   set(PAMELA_PATH ${CMAKE_SOURCE_DIR} CACHE INTERNAL "PAMELA_PATH" FORCE)
 
   # Examples

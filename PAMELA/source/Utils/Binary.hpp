@@ -9,7 +9,6 @@
 #endif
 #endif
 
-const int i = 1;
 //#define IS_BIG_ENDIAN() ( (*(char*)&i) == 0 )
 
 namespace PAMELA

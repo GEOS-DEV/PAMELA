@@ -66,7 +66,7 @@ namespace PAMELA
 		//Adjacency
 		void CreateLineGroupWithAdjacency(std::string Label, Adjacency* adjacency);
 
-
+		std::set<int> const & getNeighborList() const { return m_neighborList; }
 
 	protected:
 
@@ -86,6 +86,8 @@ namespace PAMELA
 
 		//Adjacency
 		AdjacencySet* m_AdjacencySet;
+
+		std::set<int> m_neighborList;
 
 		std::vector<int> METISPartitioning(Adjacency* adjacency, unsigned int npartition);
 		std::vector<int> TRIVIALPartitioning();

@@ -220,6 +220,7 @@ namespace PAMELA
 					if (PolyhedronAffiliation[*it2] != ipartition)
 					{
 						PolyhedronGhost.insert(*it2);
+						m_neighborList.insert(PolyhedronAffiliation[*it2]);
 					}
 				}
 			}

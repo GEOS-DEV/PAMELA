@@ -40,5 +40,7 @@ if(PAMELA_WITH_VTK)
                      LIBRARIES ${VTK_LIBRARIES}
                      COMPILE_FLAGS "${VTK_DEFINITIONS} -DWITH_VTK")
     message(STATUS "Found VTK")
+    message(STATUS "VTK Include Path: ${VTK_INCLUDE_DIRS}")
+    message(STATUS "VTK Libraries: ${VTK_LIBRARIES}")
 endif()
 

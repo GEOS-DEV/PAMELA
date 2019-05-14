@@ -9,6 +9,8 @@
 #include <vtkMPIController.h>
 #endif
 
+//#include "vld.h"
+
 int main(int argc, char **argv) {
 
 	using namespace  PAMELA;
@@ -24,8 +26,8 @@ int main(int argc, char **argv) {
 #endif
 
 
-        std::cout << PAMELA_PATH"/../data/medit/small.mesh" << std::endl;
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/../data/medit/small.mesh");
+        std::cout << PAMELA_PATH"/../data/medit/tiny.mesh" << std::endl;
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/../data/medit/tiny.mesh");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);

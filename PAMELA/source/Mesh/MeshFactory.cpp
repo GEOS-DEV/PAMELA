@@ -72,15 +72,15 @@ namespace PAMELA
 	{
 
 		std::vector<double> vdx, vdy, vdz;
-		for (auto i = 0; i < nx; i++)
+		for (auto i = 0; i < nx; ++i)
 		{
 			vdx.push_back(dx);
 		}
-		for (auto i = 0; i < ny; i++)
+		for (auto i = 0; i < ny; ++i)
 		{
 			vdy.push_back(dy);
 		}
-		for (auto i = 0; i < nz; i++)
+		for (auto i = 0; i < nz; ++i)
 		{
 			vdz.push_back(dz);
 		}

@@ -175,11 +175,6 @@ namespace PAMELA
 			auto grp = m_labelToGroup[label];
 			grp->push_back_unique(cur_element);
 			auto returnedElement = this->push_back_unique(cur_element);//TODO:index twice
-                        if( !returnedElement.second ) // element was not added, it's a duplicated.
-                        {
-                          this->m_oldToNewIndex.insert( std::make_pair(cur_element->get_initIndex(), returnedElement.first->get_localIndex()) );
-                          std::cout << "new : " <<  returnedElement.first->get_localIndex() << " old : " << cur_element->get_initIndex() << std::endl;
-                        }
 			return returnedElement;
 		}
 

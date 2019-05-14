@@ -86,7 +86,7 @@ namespace PAMELA
 		auto returnedElement = m_PointCollection.AddElement(groupLabel, element);
 		if (!returnedElement.second)
 		{
-			LOGWARNING("Try to add an existing element");
+			//LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
@@ -107,7 +107,7 @@ namespace PAMELA
 		auto returnedElement = m_LineCollection.AddElement(groupLabel, element);
 		if (!returnedElement.second)
 		{
-			LOGWARNING("Try to add an existing element");
+			//LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
@@ -118,7 +118,7 @@ namespace PAMELA
 		auto returnedElement = m_PolygonCollection.AddElement(groupLabel, element);
 		if ( !returnedElement.second )
 		{
-			LOGWARNING("Try to add an existing element");
+			//LOGWARNING("Try to add an existing element");
 		}
 		return returnedElement;
 	}
@@ -129,7 +129,7 @@ namespace PAMELA
 		auto returnedElement = m_PolyhedronCollection.AddElement(groupLabel, element);
 		if ( !returnedElement.second)
 		{
-			LOGWARNING("Try to add an existing element");
+			//LOGWARNING("Try to add an existing polyhedron");
 		}
 		return returnedElement;
 		

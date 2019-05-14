@@ -62,6 +62,7 @@ namespace PAMELA
 		std::vector<Point*> vertexTemp5 = { nullptr,nullptr,nullptr,nullptr,nullptr };
 		std::vector<Point*> vertexTemp6 = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 		std::vector<Point*> vertexTemp8 = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
+                std::vector< int > oldToNewVertexIndex;
 		ElementCollection<Point*>& vertexcollection = *(mesh->get_PointCollection());
 		ELEMENTS::TYPE elementType;
 		std::string line;
@@ -74,6 +75,7 @@ namespace PAMELA
 				{
 					LOGERROR("Error while reading" + line);
 				}
+                                oldToNewVertexIndex.resize(m_nnodes);
 
 				LOGINFO("Reading nodes...");
 
@@ -81,12 +83,14 @@ namespace PAMELA
 				elementType =ELEMENTS::TYPE::VTK_VERTEX;
 				double x, y, z;
 				std::vector<Vertex*> vertexTemp = { nullptr };
+                                int offset = 0;
 				for (int i = 0; i != m_nnodes; i++)
 				{
 					mesh_file >> id >> x >> y >> z;
-					mesh->addPoint(elementType, i, "DEFAULT", x, y, z);
+					auto res =  mesh->addPoint(elementType, i, "DEFAULT", x, y, z);
+                                          oldToNewVertexIndex[i] = res.first->get_localIndex(); 
 				}
-				LOGINFO("Done");
+				LOGINFO("Done" +  std::to_string(offset));
 			}
 			else if ((line == "$PhysicalNames"))
 			{
@@ -189,10 +193,10 @@ namespace PAMELA
 					case 4:	//TETRAHEDRON
                                                 elementType =ELEMENTS::TYPE::VTK_TETRA;
 						mesh_file >> v0 >> v1 >> v2 >> v3;
-						vertexTemp4[0] = vertexcollection.AccessToElementDuringImport(v0 - 1);
-						vertexTemp4[1] = vertexcollection.AccessToElementDuringImport(v1 - 1);
-						vertexTemp4[2] = vertexcollection.AccessToElementDuringImport(v2 - 1);
-						vertexTemp4[3] = vertexcollection.AccessToElementDuringImport(v3 - 1);
+						vertexTemp4[0] = vertexcollection[oldToNewVertexIndex[v0 - 1]];
+						vertexTemp4[1] = vertexcollection[oldToNewVertexIndex[v1 - 1]];
+						vertexTemp4[2] = vertexcollection[oldToNewVertexIndex[v2 - 1]];
+						vertexTemp4[3] = vertexcollection[oldToNewVertexIndex[v3 - 1]];
 
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)

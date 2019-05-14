@@ -102,6 +102,8 @@ namespace PAMELA
 				this->Increment_all();
 				return std::make_pair( data, true );
 			}
+                        //insertion.first->first->set_localIndex(index);
+                        //insertion.first->first->set_globalIndex(index);
 			return std::make_pair(insertion.first->first, false);
 		}
 

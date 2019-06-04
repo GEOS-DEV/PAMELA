@@ -68,7 +68,7 @@ namespace PAMELA
 			return vec;
 		}
 
-	public:
+	private:
 		std::vector<T> Data;
 
 	};

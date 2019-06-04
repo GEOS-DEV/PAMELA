@@ -111,7 +111,7 @@ namespace PAMELA {
     std::vector< int > offsets(partMap.size() + 1, 0);
     for( auto& part : partMap )
     {
-      offsets[part.second->LocalIndex] = part.second->Collection->size_owned();
+      offsets[part.second->LocalIndex] = static_cast<int>(part.second->Collection->size_owned());
     }
     for(int i = 1 ; i < static_cast<int>( offsets.size() + 1 ); i++)
     {

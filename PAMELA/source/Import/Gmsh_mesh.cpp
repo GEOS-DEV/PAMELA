@@ -139,6 +139,7 @@ namespace PAMELA
 						mesh_file >> attribute; //trash
 					}
 					//mesh_file >> itrash;	//attribute=
+                                        if(attribute == 0) attribute = 1; // Cant have a 0 attribute
 
 					switch (itype)
 					{

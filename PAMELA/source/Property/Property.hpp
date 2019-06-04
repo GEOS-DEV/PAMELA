@@ -57,13 +57,10 @@ namespace PAMELA
 		void ClearAfterPartitioning(std::set<int> owned, std::set<int> ghost)
 		{
 
-                  std::cout << "BEFORE SHRINK " << m_data["barycenter"].size_owned();
 			for (auto it = m_data.begin(); it != m_data.end(); ++it)
 			{
 				it->second.Shrink(owned, ghost, static_cast<int>( m_dimension[it->first] ));
 			}
-                  std::cout << "AFTER SHRINK " << m_data["barycenter"].size_owned();
-
 		}
 
 

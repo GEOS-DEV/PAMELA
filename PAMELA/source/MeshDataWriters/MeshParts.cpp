@@ -87,13 +87,20 @@ namespace PAMELA {
     auto ActiveGroupMapPolyhedron = polyhedronCollection->get_ActiveGroupsMap();
 
     //--Add active parts
-    int localIndex = 0;
     for (auto it = ActiveGroupMapPolyhedron.begin(); it != ActiveGroupMapPolyhedron.end(); ++it)	//Loop over group and act on active groups
     {
       if (it->second)
       {
         std::string grplabel = it->first;
-        int grpIndex = std::stoi((grplabel.substr(grplabel.size() - 1)  )) -1;
+        std::string grplabelCopy = grplabel;
+        std::replace(grplabelCopy.begin(), grplabelCopy.end(), '_', ' ');
+
+        std::vector<std::string> grplabelArray;
+        std::stringstream ss(grplabelCopy);
+        std::string temp;
+        while (ss >> temp)
+           grplabelArray.push_back( temp );
+        int grpIndex = std::stoi(grplabelArray[grplabelArray.size() -1] ) -1;
         auto groupEnsemble = polyhedronCollection->get_Group(grplabel);
         partMap[grplabel] = new Part<Polyhedron*>(grplabel, grpIndex, grpIndex, groupEnsemble);
         partIndex++;

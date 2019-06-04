@@ -29,7 +29,6 @@ namespace PAMELA
 	struct Part
 	{
 		Part(std::string label, int index, int localIndex, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* collection) { Label = label; Collection = collection; Index = index; LocalIndex = localIndex; 
-                std::cout << "ADDING PART " << Label << " " << Index << " " << localIndex << std::endl;
                 }
 		VariableDouble* AddVariable(VARIABLE_DIMENSION dim, VARIABLE_LOCATION dloc, std::string label)
 		{

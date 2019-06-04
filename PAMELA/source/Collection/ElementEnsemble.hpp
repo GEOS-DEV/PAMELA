@@ -123,11 +123,11 @@ namespace PAMELA
 		}
 
 		//Shrink
-		void Shrink(std::set<int> owned, std::set<int> ghost) override
+		void Shrink(std::set<int> owned, std::set<int> ghost, int dimension = 1) override
 		{
 			//Copy ghost elements amd owned elements in temporary vector
-			std::vector<T> ghost_vec_temp; ghost_vec_temp.reserve(ghost.size());
-			std::vector<T> owned_vec_temp; ghost_vec_temp.reserve(owned.size());
+			std::vector<T> ghost_vec_temp; ghost_vec_temp.reserve(ghost.size() * dimension);
+			std::vector<T> owned_vec_temp; ghost_vec_temp.reserve(owned.size() * dimension);
 			for (auto it = this->m_data.begin(); it != this->m_data.end(); ++it)
 			{
 				if (ghost.count((*it)->get_globalIndex()) == 1)

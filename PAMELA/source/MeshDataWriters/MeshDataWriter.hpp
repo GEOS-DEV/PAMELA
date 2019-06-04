@@ -112,7 +112,6 @@ namespace PAMELA
                     auto polyhedronPartPtr = polyhedronPartItr->second;
                     auto nbElements = polyhedronPartPtr->Collection->size_owned();
                     std::vector< T > values_in_part(nbElements);
-                    int count = 0;
                     for(auto cellBlockItr = polyhedronPartPtr->SubParts.begin();
                         cellBlockItr != polyhedronPartPtr->SubParts.end();
                         cellBlockItr++)
@@ -125,7 +124,6 @@ namespace PAMELA
                         auto cellPtr = *(cellItr);
                         auto localIndex = cellPtr->get_localIndex();
                         values_in_part[localIndex] = values[localIndex];
-                        count++;
                       }
 
                       /*

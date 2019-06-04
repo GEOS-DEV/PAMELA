@@ -64,7 +64,7 @@ namespace PAMELA
 		{
 			if (offset == 1)
 				return{ Data[i] };
-			std::vector<T> vec(&Data[i*offset], &Data[(i + 1)*offset - 1]);
+			std::vector<T> vec(&Data[i*offset], &Data[(i + 1)*offset]);
 			return vec;
 		}
 

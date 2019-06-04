@@ -128,18 +128,18 @@ namespace PAMELA
 
 
 		//Shrink
-		virtual void Shrink(std::set<int> owned, std::set<int> ghost)
+		virtual void Shrink(std::set<int> owned, std::set<int> ghost, int dimension = 1)
 		{
 			//Copy ghost elements amd owned elements in temporary vector
-			std::vector<T> ghost_vec_temp; ghost_vec_temp.reserve(ghost.size());
-			std::vector<T> owned_vec_temp; ghost_vec_temp.reserve(owned.size());
+			std::vector<T> ghost_vec_temp; ghost_vec_temp.reserve(ghost.size() * dimension);
+			std::vector<T> owned_vec_temp; ghost_vec_temp.reserve(owned.size() * dimension);
 			for (auto it = m_data.begin(); it != m_data.end(); ++it)
 			{
-				if (ghost.count(static_cast<int>(it - m_data.begin())) == 1)
+				if (ghost.count(static_cast<int>((it - m_data.begin())/ dimension)) == 1)
 				{
 					ghost_vec_temp.push_back(*it);
 				}
-				else if (owned.count(static_cast<int>(it - m_data.begin())) == 1)
+				else if (owned.count(static_cast<int>(it - m_data.begin())/ dimension) == 1)
 				{
 					owned_vec_temp.push_back(*it);
 				}
@@ -152,11 +152,11 @@ namespace PAMELA
 
 			//Rebuilt data
 			m_data.clear();
-			m_data.reserve(ghost_vec_temp.size() + owned_vec_temp.size());
+			m_data.reserve(ghost_vec_temp.size() * dimension + owned_vec_temp.size() * dimension);
 			m_data.insert(m_data.end(), owned_vec_temp.begin(), owned_vec_temp.end());
 			m_data.insert(m_data.end(), ghost_vec_temp.begin(), ghost_vec_temp.end());
-			resize_owned(static_cast<int>(owned_vec_temp.size()));
-			resize_ghost(static_cast<int>(ghost_vec_temp.size()));
+			resize_owned(static_cast<int>(owned_vec_temp.size() * dimension));
+			resize_ghost(static_cast<int>(ghost_vec_temp.size() * dimension));
 
 			//Test for emptyness
 			if (m_data.empty()) MakeEmpty();

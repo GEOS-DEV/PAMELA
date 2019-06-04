@@ -28,7 +28,8 @@ namespace PAMELA
 	template <class T>
 	struct Part
 	{
-		Part(std::string label, int index, int localIndex, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* collection) { Label = label; Collection = collection; Index = index; LocalIndex = localIndex; }
+		Part(std::string label, int index, int localIndex, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* collection) { Label = label; Collection = collection; Index = index; LocalIndex = localIndex; 
+                }
 		VariableDouble* AddVariable(VARIABLE_DIMENSION dim, VARIABLE_LOCATION dloc, std::string label)
 		{
 			if (dloc == VARIABLE_LOCATION::PER_CELL)
@@ -45,6 +46,18 @@ namespace PAMELA
 			return nullptr;
 
 		}
+
+                VariableDouble * FindVariableByName( const std::string & name )
+                {
+                  for(auto varIt = PerElementVariable.begin(); varIt != PerElementVariable.end(); ++varIt)
+                  {
+                    if( (*varIt)->Label.c_str() == name )
+                    {
+                      return (*varIt);
+                    }
+                  }
+                  return nullptr;
+                }
 
 		int Index;   // global including all families
                 int LocalIndex; // local index of this family

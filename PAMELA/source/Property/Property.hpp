@@ -52,7 +52,7 @@ namespace PAMELA
 
 		void GetProperty_owned(std::string& label) { return m_data[label].data(); }
 
-                VARIABLE_DIMENSION GetProperty_dimension(const std::string& label) { return m_dimension.at(label); };
+                VARIABLE_DIMENSION GetProperty_dimension(const std::string& label) { return m_dimension.at(label); }
 
 		void ClearAfterPartitioning(std::set<int> owned, std::set<int> ghost)
 		{

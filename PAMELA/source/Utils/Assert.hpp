@@ -10,7 +10,7 @@ namespace PAMELA {
         if (! (condition)) { \
             LOGERROR(message); \
                 } \
-            } while (false);
+            } while (false)
 #else
 #   define ASSERT(condition, message) do { } while (false)
 #endif

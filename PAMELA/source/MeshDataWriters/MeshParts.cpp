@@ -93,12 +93,56 @@ namespace PAMELA {
       if (it->second)
       {
         std::string grplabel = it->first;
+        int grpIndex = std::stoi((grplabel.substr(grplabel.size() - 1)  )) -1;
         auto groupEnsemble = polyhedronCollection->get_Group(grplabel);
-        partMap[grplabel] = new Part<Polyhedron*>(grplabel, partIndex, localIndex++, groupEnsemble);
+        partMap[grplabel] = new Part<Polyhedron*>(grplabel, grpIndex, grpIndex, groupEnsemble);
         partIndex++;
       }
     }
     FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYHEDRON", &partMap);
+        int offset = 0;
+    std::vector< int > offsets(partMap.size() + 1, 0);
+    for( auto& part : partMap )
+    {
+      offsets[part.second->LocalIndex] = part.second->Collection->size_owned();
+    }
+    for(int i = 1 ; i < static_cast<int>( offsets.size() + 1 ); i++)
+    {
+      offsets[i] = offsets[i-1] + offsets[i];
+    }
+    for( auto& part : partMap )
+    {
+      auto mesh_props = mesh->get_PolyhedronProperty_double()->get_PropertyMap();
+      auto curPart = part.second;
+      for (auto& mesh_prop : mesh_props)
+      {
+        auto values = mesh_prop.second;
+        auto dim = mesh->get_PolyhedronProperty_double()->GetProperty_dimension(mesh_prop.first);
+        int dimInt = static_cast< int >( dim );
+        auto var = curPart->AddVariable( dim, VARIABLE_LOCATION::PER_CELL,mesh_prop.first);
+        auto nbElements = curPart->Collection->size_owned();
+        std::vector< double > values_in_part(nbElements * static_cast<int>(dim));
+        for(auto cellBlockItr =curPart->SubParts.begin();
+            cellBlockItr != curPart->SubParts.end();
+            cellBlockItr++)
+        {
+          auto cellBlockPtr = cellBlockItr->second;
+          for(auto cellItr = cellBlockPtr->SubCollection.begin_owned();
+              cellItr != cellBlockPtr->SubCollection.end_owned();
+              cellItr++)
+          {
+            auto cellPtr = *(cellItr);
+            auto localIndex2 = cellPtr->get_localIndex();
+            for(int i = 0; i < dimInt; i++)
+            {
+              values_in_part[localIndex2*dimInt+i] = values[localIndex2*dimInt+i + 3*offsets[curPart->Index -1]];
+            }
+          }
+          offset += cellBlockPtr->SubCollection.size_owned() * dimInt;
+        }
+        var->set_data(values_in_part.begin(), values_in_part.end());
+      }
+    }
     return std::make_pair(partMap, partIndex);
   }
 

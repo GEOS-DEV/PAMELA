@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MeshDataWriters/Variable.hpp"
+
 
 
 namespace PAMELA
@@ -20,8 +22,13 @@ namespace PAMELA
 		//Property
 		void ReferenceProperty(std::string label)
 		{
+                  ReferenceProperty( label, VARIABLE_DIMENSION::SCALAR );
+		}
+
+		void ReferenceProperty( std::string label, VARIABLE_DIMENSION dim )
+		{
 			m_data[label] = ParallelEnsemble<T2> ();
-			//Ensemble<T2>(m_Owner->size_owned(), 0);
+                        m_dimension[label] =dim;
 		}
 
 		//void CreateProperty(std::string label)
@@ -43,17 +50,19 @@ namespace PAMELA
 			m_data[label].push_back_owned(val);
 		}
 
-		void GetProperty_owned(std::string label) { return m_data[label].data(); }
+		void GetProperty_owned(std::string& label) { return m_data[label].data(); }
 
-
+                VARIABLE_DIMENSION GetProperty_dimension(const std::string& label) { return m_dimension.at(label); };
 
 		void ClearAfterPartitioning(std::set<int> owned, std::set<int> ghost)
 		{
 
+                  std::cout << "BEFORE SHRINK " << m_data["barycenter"].size_owned();
 			for (auto it = m_data.begin(); it != m_data.end(); ++it)
 			{
-				it->second.Shrink(owned, ghost);
+				it->second.Shrink(owned, ghost, static_cast<int>( m_dimension[it->first] ));
 			}
+                  std::cout << "AFTER SHRINK " << m_data["barycenter"].size_owned();
 
 		}
 
@@ -63,8 +72,7 @@ namespace PAMELA
 		T1* m_Owner;
 		//std::unordered_map<std::string, std::vector<T2>> m_data;
 		std::unordered_map<std::string, ParallelEnsemble<T2>> m_data;
-
-		
+		std::unordered_map<std::string, VARIABLE_DIMENSION> m_dimension;
 	};
 	
 }

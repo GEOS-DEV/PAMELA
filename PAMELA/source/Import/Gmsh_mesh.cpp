@@ -352,12 +352,16 @@ namespace PAMELA
 
                                 /// Fill the properties
 		                auto props_double = mesh->get_PolyhedronProperty_double();
-                                props_double->ReferenceProperty( ppt_name);
-                                std::vector< double > ppt_vector(nb_values);
+                                props_double->ReferenceProperty( ppt_name, static_cast< VARIABLE_DIMENSION >(nb_components));
+                                std::vector< double > ppt_vector(nb_values * nb_components);
                                 ASSERT(static_cast<int>(props_double->get_Owner()->size_owned()) == nb_values, "Wrong property size");
                                 int trash;
                                 for(int i = 0 ; i < nb_values ; i++) {
-                                  mesh_file  >> trash >> ppt_vector[i];
+                                  mesh_file >> trash;
+                                  for( int j = 0; j < nb_components; j++)
+                                  {
+                                    mesh_file  >> ppt_vector[i*nb_components + j];   
+                                  }
                                 }
                                 props_double->SetProperty(ppt_name,ppt_vector);
                         }

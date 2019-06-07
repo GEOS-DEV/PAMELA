@@ -6,11 +6,7 @@
 #define LEVEL_LOG_FILE "DEBUG"
 #define LEVEL_LOG_SCREEN "BRIEF"
 #define FILE_NAME "simulator.log"
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wexit-time-destructors"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#endif
+
 namespace PAMELA
 {
   Logger* Logger::instance()

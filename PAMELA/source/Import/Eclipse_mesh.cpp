@@ -640,6 +640,26 @@ namespace PAMELA
 			props_int->ReferenceProperty(it->first);
 			props_int->SetProperty(it->first, it->second);
 		}
+
+                // Special case for the eclipse grid
+                if( ( m_CellProperties_double.find( "PERMX") != m_CellProperties_double.end() ) &&
+                    ( m_CellProperties_double.find( "PERMY") != m_CellProperties_double.end() )  &&
+                    ( m_CellProperties_double.find( "PERMZ") != m_CellProperties_double.end() ) )
+                {
+                  auto permx = m_CellProperties_double.at("PERMX");
+                  auto permy = m_CellProperties_double.at("PERMY");
+                  auto permz = m_CellProperties_double.at("PERMZ");
+
+                  props_double->ReferenceProperty("PERM", VARIABLE_DIMENSION::VECTOR);
+                  std::vector< double > allPerm( 3 * permx.size() );
+                  for( int i = 0; i < static_cast< int >( permx.size() ); i++)
+                  {
+                    allPerm[3*i] = permx[i];
+                    allPerm[3*i+1] = permy[i];
+                    allPerm[3*i+2] = permz[i];
+                  }
+                  props_double->SetProperty( "PERM", allPerm) ;
+                }
 	}
 
 	void Eclipse_mesh::ParseStringFromGRDECL(std::string& str)

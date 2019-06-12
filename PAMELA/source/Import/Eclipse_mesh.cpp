@@ -652,11 +652,12 @@ namespace PAMELA
 
                   props_double->ReferenceProperty("PERM", VARIABLE_DIMENSION::VECTOR);
                   std::vector< double > allPerm( 3 * permx.size() );
+                  const double mDToM2 = 9.869233e-16;
                   for( int i = 0; i < static_cast< int >( permx.size() ); i++)
                   {
-                    allPerm[3*i] = permx[i];
-                    allPerm[3*i+1] = permy[i];
-                    allPerm[3*i+2] = permz[i];
+                    allPerm[3*i] = permx[i]  * mDToM2;
+                    allPerm[3*i+1] = permy[i] * mDToM2;
+                    allPerm[3*i+2] = permz[i] * mDToM2;
                   }
                   props_double->SetProperty( "PERM", allPerm) ;
                 }

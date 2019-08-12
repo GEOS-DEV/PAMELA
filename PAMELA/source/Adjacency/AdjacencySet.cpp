@@ -179,15 +179,12 @@ namespace PAMELA
 		auto adj1_sourceFamily = adjacency1->get_sourceFamily();
 		auto adj1_targetFamily = adjacency1->get_targetFamily();
 		auto adj1_baseFamily = adjacency1->get_baseFamily();
-		auto adj2_sourceFamily = adjacency2->get_sourceFamily();
-		auto adj2_targetFamily = adjacency2->get_targetFamily();
-		auto adj2_baseFamily = adjacency2->get_baseFamily();
 		auto adj1_source = adjacency1->get_sourceElementCollection();
 		auto adj1_target = adjacency1->get_targetElementCollection();
 		auto adj1_base = adjacency1->get_baseElementCollection();
-		ASSERT(adj1_sourceFamily == adj2_sourceFamily, "Non matching source elements");
-		ASSERT(adj1_baseFamily == adj2_baseFamily, "Non matching base elements");
-		ASSERT(adj1_targetFamily == adj2_targetFamily, "Non matching target elements");
+		ASSERT(adj1_sourceFamily == adjacency2->get_sourceFamily(), "Non matching source elements");
+		ASSERT(adj1_baseFamily == adjacency2->get_baseFamily(), "Non matching base elements");
+		ASSERT(adj1_targetFamily == adjacency2->get_targetFamily(), "Non matching target elements");
 		auto adjacency_sum = new Adjacency(adj1_sourceFamily, adj1_targetFamily, adj1_baseFamily, adj1_source, adj1_target, adj1_base, csr_sum);
 		NonTopologicalAdjacencyMap[label] = adjacency_sum;
 	}

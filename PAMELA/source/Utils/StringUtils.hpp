@@ -87,8 +87,7 @@ namespace PAMELA
 		template<typename T>
 		void VectorStringToVectorChopped(int ChopSize, std::vector<std::string>& data, std::vector<std::vector<T>>& v)
 		{
-			int mdataSize(int(data.size()));
-			ASSERT(mdataSize == 1, " >> operator: incompatible origin and target");
+			ASSERT(data.size() == 1, " >> operator: incompatible origin and target");
 			v.reserve(data[0].size() / (2 * ChopSize));
 			std::istringstream iss(data[0]);
 			T sub;

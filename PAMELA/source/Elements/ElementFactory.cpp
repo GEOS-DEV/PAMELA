@@ -8,12 +8,14 @@ namespace PAMELA
     Point* makePoint(ELEMENTS::TYPE elementType, int index, double x, double y, double z)
     {
       ASSERT(elementType == ELEMENTS::TYPE::VTK_VERTEX, "Cannot make a point with this type");
+      (void) elementType;
       return new Vertex(index, x, y, z);
     }
 
     Line* makeLine(ELEMENTS::TYPE elementType, int index, const std::vector<Point*>& vertexList)
     {
       ASSERT(elementType == ELEMENTS::TYPE::VTK_LINE, "Cannot make a line with this type");
+      (void) elementType;
       return new ElementSpe<ELEMENTS::FAMILY::LINE, ELEMENTS::TYPE::VTK_LINE>(index, vertexList);
     }
 

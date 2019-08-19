@@ -58,7 +58,9 @@ blt_add_library(NAME                  ${PAMELA_target}
                 HEADERS               ${PAMELA_headers}
                 HEADERS_OUTPUT_SUBDIR PAMELA
                 DEFINES               ${PAMELA_definitions}
-                DEPENDS_ON             ${PAMELA_dependencies})
+                DEPENDS_ON             ${PAMELA_dependencies}
+                OBJECT TRUE
+               )
 
 				
 target_include_directories(${PAMELA_target} PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${PROJECT_SRC_DIR}) 

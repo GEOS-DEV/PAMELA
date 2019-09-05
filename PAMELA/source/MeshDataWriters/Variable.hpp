@@ -54,8 +54,7 @@ namespace PAMELA
 
 		void set_data(typename std::vector<T>::iterator it_begin_vec, typename std::vector<T>::iterator it_end_vec)
 		{
-			auto vec_size = static_cast<size_t>(it_end_vec - it_begin_vec);
-			ASSERT(vec_size == Data.size(), "Mismatch sizes");
+			ASSERT(static_cast<size_t>(it_end_vec - it_begin_vec) == Data.size(), "Mismatch sizes");
 			Data.assign(it_begin_vec, it_end_vec);
 		}
 

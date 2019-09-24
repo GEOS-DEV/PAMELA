@@ -1,17 +1,3 @@
-/*
- * ------------------------------------------------------------------------------------------------------------
- * SPDX-License-Identifier: LGPL-2.1-only
- *
- * Copyright (c) 2018-2019 Lawrence Livermore National Security LLC
- * Copyright (c) 2018-2019 The Board of Trustees of the Leland Stanford Junior University
- * Copyright (c) 2018-2019 Total, S.A
- * Copyright (c) 2019-     GEOSX Contributors
- * All right reserved
- *
- * See top level LICENSE, COPYRIGHT, CONTRIBUTORS, NOTICE, and ACKNOWLEDGEMENTS files for details.
- * ------------------------------------------------------------------------------------------------------------
- */
-
 #pragma once
 
 // Std library includes
@@ -101,7 +87,8 @@ namespace PAMELA
 		template<typename T>
 		void VectorStringToVectorChopped(int ChopSize, std::vector<std::string>& data, std::vector<std::vector<T>>& v)
 		{
-			ASSERT(data.size() == 1, " >> operator: incompatible origin and target");
+			int mdataSize(int(data.size()));
+			ASSERT(mdataSize == 1, " >> operator: incompatible origin and target");
 			v.reserve(data[0].size() / (2 * ChopSize));
 			std::istringstream iss(data[0]);
 			T sub;

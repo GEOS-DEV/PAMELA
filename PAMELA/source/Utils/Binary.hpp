@@ -1,40 +1,38 @@
-/*
- * ------------------------------------------------------------------------------------------------------------
- * SPDX-License-Identifier: LGPL-2.1-only
- *
- * Copyright (c) 2018-2019 Lawrence Livermore National Security LLC
- * Copyright (c) 2018-2019 The Board of Trustees of the Leland Stanford Junior University
- * Copyright (c) 2018-2019 Total, S.A
- * Copyright (c) 2019-     GEOSX Contributors
- * All right reserved
- *
- * See top level LICENSE, COPYRIGHT, CONTRIBUTORS, NOTICE, and ACKNOWLEDGEMENTS files for details.
- * ------------------------------------------------------------------------------------------------------------
- */
-
 #pragma once
 
 #define LEVEL_LOG_FILE "DEBUG"
 #define LEVEL_LOG_SCREEN "BRIEF"
+#ifdef __clang__
+#if __clang_major__ > 4
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-template"
+#endif
+#endif
 
 //#define IS_BIG_ENDIAN() ( (*(char*)&i) == 0 )
 
 namespace PAMELA
 {
 
-  namespace utils
-  {
-    
-    template <class T>
-    static void bites_swap(T *objp)
-    {
-      if (true)
-      {
-        unsigned char *memp = reinterpret_cast<unsigned char*>(objp);
-        std::reverse(memp, memp + sizeof(T));
-      }
-    }
+	namespace utils
+	{
+		
+		template <class T>
+		static void bites_swap(T *objp)
+		{
+			if (true)
+			{
+				unsigned char *memp = reinterpret_cast<unsigned char*>(objp);
+				std::reverse(memp, memp + sizeof(T));
+			}
+		}
 
-  }
+	}
 
 }
+
+#ifdef __clang__
+#if __clang_major__ > 4
+#pragma clang diagnostic pop
+#endif
+#endif

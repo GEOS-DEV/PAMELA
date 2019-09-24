@@ -1,3 +1,17 @@
+/*
+ * ------------------------------------------------------------------------------------------------------------
+ * SPDX-License-Identifier: LGPL-2.1-only
+ *
+ * Copyright (c) 2018-2019 Lawrence Livermore National Security LLC
+ * Copyright (c) 2018-2019 The Board of Trustees of the Leland Stanford Junior University
+ * Copyright (c) 2018-2019 Total, S.A
+ * Copyright (c) 2019-     GEOSX Contributors
+ * All right reserved
+ *
+ * See top level LICENSE, COPYRIGHT, CONTRIBUTORS, NOTICE, and ACKNOWLEDGEMENTS files for details.
+ * ------------------------------------------------------------------------------------------------------------
+ */
+
 #include "Import/Eclipse_mesh.hpp"
 #include "Utils/StringUtils.hpp"
 #include "Elements/ElementFactory.hpp"
@@ -1198,6 +1212,18 @@ namespace PAMELA
             vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz[0], xyz[1], 0));
             auto comps = well->completions;
             for (unsigned int ic = 0; ic != well->nb_completions; ++ic)
+            {
+              auto cell_index = comps[ic].hosting_cell_index;
+              auto itpol2 = polyhedron_collection->begin_owned() + cell_index;
+              auto xyz2 = (*itpol2)->get_centroidCoordinates();
+              vecpoint.push_back(ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, -1, xyz2[0], xyz2[1], xyz2[2]));
+            }
+            mesh->AddImplicitLine(ELEMENTS::TYPE::VTK_LINE, itw->first, vecpoint);
+            mesh->get_ImplicitLineCollection()->MakeActiveGroup(itw->first);
+          }
+        }
+}
+completions; ++ic)
             {
               auto cell_index = comps[ic].hosting_cell_index;
               auto itpol2 = polyhedron_collection->begin_owned() + cell_index;

@@ -860,20 +860,21 @@ namespace PAMELA
 	std::string Eclipse_mesh::extractDataBelowKeyword(std::istringstream& string_block)
 	{
 		char KeywordEnd = '/';
-		std::string chunk;
-		std::streampos pos;
-		std::vector<std::string> res;
-		getline(string_block, chunk, KeywordEnd);
-		string_block.clear();
-		StringUtils::RemoveTab(chunk);
-		StringUtils::RemoveEndOfLine(chunk);
-		StringUtils::Trim(chunk);
-		res.push_back(chunk);
-		string_block.ignore(10, '\n');
-		getline(string_block, chunk);
-		StringUtils::RemoveTab(chunk);
-		StringUtils::RemoveEndOfLine(chunk);
-		return res[0];
+                std::string line;
+		std::string res;
+		while (getline(string_block, line))
+		{
+                  StringUtils::RemoveStringAndFollowingContentFromLine("--", line); ;
+		  StringUtils::RemoveTab(line);
+		  StringUtils::RemoveEndOfLine(line);
+		  StringUtils::Trim(line);
+		  res+=line + " ";
+                  if( line.find( KeywordEnd)  != std::string::npos )
+                  {
+                    break;
+                  }
+                }
+		return res;
 	}
 
 	template<>

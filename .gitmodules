@@ -1,3 +1,6 @@
 [submodule "cmake/blt"]
 	path = cmake/blt
 	url = ../..//LLNL/blt
+[submodule "data"]
+	path = data
+	url = ../GEOSXDATA

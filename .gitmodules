@@ -4,3 +4,4 @@
 [submodule "data"]
 	path = data
 	url = ../GEOSXDATA
+	branch = master

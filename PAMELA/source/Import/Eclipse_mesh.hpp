@@ -11,6 +11,7 @@ namespace PAMELA
   enum class ECLIPSE_MESH_TYPE { VERTEX, EDGE, QUADRILATERAL, HEXAHEDRON };
   enum class UNITS {FIELD,LAB,METRIC, UNKNOWN};
 
+
   class Eclipse_mesh
   {
     public:
@@ -19,6 +20,7 @@ namespace PAMELA
       Mesh* CreateMeshFromEclipseBinaryFiles(File file);
 
     private:
+      int CountUniqueVertices(std::vector<double>, std::vector<double>, std::vector<double>);
       void ParseStringFromGRDECL(std::string& str);
       std::string ConvertFiletoString(File file);
       void ParseStringFromBinaryFile(std::string& str);
@@ -118,7 +120,7 @@ namespace PAMELA
       unsigned int m_nNNCs {0};
 
       //Duplicate
-      std::vector<int> m_Duplicate_Element {};
+      std::vector<bool> m_Is_valid_hexa_for_the_geosx_mesh {};
 
       //Properties
       std::unordered_map<std::string, std::vector<double>> m_CellProperties_double {};

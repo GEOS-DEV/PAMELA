@@ -18,10 +18,9 @@ namespace PAMELA
 
     // populate v with data
     for (int ii=0; ii<8; ii++){
-        coords.clear();
-        coords.push_back(xx[ii]);
-        coords.push_back(yy[ii]);
-        coords.push_back(zz[ii]);
+        coords[0]=xx[ii];
+        coords[1]=yy[ii];
+        coords[2]=zz[ii];
         v.push_back(coords);
     }
     std::sort(v.begin(), v.end());
@@ -360,7 +359,7 @@ namespace PAMELA
 		int idx_over_all_hexas = 0;
 		int idx_over_active_hexas_only = 0;
         int n_valid_hexa_that_will_be_added_to_the_geosx_mesh = 0;
-		int n_elements_already_added_to_the_mesh = 0;
+        int n_elements_already_added_to_the_mesh = 0;
         int n_active_hexas_with_a_weird_non_flat_shape = 0;
         int n_active_hexas_that_are_flat = 0;
 		int ipoint = 0;
@@ -564,7 +563,6 @@ namespace PAMELA
                                 {
                                     // an element with exactly the same coordinates already exists in the grid
                                     // this hexa is not valid to be in added to the GEOSX mesh
-                                    valid_hexa_for_the_geosx_mesh = false;
                                     n_elements_already_added_to_the_mesh++;
                                 }
                                 else // this hexa has not been previously added to the mesh

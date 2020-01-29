@@ -156,14 +156,25 @@ namespace PAMELA
 
 	bool StringUtils::RemoveStringAndFollowingContentFromLine(std::string ToBeRemoved, std::string& line)
 	{
-		// does the line have a semi-colon?
+		// does the line have a "ToBeRemoved" character(s)
 		std::size_t pos = line.find(ToBeRemoved);
+        std::size_t initial_line_length = line.size();
 		bool res = false;
 		if (pos != std::string::npos)
 		{
-			// remove the character and everything afterwards
-			line = line.substr(0, pos);
-			res = true;
+            res = true;
+          
+            std::size_t end_line_position = line.find('\n');
+            if(end_line_position != std::string::npos)
+            {
+                // remove the character and everything afterwards
+                line = line.substr(0, pos)+line.substr(end_line_position+1,initial_line_length);
+            }
+            else
+            {
+                line = line.substr(0, pos);
+
+            }
 		}
 		return res;
 	}

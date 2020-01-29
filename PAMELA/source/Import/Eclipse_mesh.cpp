@@ -10,6 +10,24 @@
 
 namespace PAMELA
 {
+
+    int Eclipse_mesh::CountUniqueVertices(std::vector<double> xx, std::vector<double> yy, std::vector<double> zz)
+{
+    std::vector<std::vector<double>> v;
+    std::vector<double> coords(3, 0.);
+
+    // populate v with data
+    for (int ii=0; ii<8; ii++){
+        coords[0]=xx[ii];
+        coords[1]=yy[ii];
+        coords[2]=zz[ii];
+        v.push_back(coords);
+    }
+    std::sort(v.begin(), v.end());
+    int uniqueCount = std::unique(v.begin(), v.end()) - v.begin();
+    return uniqueCount;
+}
+
 	void Eclipse_mesh::InitElementsMapping()
 	{
 		m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::EDGE)] = ELEMENTS::TYPE::VTK_LINE;
@@ -323,210 +341,251 @@ namespace PAMELA
 		int np;
 		int nx = m_SPECGRID[0], ny = m_SPECGRID[1], nz = m_SPECGRID[2];
 		double slope;
-
 		int i_xm, i_xp;
-
 		std::vector<double> z_pos(8, 0), y_pos(8, 0), x_pos(8, 0);
-
-
 		std::vector<int> layer;
 		std::vector<unsigned int> actnum;
 		layer.reserve(nx*ny*nz);
 		actnum.reserve(nx*ny*nz);
-		m_Duplicate_Element.reserve(nx*ny*nz);
+		m_Is_valid_hexa_for_the_geosx_mesh.reserve(nx*ny*nz);
 
+        // No ACTNUM was specified in GRDECL, then assume all active
 		if (m_ACTNUM.size() == 0)
 		{
 			m_nActiveCells = m_nTotalCells;
 			m_ACTNUM = std::vector<int>(m_nTotalCells, 1);
 		}
 
-		int icellTotal = 0;
-		int icell = 0;
-		int cpt = 0;
+		int idx_over_all_hexas = 0;
+		int idx_over_active_hexas_only = 0;
+        int n_valid_hexa_that_will_be_added_to_the_geosx_mesh = 0;
+        int n_elements_already_added_to_the_mesh = 0;
+        int n_active_hexas_with_a_weird_non_flat_shape = 0;
+        int n_active_hexas_that_are_flat = 0;
 		int ipoint = 0;
-		for (auto k = 0; k != nz; ++k)
+        bool valid_hexa_for_the_geosx_mesh;
+        bool hexa_is_flat;
+
+        for (auto k = 0; k != nz; ++k)
 		{
 			for (auto j = 0; j != ny; ++j)
 			{
-
 				for (auto i = 0; i != nx; ++i)
 				{
-					i_xm = 4 * nx*j + i * 2 + 8 * nx*ny*k;
-					i_xp = 4 * nx*j + 2 * nx + i * 2 + 8 * nx*ny*k;
+                    // Until it has been validated, an hexahedral element is not valid, and thus not fit to be included in the GEOSX Mesh.
+                    valid_hexa_for_the_geosx_mesh = false;
 
-					//z
-					z_pos[0] = m_ZCORN[i_xm];
-					z_pos[1] = m_ZCORN[i_xm + 1];
-					z_pos[2] = m_ZCORN[i_xp];
-					z_pos[3] = m_ZCORN[i_xp + 1];
-
-					z_pos[4] = m_ZCORN[i_xm + 4 * nx*ny];
-					z_pos[5] = m_ZCORN[i_xm + 1 + 4 * nx*ny];
-					z_pos[6] = m_ZCORN[i_xp + 4 * nx*ny];
-					z_pos[7] = m_ZCORN[i_xp + 1 + 4 * nx*ny];
-
-
-					////Pillar 1
-					np = i + (nx + 1)*j;
-
-					//1
-					i0 = np * 6 - 1;
-					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
+                    // To be valid, an hexa must satisfy all the following conditions:
+                    // -- test_1: be active (ACTNUM==1).
+                    // -- test_2: have 8 distinct vertices. Flat hexas [test_2a] or hexas with <8 unique vertices [test_2b] are not valid.
+                    // -- test_3: have all its vertices coordinates be different from any other hexahedron previously added to the GEOSX mesh (no duplicates)
+                    
+                    // test_1:
+                    // First, check if the hexa is active (ACTNUM=1)
+                    // If it is NOT active: do not include it in the GEOSX mesh and skip all geometric calculations on it (saves time)
+                    // If it is active, proceed to more tests
+					if (m_ACTNUM[idx_over_all_hexas] == 1)
 					{
-						slope = (z_pos[0] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
-					}
-					else
-					{
-						slope = 1;
-					}
-					x_pos[0] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
-					y_pos[0] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+                        i_xm = 4 * nx*j + i * 2 + 8 * nx*ny*k;
+                        i_xp = 4 * nx*j + 2 * nx + i * 2 + 8 * nx*ny*k;
 
+                        //z
+                        z_pos[0] = m_ZCORN[i_xm];
+                        z_pos[1] = m_ZCORN[i_xm + 1];
+                        z_pos[2] = m_ZCORN[i_xp];
+                        z_pos[3] = m_ZCORN[i_xp + 1];
+                        z_pos[4] = m_ZCORN[i_xm + 4 * nx*ny];
+                        z_pos[5] = m_ZCORN[i_xm + 1 + 4 * nx*ny];
+                        z_pos[6] = m_ZCORN[i_xp + 4 * nx*ny];
+                        z_pos[7] = m_ZCORN[i_xp + 1 + 4 * nx*ny];
+                        
+                        // test_2a: Test if the hexahedron is flat by summing the lengths its vertical edges (flat if this sum==0)
+                        // If it is flat: deactivate it and do not include it in the GEOSX mesh
+                        hexa_is_flat = utils::nearlyEqual(z_pos[0]-z_pos[4]+z_pos[1]-z_pos[5]+z_pos[2]-z_pos[6]+z_pos[3]-z_pos[7], 0.);
+                        if(hexa_is_flat){
+                            // This hexahedron is flat. It is deactivated and will not be included in the GEOSX mesh.
+                            // Testing for flatness saves time: in CPG grids, most ill-shaped hexas are simply flat;
+                            // we can thus discard them quickly without going through
+                            // the expensive computation and testing of their full coordinates.
+                            m_ACTNUM[idx_over_all_hexas] = 0;
+                            n_active_hexas_that_are_flat++;
+                        }
+                        else // This hexa is not flat. Proceed to test_2b (unique number of vertices)
+                        {
+                            // Compute the x and y components of the 8 vertices
+                            
+                            ////Pillar 1
+                            np = i + (nx + 1)*j;
 
-					//5
-					i0 = np * 6 - 1;
-					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
-					{
-						slope = (z_pos[4] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
-					}
-					else
-					{
-						slope = 1;
-					}
-					x_pos[4] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
-					y_pos[4] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+                            //1
+                            i0 = np * 6 - 1;
+                            if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
+                            {
+                                slope = (z_pos[0] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
+                            }
+                            else
+                            {
+                                slope = 1;
+                            }
+                            x_pos[0] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
+                            y_pos[0] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
+                            //5
+                            i0 = np * 6 - 1;
+                            if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
+                            {
+                                slope = (z_pos[4] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
+                            }
+                            else
+                            {
+                                slope = 1;
+                            }
+                            x_pos[4] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
+                            y_pos[4] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-					////Pillar 2
-					np = i + 1 + (nx + 1)*j;
-					//2
-					i0 = np * 6 - 1;
-					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
-					{
-						slope = (z_pos[1] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
-					}
-					else
-					{
-						slope = 1;
-					}
-					x_pos[1] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
-					y_pos[1] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+                            ////Pillar 2
+                            np = i + 1 + (nx + 1)*j;
+                            //2
+                            i0 = np * 6 - 1;
+                            if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
+                            {
+                                slope = (z_pos[1] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
+                            }
+                            else
+                            {
+                                slope = 1;
+                            }
+                            x_pos[1] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
+                            y_pos[1] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
+                            //6
+                            if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
+                            {
+                                slope = (z_pos[5] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
+                            }
+                            else
+                            {
+                                slope = 1;
+                            }
+                            x_pos[5] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
+                            y_pos[5] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-					//6
-					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
-					{
-						slope = (z_pos[5] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
-					}
-					else
-					{
-						slope = 1;
-					}
-					x_pos[5] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
-					y_pos[5] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+                            ////Pillar 3
+                            np = i + (nx + 1)*(j + 1);
+                            //3
+                            i0 = np * 6 - 1;
+                            if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
+                            {
+                                slope = (z_pos[2] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
+                            }
+                            else
+                            {
+                                slope = 1;
+                            }
+                            x_pos[2] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
+                            y_pos[2] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
+                            //7
+                            i0 = np * 6 - 1;
+                            if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
+                            {
+                                slope = (z_pos[6] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
+                            }
+                            else
+                            {
+                                slope = 1;
+                            }
+                            x_pos[6] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
+                            y_pos[6] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
+                            ////Pillar 4
+                            np = i + (nx + 1)*(j + 1) + 1;
+                            //4
+                            i0 = np * 6 - 1;
+                            if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
+                            {
+                                slope = (z_pos[3] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
+                            }
+                            else
+                            {
+                                slope = 1;
+                            }
+                            x_pos[3] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
+                            y_pos[3] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
 
-					////Pillar 3
-					np = i + (nx + 1)*(j + 1);
-					//3
-					i0 = np * 6 - 1;
-					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
-					{
-						slope = (z_pos[2] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
-					}
-					else
-					{
-						slope = 1;
-					}
-					x_pos[2] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
-					y_pos[2] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+                            //8
+                            i0 = np * 6 - 1;
+                            if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
+                            {
+                                slope = (z_pos[7] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
+                            }
+                            else
+                            {
+                                slope = 1;
+                            }
+                            x_pos[7] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
+                            y_pos[7] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+                            // Done computing x and y coordinates
 
+                            // Test_2b: the hexa must have 8 unique vertices
+                            // Count the number of unique vertices:
+                            int n_unique_vertices = CountUniqueVertices(x_pos, y_pos, z_pos);
+                            
+                            // The hexahedron is deprecated if it does not have 8 unique vertices:
+                            bool this_hexa_does_not_have_eight_unique_vertices = n_unique_vertices!=8;
+                            
+                            if(this_hexa_does_not_have_eight_unique_vertices){
+                                // This hexahedron is deactivated and will not be included in the GEOSX mesh
+                                m_ACTNUM[idx_over_all_hexas] = 0;
+                                n_active_hexas_with_a_weird_non_flat_shape++;
+                            }
+                            else
+                            {
+                                
+                                //Points
+                                vertexTemp[0] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]).first;
+                                vertexTemp[4] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 6, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]).first;
+                                vertexTemp[1] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 5, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]).first;
+                                vertexTemp[5] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 4, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]).first;
+                                vertexTemp[3] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 3, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]).first;
+                                vertexTemp[7] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 2, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]).first;
+                                vertexTemp[2] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 1, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]).first;
+                                vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]).first;
 
-					//7
-					i0 = np * 6 - 1;
-					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
-					{
-						slope = (z_pos[6] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
-					}
-					else
-					{
-						slope = 1;
-					}
-					x_pos[6] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
-					y_pos[6] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
+                                //Hexa
+                                mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP_1");
+                                auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], idx_over_active_hexas_only, "POLYHEDRON_GROUP_1", vertexTemp);
 
+                                // test_3: Check if this hexahedron has already been added to the mesh
+                                bool hexa_has_already_been_added_to_the_mesh = !returned_element.second;
+                                
+                                if (hexa_has_already_been_added_to_the_mesh)
+                                {
+                                    // an element with exactly the same coordinates already exists in the grid
+                                    // this hexa is not valid to be in added to the GEOSX mesh
+                                    n_elements_already_added_to_the_mesh++;
+                                }
+                                else // this hexa has not been previously added to the mesh
+                                {
+                                    // Yay!
+                                    // This hexa is valid and will be added to the GEOSX mesh
+                                    valid_hexa_for_the_geosx_mesh = true;
+                                    n_valid_hexa_that_will_be_added_to_the_geosx_mesh++;
+                                }
+                            }
+                        }
 
-					////Pillar 4
-					np = i + (nx + 1)*(j + 1) + 1;
-					//4
-					i0 = np * 6 - 1;
-					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
-					{
-						slope = (z_pos[3] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
-					}
-					else
-					{
-						slope = 1;
-					}
-					x_pos[3] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
-					y_pos[3] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
-
-
-					//8
-					i0 = np * 6 - 1;
-					if (!utils::nearlyEqual(m_COORD[i0 + 6] - m_COORD[i0 + 3], 0.))
-					{
-						slope = (z_pos[7] - m_COORD[i0 + 3]) / (m_COORD[i0 + 6] - m_COORD[i0 + 3]);
-					}
-					else
-					{
-						slope = 1;
-					}
-					x_pos[7] = slope * (m_COORD[i0 + 4] - m_COORD[i0 + 1]) + m_COORD[i0 + 1];
-					y_pos[7] = slope * (m_COORD[i0 + 5] - m_COORD[i0 + 2]) + m_COORD[i0 + 2];
-
-
-
-					if (m_ACTNUM[icellTotal] == 1)
-					{
-
-						m_IndexTotal2Active[icellTotal] = icell;
-
-						//Points
-						vertexTemp[0] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]).first;
-						vertexTemp[4] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 6, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]).first;
-						vertexTemp[1] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 5, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]).first;
-						vertexTemp[5] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 4, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]).first;
-						vertexTemp[3] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 3, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]).first;
-						vertexTemp[7] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 2, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]).first;
-						vertexTemp[2] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 1, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]).first;
-						vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]).first;
-
-						//Hexa
-						mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP_1");
-						auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], icell, "POLYHEDRON_GROUP_1", vertexTemp);
-
-						if (!returned_element.second)
-						{
-							//m_Duplicate_Element[returned_element->get_globalIndex()] = 1;
-							m_Duplicate_Element.push_back(2);
-							cpt++;
-						}
-						else
-						{
-							m_Duplicate_Element.push_back(0);
-						}
-
-						m_IJK2Index[IJK(i,j,k)] = icell;
-						m_Index2IJK[icell] = IJK(i, j, k);
-						icell++;
-					}
-
+                        // increments and maps of indices
+                        m_IndexTotal2Active[idx_over_all_hexas] = idx_over_active_hexas_only;
+						m_IJK2Index[IJK(i,j,k)] = idx_over_active_hexas_only;
+						m_Index2IJK[idx_over_active_hexas_only] = IJK(i, j, k);
+						idx_over_active_hexas_only++;
+                    }
+                    
+                    m_Is_valid_hexa_for_the_geosx_mesh.push_back(valid_hexa_for_the_geosx_mesh);
 					layer.push_back(k);
-					actnum.push_back(m_ACTNUM[icellTotal]);
-					icellTotal++;
+					actnum.push_back(m_ACTNUM[idx_over_all_hexas]);
+					idx_over_all_hexas++;
 				}
 			}
 		}
@@ -538,29 +597,23 @@ namespace PAMELA
 		m_CellProperties_integer["Layer"] = layer;
 
 		//Remove non-active properties
-
 		std::vector<double> temp_double;
 		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
 		{
-
 			if ((it->second.size()) == m_nTotalCells)	//Eliminate values on inactive blocks
 			{
-
 				temp_double.clear();
 				temp_double.reserve(m_nActiveCells);
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
-					if (actnum[i] == 1 )
+					if (m_Is_valid_hexa_for_the_geosx_mesh[i])
 					{
-
 						temp_double.push_back(prop[i]);
 					}
 				}
-
 				prop = temp_double;
 			}
-
 		}
 
 		//Inactive blocks
@@ -575,7 +628,7 @@ namespace PAMELA
 				auto& prop = it->second;
 				for (size_t i = 0; i != prop.size(); ++i)
 				{
-					if (actnum[i] == 1)
+                    if (m_Is_valid_hexa_for_the_geosx_mesh[i])
 					{
 						temp_int.push_back(prop[i]);
 					}
@@ -605,14 +658,14 @@ namespace PAMELA
 		{
 			it->downstream_index = m_IndexTotal2Active.at(it->downstream_index);
 			it->upstream_index = m_IndexTotal2Active.at(it->upstream_index);
-
-			
-
 		}
 
-		LOGINFO(std::to_string(m_nTotalCells) + "  total hexas");
-		LOGINFO(std::to_string(m_nActiveCells) + "  active hexas");
-		LOGINFO(std::to_string(cpt) + "  duplicated hexas");
+		LOGINFO(std::to_string(m_nTotalCells) + "  total GRDECL hexas");
+		LOGINFO(std::to_string(m_nActiveCells) + "  initially set as active hexas");
+        LOGINFO(std::to_string(n_active_hexas_that_are_flat) + "  active but flat hexas (->deactivated)");
+        LOGINFO(std::to_string(n_active_hexas_with_a_weird_non_flat_shape) + "  active but ill-shaped hexas (->deactivated)");
+        LOGINFO(std::to_string(n_elements_already_added_to_the_mesh) + "  duplicated hexas");
+        LOGINFO(std::to_string(n_valid_hexa_that_will_be_added_to_the_geosx_mesh) + "  will actually be used in the GEOSX mesh");
 
 		return mesh;
 
@@ -627,7 +680,7 @@ namespace PAMELA
 		//Transfer property to mesh object
 		for (auto it = m_CellProperties_double.begin(); it != m_CellProperties_double.end(); ++it)
 		{
-			ASSERT(it->second.size() == props_double->get_Owner()->size_owned(), "Property " + 
+			ASSERT(it->second.size() == props_double->get_Owner()->size_owned(), "Property " +
                             it->first + " size is different from its owner");
 			props_double->ReferenceProperty(it->first);
 			props_double->SetProperty(it->first, it->second);
@@ -695,21 +748,21 @@ namespace PAMELA
 			{
 				LOGINFO("     o COORD Found");
 				buffer = extractDataBelowKeyword(mesh_file);
-				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_COORD);
+		                StringUtils::EclipseDataBufferToVector(buffer, m_COORD);
+                
 			}
 			else if (line == "ZCORN")
 			{
 				LOGINFO("     o ZCORN Found");
 				buffer = extractDataBelowKeyword(mesh_file);
-				StringUtils::FromStringTo(buffer, m_ZCORN);
+	        	        StringUtils::EclipseDataBufferToVector(buffer, m_ZCORN);
+
 			}
 			else if (line == "ACTNUM")
 			{
 				LOGINFO("     o ACTNUM Found");
 				buffer = extractDataBelowKeyword(mesh_file);
-				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_ACTNUM);
+		                StringUtils::EclipseDataBufferToVector(buffer, m_ACTNUM);
 				std::replace(m_ACTNUM.begin(), m_ACTNUM.end(), 2, 0);
 				std::replace(m_ACTNUM.begin(), m_ACTNUM.end(), 3, 0);
 				m_nActiveCells = std::accumulate(m_ACTNUM.begin(), m_ACTNUM.end(), 0);
@@ -724,40 +777,38 @@ namespace PAMELA
 				LOGINFO("     o PORO Found");
 				m_CellProperties_double["PORO"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_CellProperties_double["PORO"]);
+                		StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PORO"]);
 			}
 			else if (line == "PERMX")
 			{
 				LOGINFO("     o PERMX Found");
 				m_CellProperties_double["PERMX"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_CellProperties_double["PERMX"]);
+                                StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PERMX"]);
 			}
 			else if (line == "PERMY")
 			{
 				LOGINFO("     o PERMY Found");
 				m_CellProperties_double["PERMY"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_CellProperties_double["PERMY"]);
+                		StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PERMY"]);
 			}
 			else if (line == "PERMZ")
 			{
 				LOGINFO("     o PERMZ Found");
 				m_CellProperties_double["PERMZ"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_CellProperties_double["PERMZ"]);
+                		StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PERMZ"]);
 			}
 			else if (line == "NTG")
 			{
 				LOGINFO("     o NTG Found");
 				m_CellProperties_double["NTG"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-				StringUtils::ExpandStarExpression(buffer);
-				StringUtils::FromStringTo(buffer, m_CellProperties_double["NTG"]);
+                StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["NTG"]);
+
+//				StringUtils::ExpandStarExpression(buffer);
+//				StringUtils::FromStringTo(buffer, m_CellProperties_double["NTG"]);
 			}
 		}
 
@@ -860,21 +911,20 @@ namespace PAMELA
 	std::string Eclipse_mesh::extractDataBelowKeyword(std::istringstream& string_block)
 	{
 		char KeywordEnd = '/';
-                std::string line;
-		std::string res;
-		while (getline(string_block, line))
-		{
-                  StringUtils::RemoveStringAndFollowingContentFromLine("--", line); ;
-		  StringUtils::RemoveTab(line);
-		  StringUtils::RemoveEndOfLine(line);
-		  StringUtils::Trim(line);
-		  res+=line + " ";
-                  if( line.find( KeywordEnd)  != std::string::npos )
-                  {
-                    break;
-                  }
-                }
-		return res;
+		std::string chunk;
+		std::streampos pos;
+		std::vector<std::string> res;
+		getline(string_block, chunk, KeywordEnd);
+		string_block.clear();
+		StringUtils::RemoveTab(chunk);
+		StringUtils::RemoveEndOfLine(chunk);
+		StringUtils::Trim(chunk);
+		res.push_back(chunk);
+		string_block.ignore(10, '\n');
+		getline(string_block, chunk);
+		StringUtils::RemoveTab(chunk);
+		StringUtils::RemoveEndOfLine(chunk);
+		return res[0];
 	}
 
 	template<>

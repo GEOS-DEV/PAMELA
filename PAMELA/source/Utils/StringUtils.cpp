@@ -6,7 +6,86 @@
 
 
 namespace PAMELA
-{
+
+    {
+    void StringUtils::EclipseDataBufferToVector(std::string& input_buffer, std::vector<double>& v)
+    {
+        std::string star("*");
+        int position_of_star(0);
+        int n_repetitions(0);
+        double repeated_value(0.);
+
+        // split the input_buffer in chunks of information (spaces are used to split)
+        std::istringstream split_buffer(input_buffer);
+        std::string chunk;
+
+        // Traverse through all chunks
+        do
+        {
+            // Read a chunk from the buffer
+            split_buffer >> chunk;
+            if (chunk.size()>0)
+            {
+                // does this word contain a star "*"
+                position_of_star = int(chunk.find(star));
+                if(position_of_star>0)
+                {
+                    std::string number_times_the_value_is_repeated_as_string( chunk.substr(0, position_of_star));
+                    std::string value_as_string( chunk.substr(position_of_star+1, chunk.size()));
+                    n_repetitions = std::stoi(number_times_the_value_is_repeated_as_string);
+                    repeated_value = std::stod(value_as_string);
+                    std::fill_n(back_inserter(v), n_repetitions, repeated_value);  // append n_repetitions of the repeated_value as double
+                }
+                else
+                {
+                    // The value is only present once (no repetition)
+                    repeated_value=std::stod(chunk);  // conversion to double
+                    v.push_back(repeated_value);  // append the repeated_value once
+                }
+            }
+            // While there is more to read
+        } while (split_buffer);
+        
+    }
+    
+    
+    void StringUtils::EclipseDataBufferToVector(std::string& input_buffer, std::vector<int>& v)
+    {
+        std::string star("*");
+        int position_of_star(0);
+        int n_repetitions(0);
+        int repeated_value(0);
+
+        // split the input_buffer in chunks of information (spaces are used to split)
+        std::istringstream split_buffer(input_buffer);
+
+        // Traverse through all chunks
+        do
+        {
+            // Read a word
+            std::string word;
+            split_buffer >> word;
+            if (word.size()>0)
+            {
+                // does this word contain a "*"
+                position_of_star = int(word.find(star));
+                if(position_of_star>0){
+                    std::string multiplier_as_string( word.substr(0, position_of_star));
+                    std::string value_as_string( word.substr(position_of_star+1, word.size()));
+                    n_repetitions = std::stoi(multiplier_as_string);
+                    repeated_value = std::stoi(value_as_string);
+                    std::fill_n(back_inserter(v), n_repetitions, repeated_value);  // append n_repetitions of the repeated_value as int
+                }
+                else{
+                    // The value is only present once (no repetition)
+                    repeated_value=std::stoi(word);  // conversion to integer
+                    v.push_back(repeated_value);  // append the repeated_value once
+                }
+            }
+            // While there is more to read
+        } while (split_buffer);
+    }
+
 
 	std::string StringUtils::FileToString(const std::string filepath)
 	{

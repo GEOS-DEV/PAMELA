@@ -748,27 +748,21 @@ namespace PAMELA
 			{
 				LOGINFO("     o COORD Found");
 				buffer = extractDataBelowKeyword(mesh_file);
-                StringUtils::EclipseDataBufferToVector(buffer, m_COORD);
-//				StringUtils::ExpandStarExpression(buffer);
-//				StringUtils::FromStringTo(buffer, m_COORD);
+        StringUtils::EclipseDataBufferToVector(buffer, m_COORD);
                 
 			}
 			else if (line == "ZCORN")
 			{
 				LOGINFO("     o ZCORN Found");
 				buffer = extractDataBelowKeyword(mesh_file);
-                StringUtils::EclipseDataBufferToVector(buffer, m_ZCORN);
+        StringUtils::EclipseDataBufferToVector(buffer, m_ZCORN);
 
-//                StringUtils::ExpandStarExpression(buffer);
-//				StringUtils::FromStringTo(buffer, m_ZCORN);
 			}
 			else if (line == "ACTNUM")
 			{
 				LOGINFO("     o ACTNUM Found");
 				buffer = extractDataBelowKeyword(mesh_file);
-                StringUtils::EclipseDataBufferToVector(buffer, m_ACTNUM);
-//				StringUtils::ExpandStarExpression(buffer);
-//				StringUtils::FromStringTo(buffer, m_ACTNUM);
+        StringUtils::EclipseDataBufferToVector(buffer, m_ACTNUM);
 				std::replace(m_ACTNUM.begin(), m_ACTNUM.end(), 2, 0);
 				std::replace(m_ACTNUM.begin(), m_ACTNUM.end(), 3, 0);
 				m_nActiveCells = std::accumulate(m_ACTNUM.begin(), m_ACTNUM.end(), 0);
@@ -783,46 +777,36 @@ namespace PAMELA
 				LOGINFO("     o PORO Found");
 				m_CellProperties_double["PORO"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-                StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PORO"]);
-//				StringUtils::ExpandStarExpression(buffer);
-//				StringUtils::FromStringTo(buffer, m_CellProperties_double["PORO"]);
-			}
+        StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PORO"]);
+
+      }
 			else if (line == "PERMX")
 			{
 				LOGINFO("     o PERMX Found");
 				m_CellProperties_double["PERMX"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-                StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PERMX"]);
-//				StringUtils::ExpandStarExpression(buffer);
-//				StringUtils::FromStringTo(buffer, m_CellProperties_double["PERMX"]);
+        StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PERMX"]);
 			}
 			else if (line == "PERMY")
 			{
 				LOGINFO("     o PERMY Found");
 				m_CellProperties_double["PERMY"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-                StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PERMY"]);
-//				StringUtils::ExpandStarExpression(buffer);
-//				StringUtils::FromStringTo(buffer, m_CellProperties_double["PERMY"]);
+     		StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PERMY"]);
 			}
 			else if (line == "PERMZ")
 			{
 				LOGINFO("     o PERMZ Found");
 				m_CellProperties_double["PERMZ"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-                StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PERMZ"]);
-//				StringUtils::ExpandStarExpression(buffer);
-//				StringUtils::FromStringTo(buffer, m_CellProperties_double["PERMZ"]);
+     		StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["PERMZ"]);
 			}
 			else if (line == "NTG")
 			{
 				LOGINFO("     o NTG Found");
 				m_CellProperties_double["NTG"].reserve(m_nTotalCells);
 				buffer = extractDataBelowKeyword(mesh_file);
-                StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["NTG"]);
-
-//				StringUtils::ExpandStarExpression(buffer);
-//				StringUtils::FromStringTo(buffer, m_CellProperties_double["NTG"]);
+        StringUtils::EclipseDataBufferToVector(buffer, m_CellProperties_double["NTG"]);
 			}
 		}
 

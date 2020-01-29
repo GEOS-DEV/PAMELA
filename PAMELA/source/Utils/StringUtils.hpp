@@ -13,6 +13,9 @@ namespace PAMELA
 
 		std::string FileToString(const std::string filepath);
 		std::string BinaryFileToString(const std::string filepath);
+    
+        void EclipseDataBufferToVector(std::string& input_buffer, std::vector<double>& output_vector);
+        void EclipseDataBufferToVector(std::string& input_buffer, std::vector<int>& output_vector);
 
 		////Formatting
 		void Trim(std::string& str);

@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
 	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Johansen/FULLFIELD_IMAXJMAX.GRDECL");
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Norne/GRID/IRAP_1005.GRDECL");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/meshes/eclipse/ReducedNorne/IRAP_1005.GRDECL");
 	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Dalia/grid.GRDECL");
 
 	MainMesh->CreateFacesFromCells();

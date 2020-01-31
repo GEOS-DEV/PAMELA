@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 #endif
 
 
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/../data/medit/tiny.mesh");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/meshes/medit/tiny.mesh");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);

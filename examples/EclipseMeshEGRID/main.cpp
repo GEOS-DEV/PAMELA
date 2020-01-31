@@ -43,7 +43,12 @@ int main(int argc, char **argv) {
 	MainMesh->CreateLineGroupWithAdjacency("NNCs+PreProc", MainMesh->getAdjacencySet()->get_NonTopologicalAdjacency("NNCs+PreProc"));
 
 	////-------------------------Output
+#ifdef WITH_VTK
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.vtm");
+#else
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.case");
+#endif
+
 
 	//Variable declarations
 	auto mesh_props = MainMesh->get_PolyhedronProperty_double()->get_PropertyMap();

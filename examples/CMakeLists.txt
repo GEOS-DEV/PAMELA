@@ -9,8 +9,6 @@ MACRO(SUBDIRLIST result curdir)
   SET(${result} ${dirlist})
 ENDMACRO()
 
-cmake_minimum_required (VERSION 3.1)
-
 SUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
 FOREACH(subdir ${SUBDIRS})

@@ -32,7 +32,6 @@ if(NOT is_submodule)
   option(PAMELA_WITH_TESTS "Compile test" OFF)
   option(PAMELA_WITH_EXAMPLES "Compile Examples" OFF)
   option(PAMELA_WITH_VTK "Enable VTK" OFF)
-  option(PAMELA_WITH_MPI "Enable MPI" OFF)
 
   include(cmake/blt/SetupBLT.cmake)
   include(cmake/PAMELA.cmake)

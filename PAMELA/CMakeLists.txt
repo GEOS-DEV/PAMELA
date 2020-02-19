@@ -18,12 +18,12 @@ endforeach()
 set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_INC_DIR}
     CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
 
-if(${PAMELA_WITH_MPI})
+if(${ENABLE_MPI})
   set(PAMELA_dependencies_list ${PAMELA_dependencies_list} MPI)
   set(PAMELA_dependencies_list ${PAMELA_dependencies_list} METIS)
   set(PAMELA_definitions_list ${PAMELA_definitions_list} "-DWITH_MPI")
   set(PAMELA_definitions_list ${PAMELA_definitions_list} "-DWITH_METIS")
-endif(${PAMELA_WITH_MPI})
+endif(${ENABLE_MPI})
 
 if(${PAMELA_WITH_VTK})
   set(PAMELA_dependencies_list ${PAMELA_dependencies_list} VTK)

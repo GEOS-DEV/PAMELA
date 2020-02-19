@@ -26,13 +26,16 @@ int main(int argc, char **argv) {
 #endif
 
 
-        std::cout << PAMELA_PATH"/../data/medit/tiny.mesh" << std::endl;
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/../data/medit/tiny.mesh");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/meshes/medit/tiny.mesh");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 	MainMesh->CreateLineGroupWithAdjacency("TopologicalC2C", MainMesh->getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
+#ifdef WITH_VTK
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.vtm");
+#else
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.case");
+#endif
 	OutputWriter->DeclareAndSetElementGlobalIndex();
 	OutputWriter->DeclareAndSetPartitionNumber();
 

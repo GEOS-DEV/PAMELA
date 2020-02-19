@@ -23,14 +23,17 @@ int main(int argc, char **argv) {
 	vtkMultiProcessController::SetGlobalController(controler.Get());
 #endif
 
-	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/gmsh/modelA1_volume_meshed.msh");
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/gmsh/mandaros.msh");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/meshes/gmsh/modelA1/modelA1_volume_meshed.msh");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);
 	MainMesh->CreateLineGroupWithAdjacency("TopologicalC2C", MainMesh->getAdjacencySet()->get_TopologicalAdjacency(ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYHEDRON, ELEMENTS::FAMILY::POLYGON));
 
+#ifdef WITH_VTK
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.vtm");
+#else
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "UnstructuredGrid.case");
+#endif
 
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_DIMENSION::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");
 	OutputWriter->DeclareVariable(FAMILY::POLYGON, VARIABLE_DIMENSION::SCALAR, VARIABLE_LOCATION::PER_CELL, "Partition");

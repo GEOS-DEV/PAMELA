@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	tstart = time(0);
 
 	//std::this_thread::sleep_for(std::chrono::seconds(10));
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/spe9/SPE9.EGRID");
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/meshes/eclipse/SPE9/SPE9.EGRID");
 	//Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/eclipse/Norne/NORNE_ATW2013.EGRID");
 
 	MainMesh->CreateFacesFromCells();
@@ -43,7 +43,12 @@ int main(int argc, char **argv) {
 	MainMesh->CreateLineGroupWithAdjacency("NNCs+PreProc", MainMesh->getAdjacencySet()->get_NonTopologicalAdjacency("NNCs+PreProc"));
 
 	////-------------------------Output
+#ifdef WITH_VTK
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.vtm");
+#else
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "EclipseGrid.case");
+#endif
+
 
 	//Variable declarations
 	auto mesh_props = MainMesh->get_PolyhedronProperty_double()->get_PropertyMap();

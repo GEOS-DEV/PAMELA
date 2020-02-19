@@ -42,7 +42,11 @@ int main(int argc, char **argv)
 
 	//Output
 	//--Create 
+#ifdef  WITH_VTK
 	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "Cartesian.vtm");
+#else
+	MeshDataWriter* OutputWriter = MeshDataWriterFactory::makeWriter(MainMesh, "Cartesian.case");
+#endif
 
 	//--Create variables
 	OutputWriter->DeclareVariable(FAMILY::POLYHEDRON, VARIABLE_DIMENSION::SCALAR, VARIABLE_LOCATION::PER_CELL,"Pressure");

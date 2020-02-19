@@ -344,10 +344,6 @@ namespace PAMELA
     METIS_PartGraphRecursive(&nnodes, &nconst, rowPtrMetis.data(), columnIndexMetis.data(),
         nullptr, nullptr, nullptr, &int_partition, nullptr, nullptr, options, &objval, partitionVector.data());
 
-    for(unsigned int i  = 0; i < partitionVector.size(); i++ )
-    {
-      std::cout << partitionVector[i] << std::endl;
-    }
     return std::vector<int>(partitionVector.begin(), partitionVector.end());
 
 #else

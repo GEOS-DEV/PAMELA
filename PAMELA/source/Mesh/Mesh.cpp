@@ -357,6 +357,7 @@ namespace PAMELA
 
   std::vector<int> Mesh::TRIVIALPartitioning( unsigned int npartition )
   {
+    int CommRankSize = Communicator::worldSize();
     if( npartition == 1 )
     {
       std::vector<int> val(m_PolyhedronCollection.size_all(), 0);
@@ -398,7 +399,7 @@ namespace PAMELA
       }
     }
     double xdiff = std::fabs( max[0] - min[0] );
-    double ydiff = std::fabs( max[0] - min[0] );
+    double ydiff = std::fabs( max[1] - min[1] );
     double base = 0.;
     double shift = 0.;
     int dim_i = -1;
@@ -406,14 +407,14 @@ namespace PAMELA
     {
       LOGINFO("Will do a X division");
       base = min[0];
-      shift = xdiff / ( npartition - 1 );
+      shift = xdiff / npartition;
       dim_i = 0;
     }
     else
     {
       LOGINFO("Will do a Y division");
       base = min[1];
-      shift = ydiff / (npartition - 1);
+      shift = ydiff / npartition;
       dim_i = 1;
     }
     std::vector< int > partitionVector( m_PolyhedronCollection.size_all(),0 );
@@ -424,6 +425,10 @@ namespace PAMELA
       double dist_to_begin = std::fabs(center[dim_i] - min[dim_i]);
       int part_nb = dist_to_begin / shift;
       partitionVector[count++] = part_nb;
+      if (part_nb >= CommRankSize )
+      {
+        LOGERROR("Wrong partition number attribute");
+      }
     }
 
     return partitionVector;

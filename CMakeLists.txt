@@ -1,5 +1,36 @@
 cmake_minimum_required (VERSION 3.1)
 
+project("PAMELA - PArallel MEsh LibrAry" CXX C)
+
+################################
+# BLT
+################################
+if (NOT BLT_LOADED)
+  if (DEFINED BLT_SOURCE_DIR)
+      # Support having a shared BLT outside of the repository if given a BLT_SOURCE_DIR
+
+      if (NOT EXISTS ${BLT_SOURCE_DIR}/SetupBLT.cmake)
+          message(FATAL_ERROR "Given BLT_SOURCE_DIR does not contain SetupBLT.cmake")
+      endif()
+  else()
+      # Use internal 'blt' submodule path if BLT_SOURCE_DIR not provided
+      set(BLT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/cmake/blt" CACHE PATH "")
+      if (NOT EXISTS ${BLT_SOURCE_DIR}/SetupBLT.cmake)
+          message(FATAL_ERROR
+              "Cannot locate BLT. "
+              "Either run the following two commands in your git repository: \n"
+              "    git submodule init\n"
+              "    git submodule update\n"
+              "Or add -DBLT_SOURCE_DIR=/path/to/blt to your CMake command." )
+      endif()
+  endif()
+
+  if (NOT BLT_CXX_STD)
+    set(BLT_CXX_STD "c++14")
+  endif()
+
+  include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
+endif()
 
 # check if PAMELA is build as a submodule or a separate project
 get_directory_property(parent_dir PARENT_DIRECTORY)
@@ -10,34 +41,18 @@ else()
 endif()
 
 if(NOT is_submodule)
-  project("PAMELA - PArallel MEsh LibrAry" CXX C)
-
-  # Check if BLT is available
-  if (NOT EXISTS ${PROJECT_SOURCE_DIR}/cmake/blt/SetupBLT.cmake)
-    message(FATAL_ERROR
-      "The BLT submodule is not present. "
-      "Run the following two commands in your git repository: \n"
-      "    git submodule init \n "
-      "    git submodule update" )
-  endif()
 
   #Path
   set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
-  set(BLT_CXX_STD "c++14")
-  include(cmake/blt/SetupBLT.cmake)
   include(cmake/PAMELA.cmake)
+  include(cmake/tpls.cmake)
 
   #Options
   option(PAMELA_WITH_TESTS "Compile test" OFF)
   option(PAMELA_WITH_EXAMPLES "Compile Examples" OFF)
   option(PAMELA_WITH_VTK "Enable VTK" OFF)
 
-  include(cmake/blt/SetupBLT.cmake)
-  include(cmake/PAMELA.cmake)
-
-  include(cmake/tpls.cmake)
-  
   # Add source
   add_subdirectory(PAMELA)
 

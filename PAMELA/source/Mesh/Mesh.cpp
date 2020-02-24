@@ -400,20 +400,17 @@ namespace PAMELA
     }
     double xdiff = std::fabs( max[0] - min[0] );
     double ydiff = std::fabs( max[1] - min[1] );
-    double base = 0.;
     double shift = 0.;
     int dim_i = -1;
     if ( xdiff > ydiff )
     {
       LOGINFO("Will do a X division");
-      base = min[0];
       shift = xdiff / npartition;
       dim_i = 0;
     }
     else
     {
       LOGINFO("Will do a Y division");
-      base = min[1];
       shift = ydiff / npartition;
       dim_i = 1;
     }

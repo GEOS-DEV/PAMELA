@@ -218,14 +218,14 @@ namespace PAMELA
 					case 5:	//HEXAHEDRON
                                                 elementType =ELEMENTS::TYPE::VTK_HEXAHEDRON;
 						mesh_file >> v0 >> v1 >> v2 >> v3 >> v4 >> v5 >> v6 >> v7;
-						vertexTemp8[0] = vertexcollection[v4 - 1];
-						vertexTemp8[1] = vertexcollection[v5 - 1];
-						vertexTemp8[2] = vertexcollection[v6 - 1];
-						vertexTemp8[3] = vertexcollection[v7 - 1];
-						vertexTemp8[4] = vertexcollection[v0 - 1];
-						vertexTemp8[5] = vertexcollection[v1 - 1];
-						vertexTemp8[6] = vertexcollection[v2 - 1];
-						vertexTemp8[7] = vertexcollection[v3 - 1];
+						vertexTemp8[0] = vertexcollection[v0 - 1];
+						vertexTemp8[1] = vertexcollection[v1 - 1];
+						vertexTemp8[2] = vertexcollection[v2 - 1];
+						vertexTemp8[3] = vertexcollection[v3 - 1];
+						vertexTemp8[4] = vertexcollection[v4 - 1];
+						vertexTemp8[5] = vertexcollection[v5 - 1];
+						vertexTemp8[6] = vertexcollection[v6 - 1];
+						vertexTemp8[7] = vertexcollection[v7 - 1];
 
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)

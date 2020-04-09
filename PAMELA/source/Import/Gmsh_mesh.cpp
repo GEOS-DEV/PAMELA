@@ -92,6 +92,7 @@ namespace PAMELA
 				}
 				LOGINFO("Done" +  std::to_string(offset));
 			}
+                        /*
 			else if ((line == "$PhysicalNames"))
 			{
 				int dim;
@@ -113,6 +114,7 @@ namespace PAMELA
 				}
 
 			}
+                        */
 			else if ((line == "$Elements"))
 			{
 				int nPolygon = 0, nPolyhedron = 0;

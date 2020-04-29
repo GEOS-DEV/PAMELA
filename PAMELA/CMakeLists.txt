@@ -53,12 +53,11 @@ set(PAMELA_definitions ${PAMELA_definitions_list})
 
 message(STATUS "adding PAMELA_Library")
 message(STATUS "PAMELA with following definitions : ${PAMELA_definitions}")
-blt_add_library(NAME                  ${PAMELA_target}
-                SOURCES               ${PAMELA_sources}
-                HEADERS               ${PAMELA_headers}
-                HEADERS_OUTPUT_SUBDIR PAMELA
-                DEFINES               ${PAMELA_definitions}
-                DEPENDS_ON             ${PAMELA_dependencies})
+blt_add_library(NAME       ${PAMELA_target}
+                SOURCES    ${PAMELA_sources}
+                HEADERS    ${PAMELA_headers}
+                DEFINES    ${PAMELA_definitions}
+                DEPENDS_ON ${PAMELA_dependencies})
 
 				
 target_include_directories(${PAMELA_target} PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${PROJECT_SRC_DIR}) 

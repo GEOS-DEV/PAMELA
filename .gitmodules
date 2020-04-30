@@ -1,7 +1,7 @@
 [submodule "cmake/blt"]
 	path = cmake/blt
-	url = ../..//LLNL/blt
+	url = ../../LLNL/blt.git
 [submodule "data"]
 	path = data
-	url = ../GEOSXDATA
+	url = ../GEOSXDATA.git
 	branch = master

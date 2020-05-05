@@ -134,12 +134,20 @@ namespace PAMELA
 					mesh_file >> id;	//id
 					mesh_file >> itype;	//itype
 					mesh_file >> ntags;	//itype
-					for (auto nt = 0; nt != ntags; nt++)
-					{
+          if( ntags < 1 )
+          {
+            attribute = 1;
+          }
+          else
+          {
 						mesh_file >> attribute; //trash
+          }
+          std::string trash;
+					for (auto nt = 1; nt < ntags; nt++)
+					{
+            mesh_file >> trash;
 					}
-					//mesh_file >> itrash;	//attribute=
-                                        if(attribute == 0) attribute = 1; // Cant have a 0 attribute
+          if(attribute == 0) attribute = 1; // Cant have a 0 attribute
 
 					switch (itype)
 					{

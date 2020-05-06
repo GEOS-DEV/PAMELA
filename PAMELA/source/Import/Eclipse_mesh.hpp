@@ -119,9 +119,6 @@ namespace PAMELA
       unsigned int m_nTotalCells {0};
       unsigned int m_nNNCs {0};
 
-      const GroupInfo m_defaultPolyhedronGroupInfo {"CELLS", 1, GroupType::VOLUME };
-      const GroupInfo m_defaulPointGroupInfo {"POINTS", 1, GroupType::CORNER };
-
       //Duplicate
       std::vector<bool> m_Is_valid_hexa_for_the_geosx_mesh {};
 
@@ -134,7 +131,7 @@ namespace PAMELA
 
       //Wells
       unsigned int m_nWells {0};
-      std::unordered_map<GroupInfo, WELL*> m_Wells{};
+      std::unordered_map<std::string, WELL*> m_Wells {};
 
       std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap {};
 

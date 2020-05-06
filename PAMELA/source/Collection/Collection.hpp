@@ -5,7 +5,6 @@
 #include <numeric>
 #include <set>
 #include "Collection/Indexing.hpp"
-#include "Collection/GroupInfo.hpp"
 #include "Elements/Point.hpp"
 #include "Elements/Line.hpp"
 #include "Elements/Polygon.hpp"
@@ -167,13 +166,13 @@ namespace PAMELA
 		ELEMENTS::FAMILY get_family() const { return m_family; }
 
 		//Add elements
-                std::pair< T, bool > AddElement(GroupInfo const & groupInfo, T cur_element)
+                std::pair< T, bool > AddElement(std::string label, T cur_element)
 		{
-			if (!groupExist(groupInfo))
+			if (!groupExist(label))
 			{
-				addAndCreateGroup(groupInfo);
+				addAndCreateGroup(label);
 			}
-			auto grp = m_labelToGroup[groupInfo];
+			auto grp = m_labelToGroup[label];
 			grp->push_back_unique(cur_element);
 			auto returnedElement = this->push_back_unique(cur_element);//TODO:index twice
 			return returnedElement;
@@ -181,36 +180,36 @@ namespace PAMELA
 
 
 
-		std::pair< T, bool > AddElement_owned(GroupInfo const & groupInfo, T Element)
+		std::pair< T, bool > AddElement_owned(std::string label, T Element)
 		{
-			if (!groupExist(groupInfo))
+			if (!groupExist(label))
 			{
-				addAndCreateGroup(groupInfo);
+				addAndCreateGroup(label);
 			}
-			auto grp = m_labelToGroup[groupInfo];
+			auto grp = m_labelToGroup[label];
 			grp->push_back_owned_unique(Element);
 			auto add = push_back_owned_unique(Element);
 			return add;
 		}
 
-		std::pair< T, bool > AddElement_ghost(GroupInfo const & groupInfo, T Element)
+		std::pair< T, bool > AddElement_ghost(std::string label, T Element)
 		{
-			if (!groupExist(groupInfo))
+			if (!groupExist(label))
 			{
-				addAndCreateGroup(groupInfo);
+				addAndCreateGroup(label);
 			}
-			auto grp = m_labelToGroup[groupInfo];
+			auto grp = m_labelToGroup[label];
 			grp->push_back_ghost_unique(Element);
 			auto add = push_back_ghost_unique(Element);
 			return add;
 		}
 
 		//Groups
-		void addAndCreateGroup(GroupInfo const & groupInfo) { m_labelToGroup[groupInfo] = new ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>(); }
-		void MakeActiveGroup(GroupInfo const & groupInfo) { ASSERT(groupExist(groupInfo), "The group does not exist"); m_activeGroup[groupInfo] = true; }
-		std::unordered_map<GroupInfo, bool>& get_ActiveGroupsMap() { return m_activeGroup; }
-		std::unordered_map<GroupInfo, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>*>& get_labelToGroupMap() { return m_labelToGroup; }
-		ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* get_Group(std::string groupInfo) { ASSERT(groupExist(groupInfo), "The group does not exist"); return m_labelToGroup.at(groupInfo); }
+		void addAndCreateGroup(std::string label) { m_labelToGroup[label] = new ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>(); }
+		void MakeActiveGroup(std::string label) { ASSERT(groupExist(label), "The group does not exist"); m_activeGroup[label] = true; }
+		std::unordered_map<std::string, bool>& get_ActiveGroupsMap() { return m_activeGroup; }
+		std::unordered_map<std::string, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>*>& get_labelToGroupMap() { return m_labelToGroup; }
+		ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* get_Group(std::string label) { ASSERT(groupExist(label), "The group does not exist"); return m_labelToGroup.at(label); }
 
 		//Parallel
 		void ClearAfterPartitioning(std::set<int> owned, std::set<int> ghost);
@@ -221,9 +220,9 @@ namespace PAMELA
 		ELEMENTS::FAMILY m_family;
 
 		//Groups
-		bool groupExist(std::string groupInfo) { return m_labelToGroup.count(groupInfo) == 1; }
-		std::unordered_map<GroupInfo, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>*> m_labelToGroup;
-		std::unordered_map<GroupInfo, bool> m_activeGroup;
+		bool groupExist(std::string label) { return m_labelToGroup.count(label) == 1; }
+		std::unordered_map<std::string, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>*> m_labelToGroup;
+		std::unordered_map<std::string, bool> m_activeGroup;
 
 	};
 

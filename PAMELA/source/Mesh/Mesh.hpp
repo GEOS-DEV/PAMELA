@@ -5,6 +5,7 @@
 #include "Elements/Polygon.hpp"
 #include "Elements/Polyhedron.hpp"
 #include "Collection/Collection.hpp"
+#include "Collection/GroupInfo.hpp"
 #include "Property/Property.hpp"
 #include "Adjacency/AdjacencySet.hpp"
 #include "Utils/Utils.hpp"
@@ -47,14 +48,14 @@ namespace PAMELA
 
       ///Functions to add elements or group to the mesh
       //Add Element
-      std::pair< Point*, bool > addPoint(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, double x, double y, double z);
-      std::pair< Point*, bool > addPoint(std::string groupLabel, Point* point);
-      std::pair< Line*, bool > addLine(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
-      std::pair< Polygon*, bool > addPolygon(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
-      std::pair< Polyhedron*, bool > addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
+      std::pair< Point*, bool > addPoint(ELEMENTS::TYPE elementType, int elementIndex, GroupInfo const & groupInfo, double x, double y, double z);
+      std::pair< Point*, bool > addPoint(GroupInfo const & groupInfo, Point* point);
+      std::pair< Line*, bool > addLine(ELEMENTS::TYPE elementType, int elementIndex, GroupInfo const & groupInfo, const std::vector<Point*>& vertexList);
+      std::pair< Polygon*, bool > addPolygon(ELEMENTS::TYPE elementType, int elementIndex, GroupInfo const & groupInfo, const std::vector<Point*>& vertexList);
+      std::pair< Polyhedron*, bool > addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, GroupInfo const & groupInfo, const std::vector<Point*>& vertexList);
 
       //Add Implicit Elements
-      void AddImplicitLine(ELEMENTS::TYPE elementType, std::string groupLabel, std::vector<Point*>& pointList);
+      void AddImplicitLine(ELEMENTS::TYPE elementType, GroupInfo const & groupInfo, std::vector<Point*>& pointList);
 
 
 

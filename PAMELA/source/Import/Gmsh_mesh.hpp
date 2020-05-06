@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Mesh/UnstructuredMesh.hpp"
+#include "Collection/GroupInfo.hpp"
 #include <fstream>
 namespace PAMELA
 {
@@ -28,8 +29,9 @@ namespace PAMELA
       int m_npyramids {0};
       int m_npoints {0};
 
-      std::unordered_map<int, std::string> m_TagNamePolygon {};
-      std::unordered_map<int, std::string> m_TagNamePolyhedron {};
+      /// Key : 
+      std::unordered_map<int, GroupInfo> m_tagNamePolygon {};
+      std::unordered_map<int, GroupInfo> m_tagNamePolyhedron {};
 
       void InitElementsMapping();
 

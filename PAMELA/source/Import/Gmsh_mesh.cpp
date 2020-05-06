@@ -3,6 +3,7 @@
 #include "Elements/ElementFactory.hpp"
 #include "Elements/Element.hpp"
 #include <map>
+#include <string>
 #include "Parallel/Communicator.hpp"
 
 namespace PAMELA
@@ -84,10 +85,11 @@ namespace PAMELA
 				double x, y, z;
 				std::vector<Vertex*> vertexTemp = { nullptr };
                                 int offset = 0;
+        GroupInfo groupPoint("POINT_GROUP", 0, GroupType::CORNER );
 				for (int i = 0; i != m_nnodes; i++)
 				{
 					mesh_file >> id >> x >> y >> z;
-					auto res =  mesh->addPoint(elementType, i, "DEFAULT", x, y, z);
+					auto res =  mesh->addPoint(elementType, i, groupPoint, x, y, z);
                                           oldToNewVertexIndex[i] = res.first->get_localIndex(); 
 				}
 				LOGINFO("Done" +  std::to_string(offset));
@@ -104,11 +106,11 @@ namespace PAMELA
 					StringUtils::RemoveDoubleQuotes(label);
 					if (dim==2)
 					{
-						m_TagNamePolygon[tagid] =  label;
+						m_tagNamePolygon[tagid] =  {label, tagid, GroupType::SURFACE};
 					}
 					else if (dim==3)
 					{
-						m_TagNamePolyhedron[tagid] = label;
+						m_tagNamePolyhedron[tagid] = {label, tagid, GroupType::SURFACE};;
 					}
 				}
 
@@ -124,8 +126,6 @@ namespace PAMELA
 				}
 
 				LOGINFO("Reading elements...");
-
-				std::string grplabel;
 
 				for (auto i = 0; i != m_nelements; i++)
 				{
@@ -158,19 +158,18 @@ namespace PAMELA
 						vertexTemp3[0] = vertexcollection[v0 - 1];
 						vertexTemp3[1] = vertexcollection[v1 - 1];
 						vertexTemp3[2] = vertexcollection[v2 - 1];
+            if( m_tagNamePolygon.count( attribute ) )
+            {
+						  mesh->addPolygon(elementType, nPolygon, m_tagNamePolygon[attribute], vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(m_tagNamePolygon[attribute]);
+            }
+            else
+            {
+              GroupInfo group("POLYGON_GROUP_" +  std::to_string( attribute ), attribute, GroupType::SURFACE );
+						  mesh->addPolygon(elementType, nPolygon, group, vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(group);
+            }
 
-						//Find group label
-						if (m_TagNamePolygon.count(attribute) == 0)
-						{
-							grplabel= "POLYGON_GROUP_" + std::to_string(attribute);
-						}
-						else
-						{
-							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute];
-						}
-
-						mesh->addPolygon(elementType, nPolygon, grplabel, vertexTemp3);
-						mesh->get_PolygonCollection()->MakeActiveGroup(grplabel);
 						nPolygon++;
 						m_ntriangles++;
 						break;
@@ -183,18 +182,18 @@ namespace PAMELA
 						vertexTemp4[2] = vertexcollection[v2 - 1];
 						vertexTemp4[3] = vertexcollection[v3 - 1];
 
-						//Find group label
-						if (m_TagNamePolygon.count(attribute) == 0)
-						{
-							grplabel = "POLYGON_GROUP_" + std::to_string(attribute);
-						}
-						else
-						{
-							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute];
-						}
+            if( m_tagNamePolygon.count( attribute ) )
+            {
+						  mesh->addPolygon(elementType, nPolygon, m_tagNamePolygon[attribute], vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(m_tagNamePolygon[attribute]);
+            }
+            else
+            {
+              GroupInfo group("POLYGON_GROUP_" +  std::to_string( attribute ), attribute, GroupType::SURFACE );
+						  mesh->addPolygon(elementType, nPolygon, group, vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(group);
+            }
 
-						mesh->addPolygon(elementType, nPolygon, grplabel, vertexTemp4);
-						mesh->get_PolygonCollection()->MakeActiveGroup(grplabel);
 						nPolygon++;
 						m_nquadrangles++;
 						break;
@@ -207,18 +206,18 @@ namespace PAMELA
 						vertexTemp4[2] = vertexcollection[oldToNewVertexIndex[v2 - 1]];
 						vertexTemp4[3] = vertexcollection[oldToNewVertexIndex[v3 - 1]];
 
-						//Find group label
-						if (m_TagNamePolyhedron.count(attribute) == 0)
-						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
-						}
-						else
-						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
-						}
+            if( m_tagNamePolygon.count( attribute ) )
+            {
+						  mesh->addPolygon(elementType, nPolygon, m_tagNamePolygon[attribute], vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(m_tagNamePolygon[attribute]);
+            }
+            else
+            {
+              GroupInfo group("POLYHEDRON_GROUP_" +  std::to_string( attribute ), attribute, GroupType::SURFACE );
+						  mesh->addPolygon(elementType, nPolygon, group, vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(group);
+            }
 
-						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp4);
-						mesh->get_PolyhedronCollection()->MakeActiveGroup(grplabel);
 						nPolyhedron++;
 						m_ntetrahedra++;
 						break;
@@ -235,18 +234,18 @@ namespace PAMELA
 						vertexTemp8[6] = vertexcollection[v6 - 1];
 						vertexTemp8[7] = vertexcollection[v7 - 1];
 
-						//Find group label
-						if (m_TagNamePolyhedron.count(attribute) == 0)
-						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
-						}
-						else
-						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
-						}
+            if( m_tagNamePolygon.count( attribute ) )
+            {
+						  mesh->addPolygon(elementType, nPolygon, m_tagNamePolygon[attribute], vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(m_tagNamePolygon[attribute]);
+            }
+            else
+            {
+              GroupInfo group("POLYHEDRON_GROUP_" +  std::to_string( attribute ), attribute, GroupType::SURFACE );
+						  mesh->addPolygon(elementType, nPolygon, group, vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(group);
+            }
 
-						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp8);
-						mesh->get_PolyhedronCollection()->MakeActiveGroup(grplabel);
 						nPolyhedron++;
 						m_nhexahedra++;
 						break;
@@ -261,18 +260,18 @@ namespace PAMELA
 						vertexTemp6[4] = vertexcollection[v4 - 1];
 						vertexTemp6[5] = vertexcollection[v5 - 1];
 
-						//Find group label
-						if (m_TagNamePolyhedron.count(attribute) == 0)
-						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
-						}
-						else
-						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
-						}
+            if( m_tagNamePolygon.count( attribute ) )
+            {
+						  mesh->addPolygon(elementType, nPolygon, m_tagNamePolygon[attribute], vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(m_tagNamePolygon[attribute]);
+            }
+            else
+            {
+              GroupInfo group("POLYHEDRON_GROUP_" +  std::to_string( attribute ), attribute, GroupType::SURFACE );
+						  mesh->addPolygon(elementType, nPolygon, group, vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(group);
+            }
 
-						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp6);
-						mesh->get_PolyhedronCollection()->MakeActiveGroup(grplabel);
 						nPolyhedron++;
 						m_nprisms++;
 						break;
@@ -286,18 +285,18 @@ namespace PAMELA
 						vertexTemp5[3] = vertexcollection[v3 - 1];
 						vertexTemp5[4] = vertexcollection[v4 - 1];
 
-						//Find group label
-						if (m_TagNamePolyhedron.count(attribute) == 0)
-						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
-						}
-						else
-						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
-						}
+            if( m_tagNamePolygon.count( attribute ) )
+            {
+						  mesh->addPolygon(elementType, nPolygon, m_tagNamePolygon[attribute], vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(m_tagNamePolygon[attribute]);
+            }
+            else
+            {
+              GroupInfo group("POLYHEDRON_GROUP_" +  std::to_string( attribute ), attribute, GroupType::SURFACE );
+						  mesh->addPolygon(elementType, nPolygon, group, vertexTemp3);
+						  mesh->get_PolygonCollection()->MakeActiveGroup(group);
+            }
 
-						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp5);
-						mesh->get_PolyhedronCollection()->MakeActiveGroup(grplabel);
 						nPolyhedron++;
 						m_npyramids++;
 						break;

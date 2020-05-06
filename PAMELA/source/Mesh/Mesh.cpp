@@ -80,7 +80,7 @@ namespace PAMELA
   }
 
 
-  std::pair< Point*, bool > Mesh::addPoint(ELEMENTS::TYPE elementType, int index, std::string groupLabel, double x, double y, double z)
+  std::pair< Point*, bool > Mesh::addPoint(ELEMENTS::TYPE elementType, int index, GroupInfo const & groupInfo, double x, double y, double z)
   {
     Point* element = ElementFactory::makePoint(elementType, index, x, y, z);
     auto returnedElement = m_PointCollection.AddElement(groupLabel, element);
@@ -91,7 +91,7 @@ namespace PAMELA
     return returnedElement;
   }
 
-  std::pair<Point*, bool > Mesh::addPoint(std::string groupLabel, Point* point)
+  std::pair<Point*, bool > Mesh::addPoint(GroupInfo const & groupInfo, Point* point)
   {
     auto returnedElement = m_PointCollection.AddElement(groupLabel, point);
     if (returnedElement.second)
@@ -101,7 +101,7 @@ namespace PAMELA
     return returnedElement;
   }
 
-  std::pair< Line*, bool> Mesh::addLine(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
+  std::pair< Line*, bool> Mesh::addLine(ELEMENTS::TYPE elementType, int elementIndex, GroupInfo const & groupInfo, const std::vector<Point*>& vertexList)
   {
     Line* element = ElementFactory::makeLine(elementType, elementIndex, vertexList);
     auto returnedElement = m_LineCollection.AddElement(groupLabel, element);
@@ -112,7 +112,7 @@ namespace PAMELA
     return returnedElement;
   }
 
-  std::pair< Polygon*, bool > Mesh::addPolygon(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
+  std::pair< Polygon*, bool > Mesh::addPolygon(ELEMENTS::TYPE elementType, int elementIndex, GroupInfo const & groupInfo, const std::vector<Point*>& vertexList)
   {
     Polygon* element = ElementFactory::makePolygon(elementType, elementIndex, vertexList);
     auto returnedElement = m_PolygonCollection.AddElement(groupLabel, element);
@@ -123,7 +123,7 @@ namespace PAMELA
     return returnedElement;
   }
 
-  std::pair< Polyhedron*, bool> Mesh::addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
+  std::pair< Polyhedron*, bool> Mesh::addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, GroupInfo const & groupInfo, const std::vector<Point*>& vertexList)
   {
     Polyhedron* element = ElementFactory::makePolyhedron(elementType, elementIndex, vertexList);
     auto returnedElement = m_PolyhedronCollection.AddElement(groupLabel, element);
@@ -136,7 +136,7 @@ namespace PAMELA
 
   }
 
-  void Mesh::AddImplicitLine(ELEMENTS::TYPE elementType, std::string groupLabel, std::vector<Point*>& pointList)
+  void Mesh::AddImplicitLine(ELEMENTS::TYPE elementType, GroupInfo const & groupInfo, std::vector<Point*>& pointList)
   {
     utils::pamela_unused(elementType);
     m_ImplicitPointCollection.AddElement(groupLabel, pointList[0]);

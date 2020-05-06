@@ -335,7 +335,7 @@ namespace PAMELA
 		Mesh* mesh = new UnstructuredMesh();
 		std::vector<Point*> vertexTemp = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 
-		mesh->get_PolyhedronCollection()->addAndCreateGroup("POLYHEDRON_GROUP_1");
+		mesh->get_PolyhedronCollection()->addAndCreateGroup( m_defaultPolyhedronGroupInfo);
 
 		int i0 = 0;
 		int np;
@@ -542,19 +542,18 @@ namespace PAMELA
                             else
                             {
                                 
-                                //Points
-                                vertexTemp[0] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]).first;
-                                vertexTemp[4] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 6, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]).first;
-                                vertexTemp[1] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 5, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]).first;
-                                vertexTemp[5] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 4, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]).first;
-                                vertexTemp[3] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 3, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]).first;
-                                vertexTemp[7] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 2, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]).first;
-                                vertexTemp[2] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 1, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]).first;
-                                vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]).first;
+                                vertexTemp[0] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 7, m_defaulPointGroupInfo, x_pos[0], y_pos[0], z_pos[0]).first;
+                                vertexTemp[4] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 6, m_defaulPointGroupInfo, x_pos[4], y_pos[4], z_pos[4]).first;
+                                vertexTemp[1] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 5, m_defaulPointGroupInfo, x_pos[1], y_pos[1], z_pos[1]).first;
+                                vertexTemp[5] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 4, m_defaulPointGroupInfo, x_pos[5], y_pos[5], z_pos[5]).first;
+                                vertexTemp[3] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 3, m_defaulPointGroupInfo, x_pos[2], y_pos[2], z_pos[2]).first;
+                                vertexTemp[7] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 2, m_defaulPointGroupInfo, x_pos[6], y_pos[6], z_pos[6]).first;
+                                vertexTemp[2] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 1, m_defaulPointGroupInfo, x_pos[3], y_pos[3], z_pos[3]).first;
+                                vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0, m_defaulPointGroupInfo, x_pos[7], y_pos[7], z_pos[7]).first;
 
                                 //Hexa
-                                mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP_1");
-                                auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], idx_over_active_hexas_only, "POLYHEDRON_GROUP_1", vertexTemp);
+                                mesh->get_PolyhedronCollection()->MakeActiveGroup(m_defaultPolyhedronGroupInfo);
+                                auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], idx_over_active_hexas_only, m_defaultPolyhedronGroupInfo, vertexTemp);
 
                                 // test_3: Check if this hexahedron has already been added to the mesh
                                 bool hexa_has_already_been_added_to_the_mesh = !returned_element.second;

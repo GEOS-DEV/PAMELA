@@ -162,11 +162,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolygon.count(attribute) == 0)
 						{
-							grplabel= "POLYGON_GROUP_" + std::to_string(attribute);
+							grplabel= "POLYGON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute];
+							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute] + "_" + std::to_string(attribute);
 						}
 
 						mesh->addPolygon(elementType, nPolygon, grplabel, vertexTemp3);
@@ -186,11 +186,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolygon.count(attribute) == 0)
 						{
-							grplabel = "POLYGON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYGON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute];
+							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute] + "_" + std::to_string(attribute);
 						}
 
 						mesh->addPolygon(elementType, nPolygon, grplabel, vertexTemp4);
@@ -210,11 +210,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)
 						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYHEDRON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
+							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute] + "_" +  std::to_string(attribute);
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp4);
@@ -238,11 +238,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)
 						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYHEDRON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
+							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute] + "_" +  std::to_string(attribute);
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp8);
@@ -264,11 +264,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)
 						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYHEDRON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
+							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute] + "_" +  std::to_string(attribute);
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp6);
@@ -289,11 +289,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)
 						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYHEDRON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
+							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute] + "_" +  std::to_string(attribute);
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp5);

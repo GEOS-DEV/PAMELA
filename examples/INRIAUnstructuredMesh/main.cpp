@@ -25,8 +25,8 @@ int main(int argc, char **argv) {
 	vtkMultiProcessController::SetGlobalController(controler.Get());
 #endif
 
-
-	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"/data/meshes/medit/tiny.mesh");
+  
+	Mesh* MainMesh = MeshFactory::makeMesh(PAMELA_PATH"data/DataSets/Tiny/medit/tiny.mesh");
 
 	MainMesh->CreateFacesFromCells();
 	MainMesh->PerformPolyhedronPartitioning(ELEMENTS::FAMILY::POLYGON, ELEMENTS::FAMILY::POLYGON);

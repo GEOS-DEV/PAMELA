@@ -131,7 +131,7 @@ namespace PAMELA
 
       //Wells
       unsigned int m_nWells {0};
-      std::unordered_map<std::string, WELL*> m_Wells {};
+      std::unordered_map<int, WELL*> m_Wells {};
 
       std::unordered_map<int, ELEMENTS::TYPE> m_TypeMap {};
 

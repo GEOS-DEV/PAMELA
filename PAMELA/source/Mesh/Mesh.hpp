@@ -47,14 +47,14 @@ namespace PAMELA
 
       ///Functions to add elements or group to the mesh
       //Add Element
-      std::pair< Point*, bool > addPoint(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, double x, double y, double z);
-      std::pair< Point*, bool > addPoint(std::string groupLabel, Point* point);
-      std::pair< Line*, bool > addLine(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
-      std::pair< Polygon*, bool > addPolygon(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
-      std::pair< Polyhedron*, bool > addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList);
+      std::pair< Point*, bool > addPoint(ELEMENTS::TYPE elementType, int elementIndex, int attribute, double x, double y, double z);
+      std::pair< Point*, bool > addPoint( int attribute, Point* point);
+      std::pair< Line*, bool > addLine(ELEMENTS::TYPE elementType, int elementIndex, int attribute, const std::vector<Point*>& vertexList);
+      std::pair< Polygon*, bool > addPolygon(ELEMENTS::TYPE elementType, int elementIndex, int attribute, const std::vector<Point*>& vertexList);
+      std::pair< Polyhedron*, bool > addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, int attribute, const std::vector<Point*>& vertexList);
 
       //Add Implicit Elements
-      void AddImplicitLine(ELEMENTS::TYPE elementType, std::string groupLabel, std::vector<Point*>& pointList);
+      void AddImplicitLine(ELEMENTS::TYPE elementType, int attribute, std::vector<Point*>& pointList);
 
 
 
@@ -73,7 +73,7 @@ namespace PAMELA
 
 
       //Adjacency
-      void CreateLineGroupWithAdjacency(std::string Label, Adjacency* adjacency);
+      void CreateLineGroupWithAdjacency(int attribute, Adjacency* adjacency);
 
       std::set<int> const & getNeighborList() const { return m_neighborList; }
 

@@ -80,10 +80,10 @@ namespace PAMELA
   }
 
 
-  std::pair< Point*, bool > Mesh::addPoint(ELEMENTS::TYPE elementType, int index, std::string groupLabel, double x, double y, double z)
+  std::pair< Point*, bool > Mesh::addPoint(ELEMENTS::TYPE elementType, int index, int attribute, double x, double y, double z)
   {
     Point* element = ElementFactory::makePoint(elementType, index, x, y, z);
-    auto returnedElement = m_PointCollection.AddElement(groupLabel, element);
+    auto returnedElement = m_PointCollection.AddElement(attribute, element);
     if (!returnedElement.second)
     {
       //LOGWARNING("Try to add an existing element");
@@ -91,9 +91,9 @@ namespace PAMELA
     return returnedElement;
   }
 
-  std::pair<Point*, bool > Mesh::addPoint(std::string groupLabel, Point* point)
+  std::pair<Point*, bool > Mesh::addPoint(int attribute, Point* point)
   {
-    auto returnedElement = m_PointCollection.AddElement(groupLabel, point);
+    auto returnedElement = m_PointCollection.AddElement(attribute, point);
     if (returnedElement.second)
     {
       //LOGWARNING("Try to add an existing element");
@@ -101,10 +101,10 @@ namespace PAMELA
     return returnedElement;
   }
 
-  std::pair< Line*, bool> Mesh::addLine(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
+  std::pair< Line*, bool> Mesh::addLine(ELEMENTS::TYPE elementType, int elementIndex, int attribute, const std::vector<Point*>& vertexList)
   {
     Line* element = ElementFactory::makeLine(elementType, elementIndex, vertexList);
-    auto returnedElement = m_LineCollection.AddElement(groupLabel, element);
+    auto returnedElement = m_LineCollection.AddElement(attribute, element);
     if (!returnedElement.second)
     {
       //LOGWARNING("Try to add an existing element");
@@ -112,10 +112,10 @@ namespace PAMELA
     return returnedElement;
   }
 
-  std::pair< Polygon*, bool > Mesh::addPolygon(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
+  std::pair< Polygon*, bool > Mesh::addPolygon(ELEMENTS::TYPE elementType, int elementIndex, int attribute, const std::vector<Point*>& vertexList)
   {
     Polygon* element = ElementFactory::makePolygon(elementType, elementIndex, vertexList);
-    auto returnedElement = m_PolygonCollection.AddElement(groupLabel, element);
+    auto returnedElement = m_PolygonCollection.AddElement(attribute, element);
     if ( !returnedElement.second )
     {
       //LOGWARNING("Try to add an existing element");
@@ -123,10 +123,10 @@ namespace PAMELA
     return returnedElement;
   }
 
-  std::pair< Polyhedron*, bool> Mesh::addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, std::string groupLabel, const std::vector<Point*>& vertexList)
+  std::pair< Polyhedron*, bool> Mesh::addPolyhedron(ELEMENTS::TYPE elementType, int elementIndex, int attribute, const std::vector<Point*>& vertexList)
   {
     Polyhedron* element = ElementFactory::makePolyhedron(elementType, elementIndex, vertexList);
-    auto returnedElement = m_PolyhedronCollection.AddElement(groupLabel, element);
+    auto returnedElement = m_PolyhedronCollection.AddElement( attribute, element);
     if ( !returnedElement.second)
     {
       //LOGWARNING("Try to add an existing polyhedron");
@@ -136,15 +136,15 @@ namespace PAMELA
 
   }
 
-  void Mesh::AddImplicitLine(ELEMENTS::TYPE elementType, std::string groupLabel, std::vector<Point*>& pointList)
+  void Mesh::AddImplicitLine(ELEMENTS::TYPE elementType, int attribute, std::vector<Point*>& pointList)
   {
     utils::pamela_unused(elementType);
-    m_ImplicitPointCollection.AddElement(groupLabel, pointList[0]);
+    m_ImplicitPointCollection.AddElement(attribute, pointList[0]);
     for (size_t i=1;i!= pointList.size();++i)
     {
-      m_ImplicitPointCollection.AddElement(groupLabel, pointList[i]);
+      m_ImplicitPointCollection.AddElement(attribute, pointList[i]);
       Line* element = ElementFactory::makeLine(ELEMENTS::TYPE::VTK_LINE, -1, { pointList[i-1],pointList[i] });
-      m_ImplicitLineCollection.AddElement(groupLabel, element);
+      m_ImplicitLineCollection.AddElement(attribute, element);
     }
   }
 
@@ -432,7 +432,7 @@ namespace PAMELA
 
   }
 
-  void Mesh::CreateLineGroupWithAdjacency(std::string Label, Adjacency* adjacency)
+  void Mesh::CreateLineGroupWithAdjacency(int attribute, Adjacency* adjacency)
   {
 
     auto& line_collection = m_LineCollection;
@@ -460,7 +460,7 @@ namespace PAMELA
           auto it = get_PolyhedronCollection()->begin_owned() + irow;
           auto xyz1 = (*it)->get_centroidCoordinates();
           auto source_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz1[0], xyz1[1], xyz1[2]);
-          auto source_rpoint = point_collection.AddElement(Label, source_point).first;
+          auto source_rpoint = point_collection.AddElement(attribute, source_point).first;
           ++ipoint; ++nb_points;
           itarget = isource;
           for (auto icol = rowPtr[irow]; icol != rowPtr[irow + 1]; ++icol)
@@ -471,12 +471,12 @@ namespace PAMELA
               auto it2 = get_PolyhedronCollection()->begin_owned() + columIndex[icol];
               auto xyz2 = (*it2)->get_centroidCoordinates();
               auto target_point = ElementFactory::makePoint(ELEMENTS::TYPE::VTK_VERTEX, ipoint, xyz2[0], xyz2[1], xyz2[2]);
-              auto target_rpoint = point_collection.AddElement(Label, target_point).first;
+              auto target_rpoint = point_collection.AddElement(attribute, target_point).first;
               ++ipoint;
               auto edgev = { source_rpoint , target_rpoint };
               auto edge = ElementFactory::makeLine(ELEMENTS::TYPE::VTK_LINE, iline, edgev);
               ++iline;
-              line_collection.AddElement(Label, edge);
+              line_collection.AddElement(attribute, edge);
             }
 
           }
@@ -488,11 +488,11 @@ namespace PAMELA
     }
     if (nb_lines >0)
     {
-      m_LineCollection.MakeActiveGroup(Label);
+      m_LineCollection.MakeActiveGroup(attribute);
     }
     if (nb_points > 0)
     {
-      m_PointCollection.MakeActiveGroup(Label);
+      m_PointCollection.MakeActiveGroup(attribute);
     }
 
   }

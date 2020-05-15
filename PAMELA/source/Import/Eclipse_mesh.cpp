@@ -335,7 +335,7 @@ namespace PAMELA
 		Mesh* mesh = new UnstructuredMesh();
 		std::vector<Point*> vertexTemp = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 
-		mesh->get_PolyhedronCollection()->addAndCreateGroup(1);
+		mesh->get_PolyhedronCollection()->addAndCreateGroup("POLYHEDRON_GROUP_1");
 
 		int i0 = 0;
 		int np;
@@ -543,18 +543,18 @@ namespace PAMELA
                             {
                                 
                                 //Points
-                                vertexTemp[0] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 7,1 , x_pos[0], y_pos[0], z_pos[0]).first;
-                                vertexTemp[4] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 6,1 , x_pos[4], y_pos[4], z_pos[4]).first;
-                                vertexTemp[1] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 5,1 , x_pos[1], y_pos[1], z_pos[1]).first;
-                                vertexTemp[5] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 4,1 , x_pos[5], y_pos[5], z_pos[5]).first;
-                                vertexTemp[3] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 3,1 , x_pos[2], y_pos[2], z_pos[2]).first;
-                                vertexTemp[7] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 2,1 , x_pos[6], y_pos[6], z_pos[6]).first;
-                                vertexTemp[2] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 1,1 , x_pos[3], y_pos[3], z_pos[3]).first;
-                                vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0,1 , x_pos[7], y_pos[7], z_pos[7]).first;
+                                vertexTemp[0] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 7, "POINT_GROUP_0", x_pos[0], y_pos[0], z_pos[0]).first;
+                                vertexTemp[4] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 6, "POINT_GROUP_0", x_pos[4], y_pos[4], z_pos[4]).first;
+                                vertexTemp[1] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 5, "POINT_GROUP_0", x_pos[1], y_pos[1], z_pos[1]).first;
+                                vertexTemp[5] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 4, "POINT_GROUP_0", x_pos[5], y_pos[5], z_pos[5]).first;
+                                vertexTemp[3] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 3, "POINT_GROUP_0", x_pos[2], y_pos[2], z_pos[2]).first;
+                                vertexTemp[7] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 2, "POINT_GROUP_0", x_pos[6], y_pos[6], z_pos[6]).first;
+                                vertexTemp[2] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 1, "POINT_GROUP_0", x_pos[3], y_pos[3], z_pos[3]).first;
+                                vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]).first;
 
                                 //Hexa
-                                mesh->get_PolyhedronCollection()->MakeActiveGroup(1);
-                                auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], idx_over_active_hexas_only, 1, vertexTemp);
+                                mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP_1");
+                                auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], idx_over_active_hexas_only, "POLYHEDRON_GROUP_1", vertexTemp);
 
                                 // test_3: Check if this hexahedron has already been added to the mesh
                                 bool hexa_has_already_been_added_to_the_mesh = !returned_element.second;
@@ -1181,23 +1181,24 @@ namespace PAMELA
           {
             std::vector<int> sub_iwel(&iwel[0 + iw*niwelz], &iwel[(iw+1)*(niwelz - 1)]);
             auto well_type = sub_iwel[6];
-            int label;
+            std::string label;
             if (well_type==1)
             {
-              label = 1;
+              label = "PRODUCER";
             }
             else if (well_type == 2)
             {
-              label = 2;
+              label = "OIL_INJECTOR";
             }
             else if (well_type == 3)
             {
-              label = 3;
+              label = "WATER_INJECTOR";
             }
             else if (well_type == 4)
             {
-              label = 4;
+              label = "GAS_INJECTOR";
             }
+            label = label + "_" + std::to_string(iw);
 
             auto icell = m_IJK2Index.at(IJK(sub_iwel[0]-1, sub_iwel[1]-1, sub_iwel[2]-1));
             auto nb_comp = sub_iwel[4];

@@ -22,12 +22,12 @@ namespace PAMELA
 		LOGINFO("Initialization...");
 
 		//Groups
-		m_PolygonCollection.addAndCreateGroup(1);//west 
-		m_PolygonCollection.addAndCreateGroup(2);//east
-		m_PolygonCollection.addAndCreateGroup(3);//north
-		m_PolygonCollection.addAndCreateGroup(4);//south
-		m_PolygonCollection.addAndCreateGroup(5);//top
-		m_PolygonCollection.addAndCreateGroup(6);//bottom
+		m_PolygonCollection.addAndCreateGroup("West");
+		m_PolygonCollection.addAndCreateGroup("East");
+		m_PolygonCollection.addAndCreateGroup("North");
+		m_PolygonCollection.addAndCreateGroup("South");
+		m_PolygonCollection.addAndCreateGroup("Top");
+		m_PolygonCollection.addAndCreateGroup("Bottom");
 
 		//Dim
 		int dxSize = static_cast<int>(dx.size());
@@ -68,6 +68,8 @@ namespace PAMELA
 		m_Lymax = yVector.back();
 		m_Lzmax = zVector.back();
 
+		std::string CurrentPointGrp;
+
 		LOGINFO("Create Vertices...");
 		//Vertices
 		int ivertex = 0;
@@ -77,7 +79,8 @@ namespace PAMELA
 			{
 				for (auto i = 0; i < dxSize + 1; i++)
 				{
-					addPoint(ELEMENTS::TYPE::VTK_VERTEX, ivertex, 1, xVector[i], yVector[j], zVector[k]);
+					CurrentPointGrp = "DEFAULT";
+					addPoint(ELEMENTS::TYPE::VTK_VERTEX, ivertex, CurrentPointGrp, xVector[i], yVector[j], zVector[k]);
 					++ivertex;
 				}
 			}
@@ -125,7 +128,7 @@ namespace PAMELA
 					vertexListHexa[7] = m_PointCollection[i + j * dxSize + j + (k + 1) * (dxSize + 1) * (dySize + 1) + dxSize + 1];
 
 					//Add polyhedron to collection
-					addPolyhedron(ELEMENTS::TYPE::VTK_HEXAHEDRON, ihexa, 1, vertexListHexa);
+					addPolyhedron(ELEMENTS::TYPE::VTK_HEXAHEDRON, ihexa, "DEFAULT", vertexListHexa);
 
 
 					//------ Quads at boundary
@@ -145,7 +148,7 @@ namespace PAMELA
 						vertexListQuad[3] = vertexListHexa[4];
 
 						//Add polyhedron to collection
-						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, 1, vertexListQuad);
+						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, "West", vertexListQuad);
 					}
 
 					if (i == dxSize - 1)
@@ -163,7 +166,7 @@ namespace PAMELA
 						vertexListQuad[3] = vertexListHexa[5];
 
 						//Add polygon to collection
-						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, 2, vertexListQuad);
+						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, "East", vertexListQuad);
 					}
 
 					if (k == 0)
@@ -181,7 +184,7 @@ namespace PAMELA
 						vertexListQuad[3] = vertexListHexa[3];
 
 						//Add polyhedron to collection
-						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, 6, vertexListQuad);
+						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, "Bottom", vertexListQuad);
 					}
 
 					if (k == dzSize - 1)
@@ -199,7 +202,7 @@ namespace PAMELA
 						vertexListQuad[3] = vertexListHexa[7];
 
 						//Add polygon to collection
-						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, 5, vertexListQuad);
+						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, "Top", vertexListQuad);
 					}
 
 					if (j == 0)
@@ -217,7 +220,7 @@ namespace PAMELA
 						vertexListQuad[3] = vertexListHexa[4];
 
 						//Add polyhedron to collection
-						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, 4, vertexListQuad);
+						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, "South", vertexListQuad);
 					}
 
 					if (j == dySize - 1)
@@ -235,7 +238,7 @@ namespace PAMELA
 						vertexListQuad[3] = vertexListHexa[7];
 
 						//Add polygon to collection
-						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, 3, vertexListQuad);
+						addPolygon(ELEMENTS::TYPE::VTK_QUAD, iquad, "North", vertexListQuad);
 					}
 
 				}
@@ -243,14 +246,14 @@ namespace PAMELA
 		}
 
 		//By default all polyhedron groups are active, only polygon boundary groups are active
-		m_PolygonCollection.MakeActiveGroup(1);
-		m_PolygonCollection.MakeActiveGroup(2);
-		m_PolygonCollection.MakeActiveGroup(3);
-		m_PolygonCollection.MakeActiveGroup(4);
-		m_PolygonCollection.MakeActiveGroup(5);
-		m_PolygonCollection.MakeActiveGroup(6);
+		m_PolygonCollection.MakeActiveGroup("North");
+		m_PolygonCollection.MakeActiveGroup("South");
+		m_PolygonCollection.MakeActiveGroup("East");
+		m_PolygonCollection.MakeActiveGroup("West");
+		m_PolygonCollection.MakeActiveGroup("Top");
+		m_PolygonCollection.MakeActiveGroup("Bottom");
 
-		m_PolyhedronCollection.MakeActiveGroup(1);
+		m_PolyhedronCollection.MakeActiveGroup("DEFAULT");
 
 
 	}
@@ -280,7 +283,7 @@ namespace PAMELA
 
 		//Realign point on boundaries
 		//--North
-		auto Northgroup = m_PolygonCollection.get_Group(3);
+		auto Northgroup = m_PolygonCollection.get_Group("North");
 		for (auto it = Northgroup->begin(); it != Northgroup->end(); ++it)
 		{
 			auto& vertexList = (*it)->get_vertexList();
@@ -290,7 +293,7 @@ namespace PAMELA
 			}
 		}
 		//--South
-		auto Southgroup = m_PolygonCollection.get_Group(4);
+		auto Southgroup = m_PolygonCollection.get_Group("South");
 		for (auto it = Southgroup->begin(); it != Southgroup->end(); ++it)
 		{
 			auto& vertexList = (*it)->get_vertexList();
@@ -300,7 +303,7 @@ namespace PAMELA
 			}
 		}
 		//--East
-		auto Eastgroup = m_PolygonCollection.get_Group(2);
+		auto Eastgroup = m_PolygonCollection.get_Group("East");
 		for (auto it = Eastgroup->begin(); it != Eastgroup->end(); ++it)
 		{
 			auto& vertexList = (*it)->get_vertexList();
@@ -310,7 +313,7 @@ namespace PAMELA
 			}
 		}
 		//--West
-		auto Westgroup = m_PolygonCollection.get_Group(1);
+		auto Westgroup = m_PolygonCollection.get_Group("West");
 		for (auto it = Westgroup->begin(); it != Westgroup->end(); ++it)
 		{
 			auto& vertexList = (*it)->get_vertexList();
@@ -320,7 +323,7 @@ namespace PAMELA
 			}
 		}
 		//--Top
-		auto Topgroup = m_PolygonCollection.get_Group(5);
+		auto Topgroup = m_PolygonCollection.get_Group("Top");
 		for (auto it = Topgroup->begin(); it != Topgroup->end(); ++it)
 		{
 			auto& vertexList = (*it)->get_vertexList();
@@ -330,7 +333,7 @@ namespace PAMELA
 			}
 		}
 		//--Bottom
-		auto Bottomgroup = m_PolygonCollection.get_Group(6);
+		auto Bottomgroup = m_PolygonCollection.get_Group("Bottom");
 		for (auto it = Bottomgroup->begin(); it != Bottomgroup->end(); ++it)
 		{
 			auto& vertexList = (*it)->get_vertexList();

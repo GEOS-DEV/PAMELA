@@ -146,8 +146,8 @@ namespace PAMELA
       m_data.reserve(ghost_vec_temp.size() * dimension + owned_vec_temp.size() * dimension);
       m_data.insert(m_data.end(), owned_vec_temp.begin(), owned_vec_temp.end());
       m_data.insert(m_data.end(), ghost_vec_temp.begin(), ghost_vec_temp.end());
-      resize_owned(static_cast<int>(owned_vec_temp.size() * dimension));
-      resize_ghost(static_cast<int>(ghost_vec_temp.size() * dimension));
+      resize_owned(static_cast<int>(owned_vec_temp.size() ));
+      resize_ghost(static_cast<int>(ghost_vec_temp.size() ));
 
       //Test for emptyness
       if (m_data.empty()) MakeEmpty();

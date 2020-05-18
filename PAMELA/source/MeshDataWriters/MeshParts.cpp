@@ -118,9 +118,10 @@ namespace PAMELA {
       offsets[i] = offsets[i-1] + offsets[i];
     }
 
+    auto mesh_props = mesh->get_PolyhedronProperty_double()->get_PropertyMap();
+    std::cout << partMap.size() << std::endl;
     for( auto& part : partMap )
     {
-      auto mesh_props = mesh->get_PolyhedronProperty_double()->get_PropertyMap();
       auto curPart = part.second;
       for (auto& mesh_prop : mesh_props)
       {
@@ -129,6 +130,7 @@ namespace PAMELA {
         int dimInt = static_cast< int >( dim );
         auto var = curPart->AddVariable( dim, VARIABLE_LOCATION::PER_CELL,mesh_prop.first);
         auto nbElements = curPart->Collection->size_owned();
+        std::cout << mesh_prop.first << " " << dimInt << " " <<values.size_owned() <<  " "  << nbElements << std::endl;
         std::vector< double > values_in_part(nbElements * static_cast<int>(dim));
         for(auto cellBlockItr =curPart->SubParts.begin();
             cellBlockItr != curPart->SubParts.end();

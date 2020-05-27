@@ -335,7 +335,7 @@ namespace PAMELA
 		Mesh* mesh = new UnstructuredMesh();
 		std::vector<Point*> vertexTemp = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 
-		mesh->get_PolyhedronCollection()->addAndCreateGroup("POLYHEDRON_GROUP_1");
+		mesh->get_PolyhedronCollection()->addAndCreateGroup("POLYHEDRON_GROUP_DEFAULT_1");
 
 		int i0 = 0;
 		int np;
@@ -553,8 +553,8 @@ namespace PAMELA
                                 vertexTemp[6] = mesh->addPoint(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::VERTEX)], ipoint - 0, "POINT_GROUP_0", x_pos[7], y_pos[7], z_pos[7]).first;
 
                                 //Hexa
-                                mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP_1");
-                                auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], idx_over_active_hexas_only, "POLYHEDRON_GROUP_1", vertexTemp);
+                                mesh->get_PolyhedronCollection()->MakeActiveGroup("POLYHEDRON_GROUP_DEFAULT_1");
+                                auto returned_element = mesh->addPolyhedron(m_TypeMap[static_cast<int>(ECLIPSE_MESH_TYPE::HEXAHEDRON)], idx_over_active_hexas_only, "POLYHEDRON_GROUP_DEFAULT_1", vertexTemp);
 
                                 // test_3: Check if this hexahedron has already been added to the mesh
                                 bool hexa_has_already_been_added_to_the_mesh = !returned_element.second;

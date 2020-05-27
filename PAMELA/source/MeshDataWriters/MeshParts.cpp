@@ -107,20 +107,10 @@ namespace PAMELA {
       }
     }
     FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYHEDRON", &partMap);
-        int offset = 0;
-    std::vector< int > offsets(partMap.size() + 1, 0);
-    for( auto& part : partMap )
-    {
-      offsets[part.second->LocalIndex+1] = static_cast<int>(part.second->Collection->size_owned());
-    }
-    for(int i = 1 ; i < static_cast<int>( offsets.size() ); i++)
-    {
-      offsets[i] = offsets[i-1] + offsets[i];
-    }
 
+    auto mesh_props = mesh->get_PolyhedronProperty_double()->get_PropertyMap();
     for( auto& part : partMap )
     {
-      auto mesh_props = mesh->get_PolyhedronProperty_double()->get_PropertyMap();
       auto curPart = part.second;
       for (auto& mesh_prop : mesh_props)
       {
@@ -141,12 +131,12 @@ namespace PAMELA {
           {
             auto cellPtr = *(cellItr);
             auto localIndex2 = cellPtr->get_localIndex();
+            auto globalIndex = cellPtr->get_globalIndex();
             for(int i = 0; i < dimInt; i++)
             {
-              values_in_part[localIndex2*dimInt+i] = values[localIndex2*dimInt+i + dimInt*offsets[curPart->Index]];
+              values_in_part[localIndex2*dimInt+i] = values[globalIndex*dimInt+i];
             }
           }
-          offset += cellBlockPtr->SubCollection.size_owned() * dimInt;
         }
         var->set_data(values_in_part.begin(), values_in_part.end());
       }

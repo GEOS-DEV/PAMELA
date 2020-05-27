@@ -134,12 +134,20 @@ namespace PAMELA
 					mesh_file >> id;	//id
 					mesh_file >> itype;	//itype
 					mesh_file >> ntags;	//itype
-					for (auto nt = 0; nt != ntags; nt++)
-					{
+          if( ntags < 1 )
+          {
+            attribute = 1;
+          }
+          else
+          {
 						mesh_file >> attribute; //trash
+          }
+          std::string trash;
+					for (auto nt = 1; nt < ntags; nt++)
+					{
+            mesh_file >> trash;
 					}
-					//mesh_file >> itrash;	//attribute=
-                                        if(attribute == 0) attribute = 1; // Cant have a 0 attribute
+          if(attribute == 0) attribute = 1; // Cant have a 0 attribute
 
 					switch (itype)
 					{
@@ -154,11 +162,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolygon.count(attribute) == 0)
 						{
-							grplabel= "POLYGON_GROUP_" + std::to_string(attribute);
+							grplabel= "POLYGON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute];
+							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute] + "_" + std::to_string(attribute);
 						}
 
 						mesh->addPolygon(elementType, nPolygon, grplabel, vertexTemp3);
@@ -178,11 +186,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolygon.count(attribute) == 0)
 						{
-							grplabel = "POLYGON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYGON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute];
+							grplabel = "POLYGON_GROUP_" + m_TagNamePolygon[attribute] + "_" + std::to_string(attribute);
 						}
 
 						mesh->addPolygon(elementType, nPolygon, grplabel, vertexTemp4);
@@ -202,11 +210,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)
 						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYHEDRON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
+							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute] + "_" +  std::to_string(attribute);
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp4);
@@ -230,11 +238,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)
 						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYHEDRON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
+							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute] + "_" +  std::to_string(attribute);
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp8);
@@ -256,11 +264,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)
 						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYHEDRON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
+							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute] + "_" +  std::to_string(attribute);
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp6);
@@ -281,11 +289,11 @@ namespace PAMELA
 						//Find group label
 						if (m_TagNamePolyhedron.count(attribute) == 0)
 						{
-							grplabel = "POLYHEDRON_GROUP_" + std::to_string(attribute);
+							grplabel = "POLYHEDRON_GROUP_DEFAULT_" + std::to_string(attribute);
 						}
 						else
 						{
-							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute];
+							grplabel = "POLYHEDRON_GROUP_" + m_TagNamePolyhedron[attribute] + "_" +  std::to_string(attribute);
 						}
 
 						mesh->addPolyhedron(elementType, nPolyhedron, grplabel, vertexTemp5);
@@ -356,9 +364,9 @@ namespace PAMELA
                                 props_double->ReferenceProperty( ppt_name, static_cast< VARIABLE_DIMENSION >(nb_components));
                                 std::vector< double > ppt_vector(nb_values * nb_components);
                                 ASSERT(static_cast<int>(props_double->get_Owner()->size_owned()) == nb_values, "Wrong property size");
-                                int trash;
+                                int index;
                                 for(int i = 0 ; i < nb_values ; i++) {
-                                  mesh_file >> trash;
+                                  mesh_file >> index;
                                   for( int j = 0; j < nb_components; j++)
                                   {
                                     mesh_file  >> ppt_vector[i*nb_components + j];   

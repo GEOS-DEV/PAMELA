@@ -115,6 +115,8 @@ namespace PAMELA {
       for (auto& mesh_prop : mesh_props)
       {
         auto values = mesh_prop.second;
+        std::cout <<Communicator::worldRank() << " >> VALUES SIZE OWNED" << values.size_owned() << std::endl;
+        std::cout <<Communicator::worldRank() << " >> VALUES SIZE GHOST" << values.size_ghost() << std::endl;
         auto dim = mesh->get_PolyhedronProperty_double()->GetProperty_dimension(mesh_prop.first);
         int dimInt = static_cast< int >( dim );
         auto var = curPart->AddVariable( dim, VARIABLE_LOCATION::PER_CELL,mesh_prop.first);
@@ -134,7 +136,15 @@ namespace PAMELA {
             auto globalIndex = cellPtr->get_globalIndex();
             for(int i = 0; i < dimInt; i++)
             {
-              values_in_part[localIndex2*dimInt+i] = values[globalIndex*dimInt+i];
+              values_in_part[localIndex2*dimInt+i] = values[localIndex2*dimInt+i];
+              if( mesh_prop.first == "PORO" )
+              {
+                std::cout << Communicator::worldRank() << " >> localIndex2 " << localIndex2 << std::endl;
+                std::cout << Communicator::worldRank() << " >> dimint " << dimInt << std::endl;
+                std::cout << Communicator::worldRank() << " >> globalIndex " << globalIndex << std::endl;
+                std::cout << Communicator::worldRank() << " >> i " << i << std::endl;
+                std::cout << Communicator::worldRank() << " >> putting " <<  values[globalIndex*dimInt+i] << " in " << localIndex2*dimInt+i << std::endl;
+              }
             }
           }
         }

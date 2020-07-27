@@ -107,7 +107,17 @@ namespace PAMELA {
       }
     }
     FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYHEDRON", &partMap);
+    int offset = 0;
+    std::vector< int > offsets(partMap.size() + 1, 0);
+    for( auto& part : partMap )
+    {
+      offsets[part.second->LocalIndex+1] = static_cast<int>(part.second->Collection->size_owned());
+    }
 
+    for(int i = 1 ; i < static_cast<int>( offsets.size() ); i++)
+    {
+      offsets[i] = offsets[i-1] + offsets[i];
+    }
     auto mesh_props = mesh->get_PolyhedronProperty_double()->get_PropertyMap();
     for( auto& part : partMap )
     {
@@ -115,8 +125,8 @@ namespace PAMELA {
       for (auto& mesh_prop : mesh_props)
       {
         auto values = mesh_prop.second;
-        std::cout <<Communicator::worldRank() << " >> VALUES SIZE OWNED" << values.size_owned() << std::endl;
-        std::cout <<Communicator::worldRank() << " >> VALUES SIZE GHOST" << values.size_ghost() << std::endl;
+        //std::cout <<Communicator::worldRank() << " >> VALUES SIZE OWNED" << values.size_owned() << std::endl;
+        //std::cout <<Communicator::worldRank() << " >> VALUES SIZE GHOST" << values.size_ghost() << std::endl;
         auto dim = mesh->get_PolyhedronProperty_double()->GetProperty_dimension(mesh_prop.first);
         int dimInt = static_cast< int >( dim );
         auto var = curPart->AddVariable( dim, VARIABLE_LOCATION::PER_CELL,mesh_prop.first);
@@ -133,20 +143,21 @@ namespace PAMELA {
           {
             auto cellPtr = *(cellItr);
             auto localIndex2 = cellPtr->get_localIndex();
-            auto globalIndex = cellPtr->get_globalIndex();
+            //auto globalIndex = cellPtr->get_globalIndex();
             for(int i = 0; i < dimInt; i++)
             {
-              values_in_part[localIndex2*dimInt+i] = values[localIndex2*dimInt+i];
+              values_in_part[localIndex2*dimInt+i] = values[localIndex2*dimInt+i + dimInt*offsets[curPart->Index]];
               if( mesh_prop.first == "PORO" )
               {
-                std::cout << Communicator::worldRank() << " >> localIndex2 " << localIndex2 << std::endl;
-                std::cout << Communicator::worldRank() << " >> dimint " << dimInt << std::endl;
-                std::cout << Communicator::worldRank() << " >> globalIndex " << globalIndex << std::endl;
-                std::cout << Communicator::worldRank() << " >> i " << i << std::endl;
-                std::cout << Communicator::worldRank() << " >> putting " <<  values[globalIndex*dimInt+i] << " in " << localIndex2*dimInt+i << std::endl;
+                //std::cout << Communicator::worldRank() << " >> localIndex2 " << localIndex2 << std::endl;
+                //std::cout << Communicator::worldRank() << " >> dimint " << dimInt << std::endl;
+                //std::cout << Communicator::worldRank() << " >> globalIndex " << globalIndex << std::endl;
+                //std::cout << Communicator::worldRank() << " >> i " << i << std::endl;
+                //std::cout << Communicator::worldRank() << " >> putting " <<  values[globalIndex*dimInt+i] << " in " << localIndex2*dimInt+i << std::endl;
               }
             }
           }
+          offset += cellBlockPtr->SubCollection.size_owned() * dimInt;
         }
         var->set_data(values_in_part.begin(), values_in_part.end());
       }

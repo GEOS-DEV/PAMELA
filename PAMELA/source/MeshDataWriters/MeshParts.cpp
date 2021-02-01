@@ -86,6 +86,8 @@ namespace PAMELA {
     auto polyhedronCollection = mesh->get_PolyhedronCollection();
     auto ActiveGroupMapPolyhedron = polyhedronCollection->get_ActiveGroupsMap();
 
+    std::map< int, int > groupIndexToPosition; 
+    
     //--Add active parts
     for (auto it = ActiveGroupMapPolyhedron.begin(); it != ActiveGroupMapPolyhedron.end(); ++it)	//Loop over group and act on active groups
     {
@@ -102,16 +104,17 @@ namespace PAMELA {
            grplabelArray.push_back( temp );
         int grpIndex = std::stoi(grplabelArray[grplabelArray.size() -1] ) -1;
         auto groupEnsemble = polyhedronCollection->get_Group(grplabel);
+        auto labelToPositionMap = polyhedronCollection->get_labelToPositionMap();
+        groupIndexToPosition[grpIndex] = labelToPositionMap.at( grplabel ); 
         partMap[grplabel] = new Part<Polyhedron*>(grplabel, grpIndex, grpIndex, groupEnsemble);
         partIndex++;
       }
     }
     FillParts("PART" + PartitionNumberForExtension() + "_" + "POLYHEDRON", &partMap);
-    int offset = 0;
     std::vector< int > offsets(partMap.size() + 1, 0);
     for( auto& part : partMap )
     {
-      offsets[part.second->LocalIndex+1] = static_cast<int>(part.second->Collection->size_owned());
+      offsets[groupIndexToPosition.at(part.second->Index)+1] = static_cast<int>(part.second->Collection->size_owned());
     }
 
     for(int i = 1 ; i < static_cast<int>( offsets.size() ); i++)
@@ -125,8 +128,6 @@ namespace PAMELA {
       for (auto& mesh_prop : mesh_props)
       {
         auto values = mesh_prop.second;
-        //std::cout <<Communicator::worldRank() << " >> VALUES SIZE OWNED" << values.size_owned() << std::endl;
-        //std::cout <<Communicator::worldRank() << " >> VALUES SIZE GHOST" << values.size_ghost() << std::endl;
         auto dim = mesh->get_PolyhedronProperty_double()->GetProperty_dimension(mesh_prop.first);
         int dimInt = static_cast< int >( dim );
         auto var = curPart->AddVariable( dim, VARIABLE_LOCATION::PER_CELL,mesh_prop.first);
@@ -143,21 +144,11 @@ namespace PAMELA {
           {
             auto cellPtr = *(cellItr);
             auto localIndex2 = cellPtr->get_localIndex();
-            //auto globalIndex = cellPtr->get_globalIndex();
             for(int i = 0; i < dimInt; i++)
             {
-              values_in_part[localIndex2*dimInt+i] = values[localIndex2*dimInt+i + dimInt*offsets[curPart->Index]];
-              if( mesh_prop.first == "PORO" )
-              {
-                //std::cout << Communicator::worldRank() << " >> localIndex2 " << localIndex2 << std::endl;
-                //std::cout << Communicator::worldRank() << " >> dimint " << dimInt << std::endl;
-                //std::cout << Communicator::worldRank() << " >> globalIndex " << globalIndex << std::endl;
-                //std::cout << Communicator::worldRank() << " >> i " << i << std::endl;
-                //std::cout << Communicator::worldRank() << " >> putting " <<  values[globalIndex*dimInt+i] << " in " << localIndex2*dimInt+i << std::endl;
-              }
+              values_in_part[localIndex2*dimInt+i] = values[localIndex2*dimInt+i + dimInt*offsets[groupIndexToPosition.at(part.second->Index)]];
             }
           }
-          offset += cellBlockPtr->SubCollection.size_owned() * dimInt;
         }
         var->set_data(values_in_part.begin(), values_in_part.end());
       }

@@ -205,10 +205,11 @@ namespace PAMELA
 		}
 
 		//Groups
-		void addAndCreateGroup(std::string label) { m_labelToGroup[label] = new ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>(); }
+		void addAndCreateGroup(std::string label) { int const size = m_labelToGroup.size(); m_labelToGroup[label] = new ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>(); m_labelToPosition[label] = size;}
 		void MakeActiveGroup(std::string label) { ASSERT(groupExist(label), "The group does not exist"); m_activeGroup[label] = true; }
 		std::unordered_map<std::string, bool>& get_ActiveGroupsMap() { return m_activeGroup; }
 		std::unordered_map<std::string, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>*>& get_labelToGroupMap() { return m_labelToGroup; }
+	        std::unordered_map<std::string, int>& get_labelToPositionMap() { return m_labelToPosition; }
 		ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>* get_Group(std::string label) { ASSERT(groupExist(label), "The group does not exist"); return m_labelToGroup.at(label); }
 
 		//Parallel
@@ -222,6 +223,7 @@ namespace PAMELA
 		//Groups
 		bool groupExist(std::string label) { return m_labelToGroup.count(label) == 1; }
 		std::unordered_map<std::string, ElementEnsemble<T, ElementHash<T>, ElementEqual<T>>*> m_labelToGroup;
+ 	        std::unordered_map<std::string, int> m_labelToPosition;
 		std::unordered_map<std::string, bool> m_activeGroup;
 
 	};

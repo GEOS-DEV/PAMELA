@@ -1,6 +1,6 @@
 if(ENABLE_MPI)
    find_package(METIS REQUIRED)
-   blt_register_library(NAME METIS
+   blt_import_library(NAME metis
                      INCLUDES ${METIS_INCLUDE_PATH}
                      TREAT_INCLUDES_AS_SYSTEM ON
                      LIBRARIES ${METIS_LIBRARIES})
@@ -9,7 +9,7 @@ endif()
 #VTK
 if(PAMELA_WITH_VTK)
   find_package(VTK REQUIRED COMPONENTS vtkParallelMPI vtkIOParallelXML)
-   blt_register_library(NAME VTK
+   blt_import_library(NAME vtk
                      INCLUDES ${VTK_INCLUDE_DIRS}
                      TREAT_INCLUDES_AS_SYSTEM ON
                      LIBRARIES ${VTK_LIBRARIES}

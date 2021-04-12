@@ -19,8 +19,8 @@ set(${PROJECT_NAME}_INCLUDE_DIRS ${PROJECT_INC_DIR}
     CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
 
 if(${ENABLE_MPI})
-  set(PAMELA_dependencies_list ${PAMELA_dependencies_list} MPI)
-  set(PAMELA_dependencies_list ${PAMELA_dependencies_list} METIS)
+  set(PAMELA_dependencies_list ${PAMELA_dependencies_list} mpi)
+  set(PAMELA_dependencies_list ${PAMELA_dependencies_list} metis)
   set(PAMELA_definitions_list ${PAMELA_definitions_list} "-DWITH_MPI")
   set(PAMELA_definitions_list ${PAMELA_definitions_list} "-DWITH_METIS")
 endif(${ENABLE_MPI})
